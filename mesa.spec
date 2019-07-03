@@ -58,9 +58,6 @@
 
 %global sanitize 1
 
-%global commit 35734129819ca7795adb9145123eb4eafea3a562
-%global shortcommit %(c=%{commit}; echo ${c:0:7})
-
 Name:           mesa
 Summary:        Mesa with the ACO compiler patchset, git version
 Version:        19.2.0
@@ -373,7 +370,7 @@ Headers for development with the Vulkan API.
 
 %prep
 %setup -q -c
-%autosetup -n mesa-%{shortcommit} -p1
+%autosetup -n mesa-master -p1
 cp %{SOURCE1} docs/
 
 cp %{SOURCE2} .
@@ -396,7 +393,6 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -D b_ndebug=true \
   -D buildtype=plain \
   --wrap-mode=nofallback \
-  -D sysconfdir=/etc \
   -D platforms=x11,wayland,drm,surfaceless \
   -D dri-drivers=i915,i965,r200,r100,nouveau \
   -D gallium-drivers=r300,r600,radeonsi,nouveau,svga,swrast,virgl,iris \
