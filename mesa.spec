@@ -390,12 +390,13 @@ export CXXFLAGS="$CXXFLAGS -falign-functions=32 -fno-semantic-interposition $LTO
 export LDFLAGS="$LDFLAG0S -flto=8 "
 
 %meson -Dcpp_std=gnu++11 \
-  -D b_ndebug=true \
-  -D buildtype=plain \
-  --wrap-mode=nofallback \
   -D platforms=x11,wayland,drm,surfaceless \
-  -D dri-drivers=i915,i965,r200,r100,nouveau \
-  -D gallium-drivers=r300,r600,radeonsi,nouveau,svga,swrast,virgl,iris \
+  -D dri-drivers=%{?dri_drivers} \
+%if 0%{?with_hardware}
+  -D gallium-drivers=swrast,virgl,r300,nouveau%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi,r600}%{?with_iris:,iris}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost} \
+%else
+  -D gallium-drivers=swrast,virgl \
+%endif
   -D vulkan-drivers=amd,intel \
   -D dri3=true \
   -D egl=true \
