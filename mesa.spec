@@ -680,5 +680,8 @@ popd
 %endif
 
 %changelog
+* Thu Jul 04 2019 Mihai Vultur <xanto@egaming.ro>
+- Modified to point to Valve's Radeon ACO compiler patches from https://github.com/daniel-schuermann/mesa.
+
 * Mon Oct 10 2016 Rudolf Kastl <rudolf@redhat.com>
 - Synced with Leighs spec.
