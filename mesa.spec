@@ -409,7 +409,7 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -D gallium-xa=true \
   -D gallium-xvmc=false \
   -D gbm=true \
-  -D gles1=true \
+  -D gles1=false \
   -D gles2=true \
   -D glvnd=true \
   -D glx=dri \
