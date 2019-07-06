@@ -1,13 +1,10 @@
-%define build_timestamp %(date +"%Y%m%d")
+%global build_timestamp %(date +"%Y%m%d")
+%global build_repo https://github.com/daniel-schuermann/mesa
 
-%global branch master
+%global build_branch master
 
-%global maj_ver 19
-%global min_ver 2
-%global patch_ver 0
-%global commit backend
-%global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global gitrel .%{build_timestamp}.git%{shortcommit}
+%define build_shortcommit %(git ls-remote %{build_repo} | grep "refs/heads/%{build_branch}" | cut -c1-8)
+%define build_version %(curl -s https://raw.githubusercontent.com/daniel-schuermann/mesa/master/VERSION | grep -oP '[0-9.]+')
 
 
 ### LTO and debugpackages are not working together
@@ -70,14 +67,13 @@
 
 Name:           mesa
 Summary:        Mesa with the ACO compiler patchset, git version
-Version:        %{maj_ver}.%{min_ver}.%{patch_ver}
-#Release: 	%{build_timestamp}
-Release:        0.1%{?gitrel}%{?dist}
+Version:	%{build_version}
+Release: 	%{build_timestamp}.%{build_shortcommit}
 
 License:        MIT
 URL:            http://www.mesa3d.org
 
-Source0:        https://github.com/daniel-schuermann/mesa/archive/%{branch}.zip
+Source0:        %{build_repo}/archive/%{build_branch}.zip
 # src/gallium/auxiliary/postprocess/pp_mlaa* have an ... interestingly worded license.
 # Source1 contains email correspondence clarifying the license terms.
 # Fedora opts to ignore the optional part of clause 2 and treat that code as 2 clause BSD.
@@ -382,7 +378,7 @@ Headers for development with the Vulkan API.
 
 %prep
 %setup -q -c
-%autosetup -n mesa-%{branch} -p1
+%autosetup -n mesa-%{build_branch} -p1
 cp %{SOURCE1} docs/
 
 cp %{SOURCE2} .
@@ -691,6 +687,9 @@ popd
 %endif
 
 %changelog
+* Sun Jul 07 2019 Mihai Vultur <xanto@egaming.ro>
+- Implement some version autodetection to reduce maintenance work.
+
 * Thu Jul 04 2019 Mihai Vultur <xanto@egaming.ro>
 - Modified to point to Valve's Radeon ACO compiler patches from https://github.com/daniel-schuermann/mesa.
 
