@@ -1,5 +1,15 @@
 %define build_timestamp %(date +"%Y%m%d")
 
+%global branch master
+
+%global maj_ver 19
+%global min_ver 2
+%global patch_ver 0
+%global commit backend
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
+%global gitrel .%{build_timestamp}.git%{shortcommit}
+
+
 ### LTO and debugpackages are not working together
 %if 0%{?fedora} >= 27
 %global debug_package %{nil}
@@ -60,13 +70,14 @@
 
 Name:           mesa
 Summary:        Mesa with the ACO compiler patchset, git version
-Version:        19.2.0
-Release: 	%{build_timestamp}
+Version:        %{maj_ver}.%{min_ver}.%{patch_ver}
+#Release: 	%{build_timestamp}
+Release:        0.1%{?gitrel}%{?dist}
 
 License:        MIT
 URL:            http://www.mesa3d.org
 
-Source0:        https://github.com/daniel-schuermann/mesa/archive/master.zip
+Source0:        https://github.com/daniel-schuermann/mesa/archive/%{branch}.zip
 # src/gallium/auxiliary/postprocess/pp_mlaa* have an ... interestingly worded license.
 # Source1 contains email correspondence clarifying the license terms.
 # Fedora opts to ignore the optional part of clause 2 and treat that code as 2 clause BSD.
@@ -371,7 +382,7 @@ Headers for development with the Vulkan API.
 
 %prep
 %setup -q -c
-%autosetup -n mesa-master -p1
+%autosetup -n mesa-%{branch} -p1
 cp %{SOURCE1} docs/
 
 cp %{SOURCE2} .
