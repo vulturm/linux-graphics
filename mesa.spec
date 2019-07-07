@@ -1,4 +1,4 @@
-%global build_timestamp %(date +"%Y%m%d")
+%global build_timestamp %(date +"%Y%m%d.%H")
 %global build_repo https://github.com/daniel-schuermann/mesa
 
 %global build_branch master
