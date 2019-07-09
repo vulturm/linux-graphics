@@ -114,7 +114,8 @@ Utility programs for the kernel DRM interface.  Will void your warranty.
 %endif
 
 %prep
-%autosetup -p1
+%setup -q -c
+%autosetup -n drm-%{build_branch} -p1
 
 %build
 %meson \
