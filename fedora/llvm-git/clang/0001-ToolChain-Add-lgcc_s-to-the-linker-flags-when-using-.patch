@@ -1,0 +1,50 @@
+From 09ae3ef5710a89505318ec721c65b6c838147276 Mon Sep 17 00:00:00 2001
+From: Tom Stellard <tstellar@redhat.com>
+Date: Thu, 7 Feb 2019 21:05:37 -0800
+Subject: [PATCH] ToolChain: Add -lgcc_s to the linker flags when using libc++
+
+The libc++ build for Fedora does not include an implementation of
+libunwind, so we need to explicitly link against something that
+provides this implementation.
+---
+ clang/lib/Driver/ToolChain.cpp | 1 +
+ clang/test/Driver/netbsd.cpp   | 4 ++--
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/lib/Driver/ToolChain.cpp b/lib/Driver/ToolChain.cpp
+index 88a627e..cb99844 100644
+--- a/lib/Driver/ToolChain.cpp
++++ b/lib/Driver/ToolChain.cpp
+@@ -767,6 +767,7 @@ void ToolChain::AddCXXStdlibLibArgs(const ArgList &Args,
+   switch (Type) {
+   case ToolChain::CST_Libcxx:
+     CmdArgs.push_back("-lc++");
++    CmdArgs.push_back("-lgcc_s");
+     break;
+ 
+   case ToolChain::CST_Libstdcxx:
+diff --git a/test/Driver/netbsd.cpp b/test/Driver/netbsd.cpp
+index 4af7d83..ff18c62 100644
+--- a/test/Driver/netbsd.cpp
++++ b/test/Driver/netbsd.cpp
+@@ -131,7 +131,7 @@
+ // ARM-7: clang{{.*}}" "-cc1" "-triple" "armv5e-unknown-netbsd7.0.0-eabi"
+ // ARM-7: ld{{.*}}" "--eh-frame-hdr" "-dynamic-linker" "/libexec/ld.elf_so"
+ // ARM-7: "-o" "a.out" "{{.*}}/usr/lib{{/|\\\\}}crt0.o" "{{.*}}/usr/lib{{/|\\\\}}eabi{{/|\\\\}}crti.o"
+-// ARM-7: "{{.*}}/usr/lib{{/|\\\\}}crtbegin.o" "{{.*}}.o" "-lc++" "-lm" "-lc"
++// ARM-7: "{{.*}}/usr/lib{{/|\\\\}}crtbegin.o" "{{.*}}.o" "-lc++" "-lgcc_s" "-lm" "-lc"
+ // ARM-7: "{{.*}}/usr/lib{{/|\\\\}}crtend.o" "{{.*}}/usr/lib{{/|\\\\}}crtn.o"
+ 
+ // AARCH64: clang{{.*}}" "-cc1" "-triple" "aarch64-unknown-netbsd"
+@@ -250,7 +250,7 @@
+ // S-ARM-7: clang{{.*}}" "-cc1" "-triple" "armv5e-unknown-netbsd7.0.0-eabi"
+ // S-ARM-7: ld{{.*}}" "--eh-frame-hdr" "-Bstatic"
+ // S-ARM-7: "-o" "a.out" "{{.*}}/usr/lib{{/|\\\\}}crt0.o" "{{.*}}/usr/lib{{/|\\\\}}eabi{{/|\\\\}}crti.o"
+-// S-ARM-7: "{{.*}}/usr/lib{{/|\\\\}}crtbegin.o" "{{.*}}.o" "-lc++" "-lm" "-lc"
++// S-ARM-7: "{{.*}}/usr/lib{{/|\\\\}}crtbegin.o" "{{.*}}.o" "-lc++" "-lgcc_s" "-lm" "-lc"
+ // S-ARM-7: "{{.*}}/usr/lib{{/|\\\\}}crtend.o" "{{.*}}/usr/lib{{/|\\\\}}crtn.o"
+ 
+ // S-AARCH64: clang{{.*}}" "-cc1" "-triple" "aarch64-unknown-netbsd"
+-- 
+1.8.3.1
+

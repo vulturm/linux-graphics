@@ -1,0 +1,22 @@
+diff -ur clang/include/clang/CodeGen/CGFunctionInfo.h clang-new/include/clang/CodeGen/CGFunctionInfo.h
+--- clang/include/clang/CodeGen/CGFunctionInfo.h	2019-05-20 13:59:14.780265656 +0200
++++ clang-new/include/clang/CodeGen/CGFunctionInfo.h	2019-05-22 22:40:49.432463864 +0200
+@@ -110,13 +110,13 @@
+   }
+ 
+   ABIArgInfo(Kind K)
+-      : TheKind(K), PaddingInReg(false), InReg(false) {
+-  }
++      : TypeData(nullptr), PaddingType(nullptr), DirectOffset(0),
++        TheKind(K), PaddingInReg(false), InAllocaSRet(false), IndirectByVal(false),
++        IndirectRealign(false), SRetAfterThis(false), InReg(false),
++        CanBeFlattened(false), SignExt(false) {}
+ 
+ public:
+-  ABIArgInfo()
+-      : TypeData(nullptr), PaddingType(nullptr), DirectOffset(0),
+-        TheKind(Direct), PaddingInReg(false), InReg(false) {}
++  ABIArgInfo() : ABIArgInfo(Direct) {}
+ 
+   static ABIArgInfo getDirect(llvm::Type *T = nullptr, unsigned Offset = 0,
+                               llvm::Type *Padding = nullptr,
