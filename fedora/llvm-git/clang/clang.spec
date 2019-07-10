@@ -1,15 +1,12 @@
 %global build_timestamp %(date +"%Y%m%d.%H")
-%global build_repo https://github.com/llvm/llvm-project
+%global build_project llvm-project
+%global build_repo https://github.com/llvm/%{build_project}
 
 %global build_branch master
 
 %define build_shortcommit %(git ls-remote %{build_repo} | grep "refs/heads/%{build_branch}" | cut -c1-8)
 
-
 %global compat_build 0
-%global svnrel r364583
-%global svnrel_clang_tools_extra r364583
-%global svnrel_test_suite r364583
 
 %global maj_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/master/llvm/CMakeLists.txt | grep LLVM_VERSION_MAJOR | grep -oP '[0-9]+')
 %global min_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/master/llvm/CMakeLists.txt | grep LLVM_VERSION_MINOR | grep -oP '[0-9]+')
@@ -68,8 +65,8 @@
 
 %global build_install_prefix %{buildroot}%{install_prefix}
 
-%global clang_srcdir %{name}-%{svnrel}
-%global clang_tools_srcdir clang-tools-extra-%{svnrel_clang_tools_extra}
+%global clang_srcdir %{name}
+%global clang_tools_srcdir clang-tools-extra
 
 Name:		%pkg_name
 Version:	%{maj_ver}.%{min_ver}.%{patch_ver}
@@ -79,9 +76,6 @@ Summary:	A C language family front-end for LLVM, built from git
 License:	NCSA
 URL:		http://llvm.org
 Source0:        %{build_repo}/archive/%{build_branch}.zip
-#%if !0%{?compat_build}
-#Source1:	http://llvm.org/releases/%{version}/%{clang_tools_srcdir}.tar.xz
-#%endif
 
 Patch4:		0002-gtest-reorg.patch
 Patch9:		0001-Fix-uninitialized-value-in-ABIArgInfo.patch
@@ -216,7 +210,11 @@ Requires:      python3
 %if 0%{?compat_build}
 %autosetup -n %{clang_srcdir} -p1
 %else
-%setup -T -q -b 1 -n %{clang_tools_srcdir}
+%autosetup -n %{build_project}-%{build_branch} -p1
+
+
+
+%setup -T -q -n %{clang_tools_srcdir}
 
 
 pathfix.py -i %{__python3} -pn \
