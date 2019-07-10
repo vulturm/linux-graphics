@@ -210,11 +210,11 @@ Requires:      python3
 %if 0%{?compat_build}
 %autosetup -n %{clang_srcdir} -p1
 %else
-%autosetup -n %{build_project}-%{build_branch} -p1
+%autosetup -n %{build_project}-%{build_branch}/%{clang_srcdir} -p1
 
 
 
-%setup -T -q -n %{clang_tools_srcdir}
+%setup -T -q -n %{build_project}-%{build_branch}/%{clang_tools_srcdir}
 
 
 pathfix.py -i %{__python3} -pn \
