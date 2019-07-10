@@ -11,9 +11,9 @@
 %global svnrel_clang_tools_extra r364583
 %global svnrel_test_suite r364583
 
-%global maj_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/master/llvm/CMakeLists.txt | grep -oP '(?<=set\(LLVM_VERSION_MAJOR )[0-9]+)
-%global min_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/master/llvm/CMakeLists.txt | grep -oP '(?<=set\(LLVM_VERSION_MINOR )[0-9]+)
-%global patch_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/master/llvm/CMakeLists.txt | grep -oP '(?<=set\(LLVM_VERSION_PATCH )[0-9]+)
+%global maj_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/master/llvm/CMakeLists.txt | grep LLVM_VERSION_MAJOR | grep -oP '[0-9]+')
+%global min_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/master/llvm/CMakeLists.txt | grep LLVM_VERSION_MINOR | grep -oP '[0-9]+')
+%global patch_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/master/llvm/CMakeLists.txt | grep LLVM_VERSION_PATCH | grep -oP '[0-9]+')
 
 %global clang_tools_binaries \
 	%{_bindir}/clangd \
