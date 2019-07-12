@@ -1,16 +1,24 @@
-%global build_timestamp %(date +"%Y%m%d.%H")
-%global build_project llvm-project
-%global build_repo https://github.com/llvm/%{build_project}
-
+%global compat_build 0
 %global build_branch master
 
-%define build_shortcommit %(git ls-remote %{build_repo} | grep "refs/heads/%{build_branch}" | cut -c1-8)
+%global clang_build_repo https://github.com/llvm-mirror/clang
+%global tools_build_repo https://github.com/llvm-mirror/clang-tools-extra
 
-%global compat_build 0
+%global maj_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_MAJOR | grep -oP '[0-9]+')
+%global min_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_MINOR | grep -oP '[0-9]+')
+%global patch_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_PATCH | grep -oP '[0-9]+')
 
-%global maj_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/master/llvm/CMakeLists.txt | grep LLVM_VERSION_MAJOR | grep -oP '[0-9]+')
-%global min_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/master/llvm/CMakeLists.txt | grep LLVM_VERSION_MINOR | grep -oP '[0-9]+')
-%global patch_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/master/llvm/CMakeLists.txt | grep LLVM_VERSION_PATCH | grep -oP '[0-9]+')
+%define commit %(git ls-remote %{clang_build_repo} | grep -w "refs/heads/%{build_branch}" | awk '{print $1}')
+%define tools_commit %(git ls-remote %{tools_build_repo} | grep -w "refs/heads/%{build_branch}" | awk '{print $1}')
+
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
+%global commit_date %(date +"%Y%m%d.%H")
+
+%global gitrel .%{commit_date}.git%{shortcommit}
+%global _default_patch_fuzz 2
+
+
+
 
 %global clang_tools_binaries \
 	%{_bindir}/clangd \
@@ -22,8 +30,7 @@
 	%{_bindir}/clang-reorder-fields \
 	%{_bindir}/clang-rename \
 	%{_bindir}/clang-tidy \
-        %{_bindir}/clang-doc \
-        %{_bindir}/clang-scan-deps 
+        %{_bindir}/clang-doc
 
 %global clang_binaries \
 	%{_bindir}/clang \
@@ -65,21 +72,26 @@
 
 %global build_install_prefix %{buildroot}%{install_prefix}
 
-%global clang_srcdir %{name}
-%global clang_tools_srcdir clang-tools-extra
+%global clang_srcdir %{name}-%{commit}
+%global clang_tools_srcdir clang-tools-extra-%{tools_commit}
 
-Name:		%pkg_name
+Name:		%{pkg_name}
 Version:	%{maj_ver}.%{min_ver}.%{patch_ver}
-Release:	%{build_timestamp}.%{build_shortcommit}
-Summary:	A C language family front-end for LLVM, built from git
+Release:	0.1%{?gitrel}%{?dist}
+Summary:	A C language family front-end for LLVM
 
 License:	NCSA
-URL:		http://llvm.org
-Source0:        %{build_repo}/archive/%{build_branch}.zip
+URL:		https://github.com/llvm-mirror/
+Source0:	%url/%{name}/archive/%{commit}.tar.gz#/%{clang_srcdir}.tar.gz
+%if !0%{?compat_build}
+Source1:	%url/clang-tools-extra/archive/%{tools_commit}.tar.gz#/%{clang_tools_srcdir}.tar.gz
+%endif
 
 Patch4:		0002-gtest-reorg.patch
 Patch9:		0001-Fix-uninitialized-value-in-ABIArgInfo.patch
+Patch10:	0001-Workaround-GCC-9-bug-when-handling-bitfields.patch
 Patch11:	0001-ToolChain-Add-lgcc_s-to-the-linker-flags-when-using-.patch
+
 
 BuildRequires:	gcc
 BuildRequires:	gcc-c++
@@ -210,26 +222,19 @@ Requires:      python3
 %if 0%{?compat_build}
 %autosetup -n %{clang_srcdir} -p1
 %else
-ls -al
-pwd
+%setup -T -q -b 1 -n %{clang_tools_srcdir}
 
-%setup -D -q -n %{build_project}-%{build_branch}/%{clang_tools_srcdir}
-pwd
-ls -al
 
 pathfix.py -i %{__python3} -pn \
 	clang-tidy/tool/*.py \
 	clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py
 
-%setup -D -T -q -n %{build_project}-%{build_branch}/%{clang_srcdir}
-ls -al
-pwd
-
+%setup -q -n %{clang_srcdir}
 
 %patch4 -p1 -b .gtest
 %patch9 -p1 -b .abi-arginfo
+%patch10 -p1 -b .bitfields
 %patch11 -p1 -b .libcxx-fix
-
 
 mv ../%{clang_tools_srcdir} tools/extra
 
@@ -259,7 +264,7 @@ cd _build
 %cmake .. -G Ninja \
 	-DLLVM_PARALLEL_LINK_JOBS=1 \
 	-DLLVM_LINK_LLVM_DYLIB:BOOL=ON \
-	-DCMAKE_BUILD_TYPE=Release \
+	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 	-DPYTHON_EXECUTABLE=%{__python3} \
 	-DCMAKE_SKIP_RPATH:BOOL=ON \
 	-DCMAKE_INSTALL_RPATH:BOOL=OFF \
@@ -289,11 +294,11 @@ cd _build
 	-DLLVM_BUILD_DOCS=ON \
 	-DLLVM_ENABLE_SPHINX=ON \
 	-DSPHINX_WARNINGS_AS_ERRORS=OFF \
+        -DLLVM_USE_LINKER=gold \
 	\
 	-DCLANG_BUILD_EXAMPLES:BOOL=OFF \
 	-DCLANG_REPOSITORY_STRING="%{?fedora:Fedora}%{?rhel:Red Hat} %{version}-%{release}"
 
-### trying to limit to one job to hopefully not exhaust memory
 ninja -v
 
 %install
@@ -342,7 +347,7 @@ ln -s clang.1.gz %{buildroot}%{_mandir}/man1/clang++.1.gz
 ln -s clang.1.gz %{buildroot}%{_mandir}/man1/clang-%{maj_ver}.1.gz
 ln -s clang.1.gz %{buildroot}%{_mandir}/man1/clang++-%{maj_ver}.1.gz
 
-# Add clang++-{version} symlink
+# Add clang++-{version} sylink
 ln -s clang++ %{buildroot}%{_bindir}/clang++-%{maj_ver}
 
 
