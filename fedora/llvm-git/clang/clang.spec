@@ -212,12 +212,8 @@ Requires:      python3
 %else
 ls -al
 pwd
-%autosetup -n %{build_project}-%{build_branch}/%{clang_srcdir} -p1
-pwd
-ls -al
 
-
-%setup -T -q -n %{build_project}-%{build_branch}/%{clang_tools_srcdir}
+%setup -D -q -n %{build_project}-%{build_branch}/%{clang_tools_srcdir}
 pwd
 ls -al
 
@@ -225,7 +221,10 @@ pathfix.py -i %{__python3} -pn \
 	clang-tidy/tool/*.py \
 	clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py
 
-%setup -q -n %{clang_srcdir}
+%setup -D -T -q -n %{build_project}-%{build_branch}/%{clang_srcdir}
+ls -al
+pwd
+
 
 %patch4 -p1 -b .gtest
 %patch9 -p1 -b .abi-arginfo
