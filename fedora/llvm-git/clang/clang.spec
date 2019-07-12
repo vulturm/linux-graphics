@@ -210,12 +210,16 @@ Requires:      python3
 %if 0%{?compat_build}
 %autosetup -n %{clang_srcdir} -p1
 %else
+ls -al
+pwd
 %autosetup -n %{build_project}-%{build_branch}/%{clang_srcdir} -p1
-
+pwd
+ls -al
 
 
 %setup -T -q -n %{build_project}-%{build_branch}/%{clang_tools_srcdir}
-
+pwd
+ls -al
 
 pathfix.py -i %{__python3} -pn \
 	clang-tidy/tool/*.py \
