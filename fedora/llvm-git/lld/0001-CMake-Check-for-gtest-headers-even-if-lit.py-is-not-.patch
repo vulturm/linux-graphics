@@ -1,0 +1,47 @@
+From e5bdf4580677da063abe8d3880fbab9eaa7a7efe Mon Sep 17 00:00:00 2001
+From: Tom Stellard <tstellar@redhat.com>
+Date: Thu, 30 Aug 2018 08:53:56 -0700
+Subject: [PATCH] CMake: Check for gtest headers even if lit.py is not present
+
+This makes it possible to build the unittests even withotu a full
+checkout of the llvm source tree.
+---
+ CMakeLists.txt | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e2fbdbf..c9b2927 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -75,6 +75,15 @@ Please install Python or specify the PYTHON_EXECUTABLE CMake variable.")
+       set(LLVM_UTILS_PROVIDED ON)
+     endif()
+ 
++		# Check for gtest
++    set(UNITTEST_DIR ${LLVM_MAIN_SRC_DIR}/utils/unittest)
++    if(EXISTS ${UNITTEST_DIR}/googletest/include/gtest/gtest.h
++        AND NOT EXISTS ${LLVM_LIBRARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}gtest${CMAKE_STATIC_LIBRARY_SUFFIX}
++        AND EXISTS ${UNITTEST_DIR}/CMakeLists.txt)
++      add_subdirectory(${UNITTEST_DIR} utils/unittest)
++    endif()
++
++		# Check for lit
+     if(EXISTS ${LLVM_MAIN_SRC_DIR}/utils/lit/lit.py)
+       # Note: path not really used, except for checking if lit was found
+       set(LLVM_LIT ${LLVM_MAIN_SRC_DIR}/utils/lit/lit.py)
+@@ -84,12 +93,6 @@ Please install Python or specify the PYTHON_EXECUTABLE CMake variable.")
+         set(LLVM_UTILS_PROVIDED ON)
+         set(LLD_TEST_DEPS FileCheck not)
+       endif()
+-      set(UNITTEST_DIR ${LLVM_MAIN_SRC_DIR}/utils/unittest)
+-      if(EXISTS ${UNITTEST_DIR}/googletest/include/gtest/gtest.h
+-          AND NOT EXISTS ${LLVM_LIBRARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}gtest${CMAKE_STATIC_LIBRARY_SUFFIX}
+-          AND EXISTS ${UNITTEST_DIR}/CMakeLists.txt)
+-        add_subdirectory(${UNITTEST_DIR} utils/unittest)
+-      endif()
+     else()
+       # Seek installed Lit.
+       find_program(LLVM_LIT
+-- 
+1.8.3.1
+
