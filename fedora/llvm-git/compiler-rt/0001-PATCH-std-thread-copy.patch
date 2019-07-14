@@ -1,0 +1,28 @@
+diff -ru compiler-rt-8.0.0rc1.src.orig/lib/fuzzer/FuzzerDefs.h compiler-rt-8.0.0rc1.src/lib/fuzzer/FuzzerDefs.h
+--- compiler-rt-8.0.0rc1.src.orig/lib/fuzzer/FuzzerDefs.h	2019-01-09 21:46:09.000000000 +0000
++++ compiler-rt-8.0.0rc1.src/lib/fuzzer/FuzzerDefs.h	2019-02-12 14:03:32.971147814 +0000
+@@ -176,6 +176,12 @@
+ 
+       template<class Other>
+       struct rebind { typedef fuzzer_allocator<Other> other;  };
++
++      template< class U, class... Args >
++      void construct( U* p, Args&&... args ) {
++        std::allocator<T>::construct(p, std::forward<Args>(args)...);
++      }
++
+   };
+ 
+ template<typename T>
+diff -ru compiler-rt-8.0.0rc1.src.orig/lib/fuzzer/FuzzerDriver.cpp compiler-rt-8.0.0rc1.src/lib/fuzzer/FuzzerDriver.cpp
+--- compiler-rt-8.0.0rc1.src.orig/lib/fuzzer/FuzzerDriver.cpp	2019-01-15 22:12:51.000000000 +0000
++++ compiler-rt-8.0.0rc1.src/lib/fuzzer/FuzzerDriver.cpp	2019-02-12 13:05:15.965113872 +0000
+@@ -252,7 +252,7 @@
+   std::thread Pulse(PulseThread);
+   Pulse.detach();
+   for (unsigned i = 0; i < NumWorkers; i++)
+-    V.push_back(std::thread(WorkerThread, std::ref(Cmd), &Counter, NumJobs, &HasErrors));
++    V.emplace_back(WorkerThread, std::ref(Cmd), &Counter, NumJobs, &HasErrors);
+   for (auto &T : V)
+     T.join();
+   return HasErrors ? 1 : 0;
