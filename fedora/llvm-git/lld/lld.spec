@@ -1,6 +1,7 @@
 %global build_branch master
+%global pkg_name lld
 
-%global build_repo https://github.com/llvm-mirror/%{name}
+%global build_repo https://github.com/llvm-mirror/%{pkg_name}
 
 %global maj_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_MAJOR | grep -oP '[0-9]+')
 %global min_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_MINOR | grep -oP '[0-9]+')
@@ -12,7 +13,6 @@
 %global commit_date %(date +"%Y%m%d.%H")
 %global gitrel .%{commit_date}.git%{shortcommit}
 
-%global pkg_name lld
 
 Name:		%{pkg_name}
 Version:	%{maj_ver}.%{min_ver}.%{patch_ver}

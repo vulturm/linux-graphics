@@ -1,5 +1,7 @@
 %global build_branch master
-%global build_repo https://github.com/llvm-mirror/%{name}
+%global pkg_name compiler-rt
+
+%global build_repo https://github.com/llvm-mirror/%{pkg_name}
 
 %global maj_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_MAJOR | grep -oP '[0-9]+')
 %global min_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_MINOR | grep -oP '[0-9]+')
@@ -13,7 +15,6 @@
 %define _unpackaged_files_terminate_build 0
 %global _default_patch_fuzz 2
 
-%global pkg_name compiler-rt
 
 %ifarch s390 s390x
 # only limited set of libs available on s390(x) and the existing ones (stats, ubsan) don't provide debuginfo

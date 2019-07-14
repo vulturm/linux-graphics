@@ -1,5 +1,5 @@
 %global build_branch master
-%global build_repo https://github.com/llvm-mirror/%{name}
+%global build_repo https://github.com/llvm-mirror/libclc
 
 %global maj_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_MAJOR | grep -oP '[0-9]+')
 %global min_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_MINOR | grep -oP '[0-9]+')
