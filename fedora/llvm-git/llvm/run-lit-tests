@@ -1,0 +1,39 @@
+#!/bin/bash
+
+usage() {
+    echo "usage: `basename $0` [OPTIONS]"
+    echo "  --threads NUM       The number of threads to use for running tests."
+}
+
+threads_arg=''
+
+while [ $# -gt 0 ]; do
+    case $1 in
+        --threads)
+            shift
+            threads_arg="--threads $1"
+            ;;
+        * )
+            echo "unknown option: $1"
+            echo ""
+            usage
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+set -xe
+
+TOOLS_DIR=/usr/lib64/llvm
+cd $(mktemp -d)
+ln -s /usr/include include
+tar -xzf /usr/share/llvm/src/test.tar.gz
+PATH=$PATH:$TOOLS_DIR lit -v -s $threads_arg test \
+	-DFileCheck=$TOOLS_DIR/FileCheck \
+	-Dcount=$TOOLS_DIR/count \
+	-Dnot=$TOOLS_DIR/not \
+	-Dlli-child-target=$TOOLS_DIR/lli-child-target \
+	-Dllvm-isel-fuzzer=$TOOLS_DIR/llvm-isel-fuzzer \
+	-Dllvm-opt-fuzzer=$TOOLS_DIR/llvm-opt-fuzzer \
+	-Dyaml-bench=$TOOLS_DIR/yaml-bench
