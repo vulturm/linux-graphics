@@ -40,6 +40,7 @@
 	%{_bindir}/clang-check \
 	%{_bindir}/clang-cl \
 	%{_bindir}/clang-cpp \
+	%{_bindir}/clang-scan-deps \
 	%{_bindir}/clang-extdef-mapping \
 	%{_bindir}/clang-format \
 	%{_bindir}/clang-import-test \
