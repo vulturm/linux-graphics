@@ -3,7 +3,7 @@
 
 %global build_branch master
 
-%define build_shortcommit %(git ls-remote %{build_repo} | grep "refs/heads/%{build_branch}" | cut -c1-8)
+%define build_shortcommit %(git ls-remote %{build_repo} | grep -w "refs/heads/%{build_branch}" | cut -c1-8)
 %define build_version %(curl -s https://raw.githubusercontent.com/daniel-schuermann/mesa/master/VERSION | grep -oP '[0-9.]+')
 
 
