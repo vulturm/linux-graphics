@@ -1,0 +1,30 @@
+From 2c6c46367969edcc57e34a97dd6fd6c7ea17b32a Mon Sep 17 00:00:00 2001
+From: Dave Airlie <airlied@redhat.com>
+Date: Mon, 31 Oct 2016 13:01:06 +1000
+Subject: [PATCH] wrap more stuff for 64-bit atomics
+
+---
+ include/_pocl_opencl.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/include/_pocl_opencl.h b/include/_pocl_opencl.h
+index 944c663..be5c59f 100644
+--- a/include/_pocl_opencl.h
++++ b/include/_pocl_opencl.h
+@@ -2014,10 +2014,10 @@ void atomic_work_item_fence (cl_mem_fence_flags flags, memory_order order,
+   __IF_EA64 (_CL_DECLARE_ATOMICS_DECL (MOD, atomic_long, long))               \
+   __IF_EA64 (_CL_DECLARE_ATOMICS_DECL (MOD, atomic_ulong, ulong))             \
+   __IF_FP64 (_CL_DECLARE_ATOMICS_DECL (MOD, atomic_double, double))           \
+-  _CL_DECLARE_ATOMICS_DECL (MOD, atomic_intptr_t, intptr_t)                   \
+-  _CL_DECLARE_ATOMICS_DECL (MOD, atomic_uintptr_t, uintptr_t)                 \
+-  _CL_DECLARE_ATOMICS_DECL (MOD, atomic_ptrdiff_t, ptrdiff_t)                 \
+-  _CL_DECLARE_ATOMICS_DECL (MOD, atomic_size_t, size_t)
++  __IF_EA64(_CL_DECLARE_ATOMICS_DECL(MOD, atomic_intptr_t, intptr_t))       \
++  __IF_EA64(_CL_DECLARE_ATOMICS_DECL(MOD, atomic_uintptr_t, uintptr_t))     \
++  __IF_EA64(_CL_DECLARE_ATOMICS_DECL(MOD, atomic_ptrdiff_t, ptrdiff_t))     \
++  __IF_EA64(_CL_DECLARE_ATOMICS_DECL(MOD, atomic_size_t, size_t))
+ 
+ _CL_DECLARE_ATOMICS2 (global)
+ 
+-- 
+2.5.5
