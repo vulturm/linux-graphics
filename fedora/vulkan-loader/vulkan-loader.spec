@@ -59,7 +59,7 @@ developing applications that use %{name}.
 
 
 %prep
-%autosetup -n Vulkan-Loader-%{version}
+%autosetup -n Vulkan-Loader-sdk-%{version}
 
 
 %build

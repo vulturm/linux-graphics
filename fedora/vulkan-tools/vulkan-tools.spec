@@ -36,7 +36,7 @@ Obsoletes:      vulkan-demos < %{version}-%{release}
 Vulkan tools
 
 %prep
-%autosetup -n Vulkan-Tools-%{version}
+%autosetup -n Vulkan-Tools-sdk-%{version}
 
 
 %build
