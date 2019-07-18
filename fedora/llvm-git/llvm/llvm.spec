@@ -71,7 +71,7 @@ Summary:	The Low Level Virtual Machine
 
 License:	NCSA
 URL:		https://github.com/llvm-mirror/
-Source0:	%url/%{name}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
+Source0:	%url/%{name}/archive/%{build_branch}.tar.gz#/%{name}-%{build_branch}.tar.gz
 Source1:	run-lit-tests
 
 Patch5:		0001-PATCH-llvm-config.patch
@@ -168,7 +168,7 @@ LLVM's modified googletest sources.
 %endif
 
 %prep
-%autosetup -n %{name}-%{commit} -p1
+%autosetup -n %{name}-%{build_branch} -p1
 
 pathfix.py -i %{__python3} -pn \
 	test/BugPoint/compile-custom.ll.py \

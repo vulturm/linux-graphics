@@ -20,7 +20,7 @@ Summary:	Next generation high-performance debugger
 
 License:	NCSA
 URL:		https://github.com/llvm-mirror/
-Source0:	%url/%{name}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
+Source0:	%url/%{name}/archive/%{build_branch}.tar.gz#/%{name}-%{build_branch}.tar.gz
 
 
 BuildRequires:	cmake
@@ -62,7 +62,7 @@ The package contains the LLDB Python module.
 
 %prep
 
-%setup -q -n %{name}-%{commit}
+%setup -q -n %{name}-%{build_branch}
 
 
 # HACK so that lldb can find its custom readline.so, because we move it

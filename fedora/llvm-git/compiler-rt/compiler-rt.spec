@@ -23,7 +23,7 @@
 
 #%%global rc_ver 4
 
-%global crt_srcdir compiler-rt-%{commit}
+%global crt_srcdir compiler-rt-%{build_branch}
 
 Name:		%{pkg_name}
 Version:	%{maj_ver}.%{min_ver}.%{patch_ver}
@@ -32,7 +32,7 @@ Summary:	LLVM "compiler-rt" runtime libraries
 
 License:	NCSA or MIT
 URL:		https://github.com/llvm-mirror
-Source0:	%url/%{name}/archive/%{commit}.tar.gz#/%{crt_srcdir}.tar.gz
+Source0:	%url/%{name}/archive/%{build_branch}.tar.gz#/%{crt_srcdir}.tar.gz
 
 Patch0:		0001-PATCH-std-thread-copy.patch
 

@@ -26,7 +26,7 @@ Release:	0.1%{?gitrel}%{?dist}
 License:        MIT and BSD and (GPLv3+ or LGPLv3+)
 
 URL:            %{build_repo}
-Source0:        %url/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
+Source0:        %url/archive/%{build_branch}.tar.gz#/%{name}-%{build_branch}.tar.gz
 
 # FIXME: link
 Patch1001:      0001-wrap-more-stuff-for-64-bit-atomics.patch
@@ -83,7 +83,7 @@ Requires:       uthash-devel
 Portable Computing Language development files.
 
 %prep
-%autosetup -p1 -n %{name}-%{commit}
+%autosetup -p1 -n %{name}-%{build_branch}
 
 # Unbundle uthash
 find . -depth -name utlist* -print -delete

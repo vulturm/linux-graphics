@@ -21,7 +21,7 @@ Summary:	The LLVM Linker
 
 License:	NCSA
 URL:		https://github.com/llvm-mirror/
-Source0:	%url/%{name}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
+Source0:	%url/%{name}/archive/%{build_branch}.tar.gz#/%{name}-%{build_branch}.tar.gz
 
 Patch0:		0001-CMake-Check-for-gtest-headers-even-if-lit.py-is-not-.patch
 Patch1:		0001-lld-Prefer-using-the-newest-installed-python-version.patch
@@ -59,7 +59,7 @@ Summary:	LLD shared libraries
 Shared libraries for LLD.
 
 %prep
-%autosetup -n %{name}-%{commit}
+%autosetup -n %{name}-%{build_branch}
 
 %build
 

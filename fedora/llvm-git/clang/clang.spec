@@ -73,8 +73,8 @@
 
 %global build_install_prefix %{buildroot}%{install_prefix}
 
-%global clang_srcdir %{name}-%{commit}
-%global clang_tools_srcdir clang-tools-extra-%{tools_commit}
+%global clang_srcdir %{name}-%{build_branch}
+%global clang_tools_srcdir clang-tools-extra-%{build_branch}
 
 Name:		%{pkg_name}
 Version:	%{maj_ver}.%{min_ver}.%{patch_ver}
@@ -83,9 +83,9 @@ Summary:	A C language family front-end for LLVM
 
 License:	NCSA
 URL:		https://github.com/llvm-mirror/
-Source0:	%url/%{name}/archive/%{commit}.tar.gz#/%{clang_srcdir}.tar.gz
+Source0:	%url/%{name}/archive/%{build_branch}.tar.gz#/%{clang_srcdir}.tar.gz
 %if !0%{?compat_build}
-Source1:	%url/clang-tools-extra/archive/%{tools_commit}.tar.gz#/%{clang_tools_srcdir}.tar.gz
+Source1:	%url/clang-tools-extra/archive/%{build_branch}.tar.gz#/%{clang_tools_srcdir}.tar.gz
 %endif
 
 Patch4:		0002-gtest-reorg.patch

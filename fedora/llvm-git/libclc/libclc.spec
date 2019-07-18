@@ -25,7 +25,7 @@ Summary:        An open source implementation of the OpenCL 1.1 library requirem
 
 License:        BSD
 URL:            https://github.com/llvm-mirror
-Source0:        %url/%{name}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
+Source0:        %url/%{name}/archive/%{build_branch}.tar.gz#/%{name}-%{build_branch}.tar.gz
 
 ExclusiveArch:	%{ix86} x86_64 %{arm} aarch64 %{power64} s390x
 
@@ -71,7 +71,7 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -n %{name}-%{commit}
+%autosetup -n %{name}-%{build_branch}
 
 %build
 export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
