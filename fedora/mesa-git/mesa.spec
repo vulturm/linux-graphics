@@ -499,7 +499,6 @@ popd
 %{_includedir}/EGL/eglmesaext.h
 %{_includedir}/EGL/eglplatform.h
 %{_includedir}/EGL/eglextchromium.h
-%{_libdir}/pkgconfig/egl.pc
 
 %files libGLES
 # No files, all provided by libglvnd
