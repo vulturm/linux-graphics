@@ -24,7 +24,7 @@ URL:		https://github.com/llvm-mirror/
 Source0:	%url/%{name}/archive/%{build_branch}.tar.gz#/%{name}-%{build_branch}.tar.gz
 
 Patch0:		0001-CMake-Check-for-gtest-headers-even-if-lit.py-is-not-.patch
-Patch1:		0001-lld-Prefer-using-the-newest-installed-python-version.patch
+#Patch1:		0001-lld-Prefer-using-the-newest-installed-python-version.patch
 #Patch2:		0001-Partial-support-of-SHT_GROUP-without-flag.patch
 
 BuildRequires:	gcc
