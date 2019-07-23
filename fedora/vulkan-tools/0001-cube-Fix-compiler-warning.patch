@@ -1,0 +1,26 @@
+From 122ac06d314c391d12d05f96aa8420010b123da2 Mon Sep 17 00:00:00 2001
+From: Tony-LunarG <tony@lunarg.com>
+Date: Thu, 13 Jun 2019 16:21:57 -0600
+Subject: [PATCH] cube: Fix compiler warning
+
+Change-Id: I8a84556cf55b03cc39402067150fc86be3ed1a0a
+---
+ cube/cube.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cube/cube.c b/cube/cube.c
+index 12b73690..1d210342 100644
+--- a/cube/cube.c
++++ b/cube/cube.c
+@@ -3732,7 +3732,7 @@ static void demo_init(struct demo *demo, int argc, char **argv) {
+ #if defined(_WIN32)
+         if (!demo->suppress_popups) MessageBox(NULL, usage, "Usage Error", MB_OK);
+ #else
+-        fprintf(stderr, usage);
++        fprintf(stderr, "%s", usage);
+         fflush(stderr);
+ #endif
+         free(usage);
+-- 
+2.20.1
+
