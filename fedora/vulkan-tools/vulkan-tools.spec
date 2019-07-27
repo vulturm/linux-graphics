@@ -13,7 +13,6 @@ Summary:        Vulkan tools
 License:        ASL 2.0
 URL:            %{build_repo}
 Source0:        %url/archive/sdk-%{version}.tar.gz#/Vulkan-Tools-%{version}.tar.gz       
-Patch0:         0001-cube-Fix-compiler-warning.patch
 
 
 BuildRequires:  gcc
