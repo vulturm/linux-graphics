@@ -3,12 +3,12 @@
 %global latest_data %(git ls-remote %{build_repo} | grep 'refs/tags/sdk-' | sort -Vrk 2 | head -1)
 %global numeric_ver %(echo %{latest_data} | grep -oP 'sdk.*' | grep -oP '[0-9.]+')
 %global commit_date %(date +"%Y%m%d.%H")
-%global rel_build .%{commit_date}.rel%{numeric_ver}
+%global rel_build %{commit_date}%{?dist}
 
 %global __python %{__python3}
 Name:           vulkan-headers
 Version:        %{numeric_ver}
-Release:        0.1%{?rel_build}%{?dist}
+Release:        %{rel_build}
 Summary:        Vulkan Header files and API registry
 
 License:        ASL 2.0
