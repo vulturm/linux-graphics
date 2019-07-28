@@ -1,0 +1,12 @@
+diff -up Vulkan-ValidationLayers-sdk-1.1.92.0/CMakeLists.txt.dma Vulkan-ValidationLayers-sdk-1.1.92.0/CMakeLists.txt
+--- Vulkan-ValidationLayers-sdk-1.1.92.0/CMakeLists.txt.dma	2019-02-13 09:20:44.590959278 +1000
++++ Vulkan-ValidationLayers-sdk-1.1.92.0/CMakeLists.txt	2019-02-13 09:21:29.178151673 +1000
+@@ -294,7 +294,7 @@ set_target_properties(generate_helper_fi
+ # files directly in layers.
+ 
+ add_library(VkLayer_utils
+-            STATIC
++            SHARED
+             layers/vk_layer_config.cpp
+             layers/vk_layer_extension_utils.cpp
+             layers/vk_layer_utils.cpp
