@@ -59,18 +59,7 @@ BuildRequires: wayland-devel
 
 %description
 The AMD Open Source Driver for Vulkan® is an open-source Vulkan driver
-for Radeon™ graphics adapters on Linux®. It is designed to support the
-following AMD GPUs:
-
-    Radeon™ HD 7000 Series
-    Radeon™ HD 8000M Series
-    Radeon™ R5/R7/R9 200/300 Series
-    Radeon™ RX 400/500 Series
-    Radeon™ M200/M300/M400 Series
-    Radeon™ RX Vega Series
-    AMD FirePro™ Workstation Wx000/Wx100/Wx300 Series
-    Radeon™ Pro WX x100 Series
-    Radeon™ Pro 400/500 Series
+for Radeon™ graphics adapters on Linux®.
 
 %prep
 %setup -q -c -n %{name}-%{version} -a 0 -a 1 -a 2 -a 3 -a 4 -a 5
@@ -80,6 +69,15 @@ ln -s llpc-%{llpc_commit} llpc
 ln -s xgl-%{xgl_commit} xgl
 ln -s pal-%{pal_commit} pal
 ln -s spvgen-%{spvgen_commit} spvgen
+
+# workaround for AMDVLK#89
+for i in xgl/icd/CMakeLists.txt llpc/CMakeLists.txt llpc/imported/metrohash/CMakeLists.txt \
+  llvm/utils/benchmark/CMakeLists.txt llvm/utils/benchmark/test/CMakeLists.txt \
+  pal/src/core/imported/addrlib/CMakeLists.txt pal/src/core/imported/vam/CMakeLists.txt \
+  pal/shared/gpuopen/cmake/AMD.cmake
+do
+  sed -i "s/-Werror//g" $i
+done
 
 %build
 mkdir -p xgl/build && pushd xgl/build
