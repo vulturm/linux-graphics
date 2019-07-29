@@ -13,7 +13,6 @@
 %global llpc_commit         %(xmllint --xpath 'string(//manifest/project[@name="llpc"]/@revision)' default.xml)
 %global xgl_commit          %(xmllint --xpath 'string(//manifest/project[@name="xgl"]/@revision)' default.xml)
 %global pal_commit          %(xmllint --xpath 'string(//manifest/project[@name="pal"]/@revision)' default.xml)
-%global wsa_commit          %(xmllint --xpath 'string(//manifest/project[@name="wsa"]/@revision)' default.xml)
 %global spvgen_commit       %(xmllint --xpath 'string(//manifest/project[@name="spvgen"]/@revision)' default.xml)
 
 %global amdvlk_short_commit %(c=%{amdvlk_commit}; echo ${c:0:7})
@@ -21,7 +20,6 @@
 %global llpc_short_commit   %(c=%{llpc_commit}; echo ${c:0:7})
 %global xgl_short_commit    %(c=%{xgl_commit}; echo ${c:0:7})
 %global pal_short_commit    %(c=%{pal_commit}; echo ${c:0:7})
-%global wsa_short_commit    %(c=%{wsa_commit}; echo ${c:0:7})
 %global spvgen_short_commit    %(c=%{spvgen_commit}; echo ${c:0:7})
 
 Name:          amdvlk-vulkan-driver
@@ -35,8 +33,8 @@ Source1:       %{url}/llvm/archive/%{llvm_commit}.tar.gz#/llvm-%{llvm_short_comm
 Source2:       %{url}/llpc/archive/%{llpc_commit}.tar.gz#/llpc-%{llpc_short_commit}.tar.gz
 Source3:       %{url}/xgl/archive/%{xgl_commit}.tar.gz#/xgl-%{xgl_short_commit}.tar.gz
 Source4:       %{url}/pal/archive/%{pal_commit}.tar.gz#/pal-%{pal_short_commit}.tar.gz
-Source5:       %{url}/wsa/archive/%{wsa_commit}.tar.gz#/wsa-%{wsa_short_commit}.tar.gz
-Source6:       %{url}/spvgen/archive/%{spvgen_commit}.tar.gz#/spvgen-%{spvgen_short_commit}.tar.gz
+Source5:       %{url}/spvgen/archive/%{spvgen_commit}.tar.gz#/spvgen-%{spvgen_short_commit}.tar.gz
+Source6:       default.xml
 
 Requires:      vulkan
 Requires:      vulkan-filesystem
@@ -73,13 +71,12 @@ following AMD GPUs:
     Radeon™ Pro 400/500 Series
 
 %prep
-%setup -q -c -n %{name}-%{version} -a 0 -a 1 -a 2 -a 3 -a 4 -a 5 -a 6
+%setup -q -c -n %{name}-%{version} -a 0 -a 1 -a 2 -a 3 -a 4 -a 5
 ln -s AMDVLK-%{amdvlk_commit} AMDVLK
 ln -s llvm-%{llvm_commit} llvm
 ln -s llpc-%{llpc_commit} llpc
 ln -s xgl-%{xgl_commit} xgl
 ln -s pal-%{pal_commit} pal
-ln -s wsa-%{wsa_commit} wsa
 ln -s spvgen-%{spvgen_commit} spvgen
 
 %build
@@ -98,22 +95,7 @@ mkdir -p xgl/build && pushd xgl/build
     -DSHARE_INSTALL_PREFIX=/usr/share \
     -DLIB_SUFFIX=64 \
     -DBUILD_SHARED_LIBS=OFF \
-    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-     -G Ninja
-
-%ninja_build -j 2
-popd
-
-mkdir -p wsa/build && pushd wsa/build
-
-%cmake3 .. -DCMAKE_AR=`which gcc-ar` \
-    -DCMAKE_NM=`which gcc-nm` \
-    -DCMAKE_RANLIB=`which gcc-ranlib` \
-    -DCMAKE_C_FLAGS_RELEASE=-DNDEBUG \
-    -DCMAKE_CXX_FLAGS_RELEASE=-DNDEBUG \
-    -DCMAKE_VERBOSE_MAKEFILE=ON \
-    -DCMAKE_INSTALL_PREFIX=/usr \
-    -DBUILD_SHARED_LIBS=OFF \
+    -DBUILD_WAYLAND_SUPPORT=ON \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo \
      -G Ninja
 
@@ -137,7 +119,6 @@ echo "MaxNumCmdStreamsPerSubmit,4" > %{buildroot}%{_sysconfdir}/amd/amdPalSettin
     install -m 644 AMDVLK/json/Redhat/amd_icd32.json %{buildroot}%{_datadir}/vulkan/icd.d/amd_icd.%{_arch}.json
     install -m 755 xgl/build/icd/amdvlk32.so %{buildroot}%{_libdir}
 %endif
-install -m 755 wsa/build/wayland/libamdgpu_wsa_wayland.so %{buildroot}%{_libdir}
 
 %files
 %doc AMDVLK/LICENSE.txt AMDVLK/README.md AMDVLK/topLevelArch.png
@@ -145,11 +126,11 @@ install -m 755 wsa/build/wayland/libamdgpu_wsa_wayland.so %{buildroot}%{_libdir}
 %config %{_sysconfdir}/amd/amdPalSettings.cfg
 %{_datadir}/vulkan/icd.d/amd_icd.%{_arch}.json
 %{_libdir}/amdvlk*.so
-%{_libdir}/libamdgpu_wsa_*.so
 
 %changelog
 * Mon Jul 29 2019 Mihai Vultur <xanto@egaming.ro>
 - Implement some version autodetection to reduce maintenance work.
+- Don't build wsa anymore.
 
 * Sat Sep 29 2018 Tomas Kovar <tkov_fedoraproject.org> - 2.55-0.20180929.gite718bcf
 
@@ -840,7 +821,7 @@ install -m 755 wsa/build/wayland/libamdgpu_wsa_wayland.so %{buildroot}%{_libdir}
        running out of reserved space in TimeSpy.
 - pal: Move MetroHash and jemalloc to src/util/imported from src/core/imported.
 
-* Tue Apr 02 2018 Tomas Kovar <tkov_fedoraproject.org> - 2.23-0.20180402.gitae72750
+* Mon Apr 02 2018 Tomas Kovar <tkov_fedoraproject.org> - 2.23-0.20180402.gitae72750
 
 - xgl:  Enable below extensions:
        - AMD_shader_explicit_vertex_parameter
