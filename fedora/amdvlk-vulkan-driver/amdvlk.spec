@@ -3,17 +3,19 @@
 %global latest_tag_data %(git ls-remote %{build_repo} | grep 'refs/tags/v-' | sort -Vrk 2 | head -1)
 %global latest_xml_data %(curl -ks https://raw.githubusercontent.com/GPUOpen-Drivers/AMDVLK/master/default.xml > default.xml)
 
+%global default_xml_location %(test -f default.xml && echo default.xml || echo /builddir/build/SOURCES/default.xml)
+
 %global numeric_ver %(echo %{latest_tag_data} | grep -oP 'v-.*' | grep -oP '[0-9A-Z.]+')
 %global commit_date %(date +"%Y%m%d.%H")
 %global rel_build %{commit_date}%{?dist}
 
 
 %global amdvlk_commit       %(echo %{latest_tag_data} | awk '{print $1}')
-%global llvm_commit         %(xmllint --xpath 'string(//manifest/project[@name="llvm"]/@revision)' default.xml)
-%global llpc_commit         %(xmllint --xpath 'string(//manifest/project[@name="llpc"]/@revision)' default.xml)
-%global xgl_commit          %(xmllint --xpath 'string(//manifest/project[@name="xgl"]/@revision)' default.xml)
-%global pal_commit          %(xmllint --xpath 'string(//manifest/project[@name="pal"]/@revision)' default.xml)
-%global spvgen_commit       %(xmllint --xpath 'string(//manifest/project[@name="spvgen"]/@revision)' default.xml)
+%global llvm_commit         %(xmllint --xpath 'string(//manifest/project[@name="llvm"]/@revision)' %{default_xml_location})
+%global llpc_commit         %(xmllint --xpath 'string(//manifest/project[@name="llpc"]/@revision)' %{default_xml_location})
+%global xgl_commit          %(xmllint --xpath 'string(//manifest/project[@name="xgl"]/@revision)' %{default_xml_location})
+%global pal_commit          %(xmllint --xpath 'string(//manifest/project[@name="pal"]/@revision)' %{default_xml_location})
+%global spvgen_commit       %(xmllint --xpath 'string(//manifest/project[@name="spvgen"]/@revision)' %{default_xml_location})
 
 %global amdvlk_short_commit %(c=%{amdvlk_commit}; echo ${c:0:7})
 %global llvm_short_commit   %(c=%{llvm_commit}; echo ${c:0:7})
