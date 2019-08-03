@@ -58,7 +58,7 @@ mv include/* %buildroot%{_includedir}/
 %{_includedir}/spirv/
 
 %changelog
-* Sat Aug 04 2019 Mihai Vultur <xanto@egaming.ro>
+* Sun Aug 04 2019 Mihai Vultur <xanto@egaming.ro>
 - Implement some version autodetection to reduce maintenance work.
 
 * Mon Jun 10 03:08:22 CEST 2019 Robert-André Mauchin <zebob.m@gmail.com> - 1.4.1-1
