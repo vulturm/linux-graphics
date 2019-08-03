@@ -90,7 +90,7 @@ popd
 %{_libdir}/pkgconfig/SPIRV-Tools.pc
 
 %changelog
-* Sat Aug 02 2019 Mihai Vultur <xanto@egaming.ro>
+* Sat Aug 04 2019 Mihai Vultur <xanto@egaming.ro>
 - Implement some version autodetection to reduce maintenance work.
 
 * Mon Jun 10 13:46:33 CEST 2019 Robert-André Mauchin <zebob.m@gmail.com> - 2019.3-1
