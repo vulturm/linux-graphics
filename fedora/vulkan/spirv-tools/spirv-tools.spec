@@ -47,6 +47,13 @@ Development files for %{name}
 
 %prep
 %autosetup -p1 -n SPIRV-Tools-%{version}
+# be more relaxed
+for i in android_test/Android.mk \
+  CMakeLists.txt \
+  Android.mk
+do
+  sed -i "s/-Werror//g" $i
+done
 
 %build
 %__mkdir_p %_target_platform
