@@ -1,10 +1,11 @@
-%global build_timestamp %(date +"%Y%m%d.%H")
 %global build_repo https://gitlab.freedesktop.org/mesa/mesa/
 
 %global build_branch master
 
 %define build_shortcommit %(git ls-remote %{build_repo} | grep -w "refs/heads/%{build_branch}" | cut -c1-8)
-%define build_version %(curl -s https://gitlab.freedesktop.org/mesa/mesa/raw/master/VERSION | grep -oP '[0-9.]+')
+%define numeric_ver %(curl -s https://gitlab.freedesktop.org/mesa/mesa/raw/master/VERSION | grep -oP '[0-9.]+')
+%global build_timestamp %(date +"%Y%m%d.%H")
+%global rel_build %{build_timestamp}.%{build_shortcommit}%{?dist}
 
 
 ### LTO and debugpackages are not working together
@@ -65,10 +66,11 @@
 
 %global sanitize 1
 
+
 Name:           mesa
 Summary:        Mesa from the official https://gitlab.freedesktop.org/mesa/mesa repo, git version
-Version:	      %{build_version}
-Release: 	      %{build_timestamp}.%{build_shortcommit}
+Version:        %{numeric_ver}
+Release:        %{rel_build}
 
 License:        MIT
 URL:            http://www.mesa3d.org

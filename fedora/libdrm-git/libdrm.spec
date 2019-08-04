@@ -1,10 +1,13 @@
-%global build_timestamp %(date +"%Y%m%d.%H")
 %global build_repo https://gitlab.freedesktop.org/mesa/drm/
 
 %global build_branch master
 
 %define build_shortcommit %(git ls-remote %{build_repo} | grep "refs/heads/%{build_branch}" | cut -c1-8)
-%define build_version %(curl -s %{build_repo}/raw/master/meson.build | grep -m 1 -oP "(?<=version : ')([0-9.]+)")
+%define numeric_ver %(curl -s %{build_repo}/raw/master/meson.build | grep -m 1 -oP "(?<=version : ')([0-9.]+)")
+%global build_timestamp %(date +"%Y%m%d.%H")
+
+%global rel_build %{build_timestamp}.%{build_shortcommit}%{?dist}
+
 
 %define bcond_meson() %{lua: do
   local option = rpm.expand("%{1}")
@@ -55,8 +58,9 @@ end}
 
 Name:           libdrm
 Summary:        Direct Rendering Manager runtime library, built from git
-Version:        %{build_version}
-Release:        %{build_timestamp}.%{build_shortcommit}
+Version:        %{numeric_ver}
+Release:        %{rel_build}
+
 License:        MIT
 
 URL:            https://dri.freedesktop.org
