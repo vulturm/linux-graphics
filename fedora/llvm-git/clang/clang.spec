@@ -263,6 +263,7 @@ cd _build
 %endif
 
 %cmake .. -G Ninja \
+  -DCMAKE_RULE_MESSAGES:BOOL=OFF \
 	-DLLVM_PARALLEL_LINK_JOBS=1 \
 	-DLLVM_LINK_LLVM_DYLIB:BOOL=ON \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
@@ -300,7 +301,7 @@ cd _build
 	-DCLANG_BUILD_EXAMPLES:BOOL=OFF \
 	-DCLANG_REPOSITORY_STRING="%{?fedora:Fedora}%{?rhel:Red Hat} %{version}-%{release}"
 
-ninja -v
+ninja
 
 %install
 DESTDIR=%{buildroot} ninja install -C _build
