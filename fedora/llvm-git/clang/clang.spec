@@ -382,11 +382,7 @@ chmod u-x %{buildroot}%{_mandir}/man1/scan-build.1*
 %{_mandir}/man1/clang++-%{maj_ver}.1.gz
 %{_mandir}/man1/diagtool.1.gz
 %{_emacs_sitestartdir}/clang-format.el
-%{_datadir}/clang/*.css
-%{_datadir}/clang/*.js
-%{_datadir}/clang/*.html
-%{_datadir}/clang/clang-format.py*
-%{_datadir}/clang/clang-format-diff.py*
+%{_datadir}/clang/*.*
 %endif
 
 %files libs
