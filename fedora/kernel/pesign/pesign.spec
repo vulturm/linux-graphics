@@ -47,6 +47,7 @@ Source0: %url/archive/%{build_branch}.tar.gz#/%{name}-%{build_branch}.tar.gz
 Source1: certs.tar.xz
 Source2: pesign.py
 
+%if 0
 Patch0001: 0001-cms-kill-generate_integer-it-doesn-t-build-on-i686-a.patch
 Patch0002: 0002-Fix-command-line-parsing.patch
 Patch0003: 0003-gcc-don-t-error-on-stuff-in-includes.patch
@@ -76,6 +77,7 @@ Patch0026: 0026-Clean-up-gcc-command-lines-a-little.patch
 Patch0027: 0027-Make-pesign-users-groups-static-in-the-repo.patch
 Patch0028: 0028-rpm-Make-the-client-signer-use-the-fedora-values-unl.patch
 Patch0029: 0029-Make-macros.pesign-error-in-kojibuilder-if-we-don-t-.patch
+%endif
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
