@@ -56,6 +56,18 @@ do
 done
 
 %build
+## enable LTO
+export CFLAGS="%{build_cflags}"
+export CXXFLAGS="%{build_cxxflags}"
+export LDFLAGS="%{build_ldflags}"
+
+LTO_FLAGS="-g0 -flto=8 -ffat-lto-objects -flto-odr-type-merging"
+export CFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
+export FCFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
+export FFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
+export CXXFLAGS="$CXXFLAGS -std=c++14 -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
+export LDFLAGS="$LDFLAG0S -flto=8 "
+
 %__mkdir_p %_target_platform
 pushd %_target_platform
 %cmake3 -DCMAKE_BUILD_TYPE=Release \
