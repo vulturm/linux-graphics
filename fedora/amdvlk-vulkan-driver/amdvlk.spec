@@ -16,13 +16,17 @@
 %global xgl_commit          %(xmllint --xpath 'string(//manifest/project[@name="xgl"]/@revision)' %{default_xml_location})
 %global pal_commit          %(xmllint --xpath 'string(//manifest/project[@name="pal"]/@revision)' %{default_xml_location})
 %global spvgen_commit       %(xmllint --xpath 'string(//manifest/project[@name="spvgen"]/@revision)' %{default_xml_location})
+%global metrohash_commit    %(xmllint --xpath 'string(//manifest/project[@name="MetroHash"]/@revision)' %{default_xml_location})
 
-%global amdvlk_short_commit %(c=%{amdvlk_commit}; echo ${c:0:7})
-%global llvm_short_commit   %(c=%{llvm_commit}; echo ${c:0:7})
-%global llpc_short_commit   %(c=%{llpc_commit}; echo ${c:0:7})
-%global xgl_short_commit    %(c=%{xgl_commit}; echo ${c:0:7})
-%global pal_short_commit    %(c=%{pal_commit}; echo ${c:0:7})
-%global spvgen_short_commit    %(c=%{spvgen_commit}; echo ${c:0:7})
+
+%global amdvlk_short_commit     %(c=%{amdvlk_commit};     echo ${c:0:7})
+%global llvm_short_commit       %(c=%{llvm_commit};       echo ${c:0:7})
+%global llpc_short_commit       %(c=%{llpc_commit};       echo ${c:0:7})
+%global xgl_short_commit        %(c=%{xgl_commit};        echo ${c:0:7})
+%global pal_short_commit        %(c=%{pal_commit};        echo ${c:0:7})
+%global spvgen_short_commit     %(c=%{spvgen_commit};     echo ${c:0:7})
+%global metrohash_short_commit  %(c=%{metrohash_commit};  echo ${c:0:7})
+
 
 Name:          amdvlk-vulkan-driver
 Version:       %{numeric_ver}
@@ -36,7 +40,8 @@ Source2:       %{url}/llpc/archive/%{llpc_commit}.tar.gz#/llpc-%{llpc_short_comm
 Source3:       %{url}/xgl/archive/%{xgl_commit}.tar.gz#/xgl-%{xgl_short_commit}.tar.gz
 Source4:       %{url}/pal/archive/%{pal_commit}.tar.gz#/pal-%{pal_short_commit}.tar.gz
 Source5:       %{url}/spvgen/archive/%{spvgen_commit}.tar.gz#/spvgen-%{spvgen_short_commit}.tar.gz
-Source6:       default.xml
+Source6:       %{url}/MetroHash/archive/%{metrohash_commit}.tar.gz#/metrohash-%{metrohash_short_commit}.tar.gz
+Source7:       default.xml
 
 Requires:      vulkan
 Requires:      vulkan-filesystem
@@ -62,13 +67,16 @@ The AMD Open Source Driver for Vulkan® is an open-source Vulkan driver
 for Radeon™ graphics adapters on Linux®.
 
 %prep
-%setup -q -c -n %{name}-%{version} -a 0 -a 1 -a 2 -a 3 -a 4 -a 5
+%setup -q -c -n %{name}-%{version} -a 0 -a 1 -a 2 -a 3 -a 4 -a 5 -a 6
 ln -s AMDVLK-%{amdvlk_commit} AMDVLK
 ln -s llvm-%{llvm_commit} llvm
 ln -s llpc-%{llpc_commit} llpc
 ln -s xgl-%{xgl_commit} xgl
 ln -s pal-%{pal_commit} pal
 ln -s spvgen-%{spvgen_commit} spvgen
+mkdir third_party && \
+  ln -s MetroHash-%{metrohash_commit} third_party/metrohash
+
 
 # workaround for AMDVLK#89
 for i in xgl/icd/CMakeLists.txt llpc/CMakeLists.txt llpc/imported/metrohash/CMakeLists.txt \
@@ -96,6 +104,7 @@ mkdir -p xgl/build && pushd xgl/build
     -DLIB_SUFFIX=64 \
     -DBUILD_SHARED_LIBS=OFF \
     -DBUILD_WAYLAND_SUPPORT=ON \
+    -DXGL_METROHASH_PATH=MetroHash/ \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo \
      -G Ninja
 
@@ -128,6 +137,9 @@ echo "MaxNumCmdStreamsPerSubmit,4" > %{buildroot}%{_sysconfdir}/amd/amdPalSettin
 %{_libdir}/amdvlk*.so
 
 %changelog
+* Thu Aug 29 2019 Mihai Vultur <xanto@egaming.ro>
+- Add MetroHash
+
 * Mon Jul 29 2019 Mihai Vultur <xanto@egaming.ro>
 - Implement some version autodetection to reduce maintenance work.
 - Don't build wsa anymore.
