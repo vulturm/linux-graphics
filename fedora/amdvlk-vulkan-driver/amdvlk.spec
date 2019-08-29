@@ -75,7 +75,7 @@ ln -s xgl-%{xgl_commit} xgl
 ln -s pal-%{pal_commit} pal
 ln -s spvgen-%{spvgen_commit} spvgen
 mkdir third_party && \
-  ln -s MetroHash-%{metrohash_commit} third_party/metrohash
+  ln -s ../MetroHash-%{metrohash_commit} third_party/metrohash
 
 
 # workaround for AMDVLK#89
@@ -103,9 +103,8 @@ mkdir -p xgl/build && pushd xgl/build
     -DSHARE_INSTALL_PREFIX=/usr/share \
     -DLIB_SUFFIX=64 \
     -DBUILD_SHARED_LIBS=OFF \
+    -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_WAYLAND_SUPPORT=ON \
-    -DXGL_METROHASH_PATH=MetroHash/ \
-    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
      -G Ninja
 
 %ninja_build -j 2
