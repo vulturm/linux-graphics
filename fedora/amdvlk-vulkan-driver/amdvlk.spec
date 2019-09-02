@@ -27,6 +27,10 @@
 %global spvgen_short_commit     %(c=%{spvgen_commit};     echo ${c:0:7})
 %global metrohash_short_commit  %(c=%{metrohash_commit};  echo ${c:0:7})
 
+### LTO and debugpackages are not working together
+%if 0%{?fedora} >= 27
+%global debug_package %{nil}
+%endif
 
 Name:          amdvlk-vulkan-driver
 Version:       %{numeric_ver}
