@@ -1,12 +1,16 @@
 %global compat_build 0
-%global build_branch master
+%if 0%{?_with_llvm9:1}
+  %define build_branch release_90
+%else
+  %define build_branch master
+%endif
 
 %global clang_build_repo https://github.com/llvm-mirror/clang
 %global tools_build_repo https://github.com/llvm-mirror/clang-tools-extra
 
-%global maj_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_MAJOR | grep -oP '[0-9]+')
-%global min_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_MINOR | grep -oP '[0-9]+')
-%global patch_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_PATCH | grep -oP '[0-9]+')
+%global maj_ver %(curl -s https://raw.githubusercontent.com/llvm-mirror/llvm/%{build_branch}/CMakeLists.txt | grep LLVM_VERSION_MAJOR | grep -oP '[0-9]+')
+%global min_ver %(curl -s https://raw.githubusercontent.com/llvm-mirror/llvm/%{build_branch}/CMakeLists.txt | grep LLVM_VERSION_MINOR | grep -oP '[0-9]+')
+%global patch_ver %(curl -s https://raw.githubusercontent.com/llvm-mirror/llvm/%{build_branch}/CMakeLists.txt | grep LLVM_VERSION_PATCH | grep -oP '[0-9]+')
 
 %define commit %(git ls-remote %{clang_build_repo} | grep -w "refs/heads/%{build_branch}" | awk '{print $1}')
 %define tools_commit %(git ls-remote %{tools_build_repo} | grep -w "refs/heads/%{build_branch}" | awk '{print $1}')
