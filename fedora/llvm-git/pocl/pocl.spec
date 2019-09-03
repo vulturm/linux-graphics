@@ -7,7 +7,7 @@
 
 %define commit %(git ls-remote %{build_repo} | grep -w "refs/heads/%{build_branch}" | awk '{print $1}')
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date %(date +"%Y%m%d.%H")
+%global commit_date %(date +"%Y%m%d")
 %global gitrel .%{commit_date}.git%{shortcommit}
 %global _default_patch_fuzz 2
 

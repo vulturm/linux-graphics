@@ -4,7 +4,7 @@
 
 %define build_shortcommit %(git ls-remote %{build_repo} | grep -w "refs/heads/%{build_branch}" | cut -c1-8)
 %define numeric_ver %(curl -s https://gitlab.freedesktop.org/mesa/mesa/raw/master/VERSION | grep -oP '[0-9.]+')
-%global build_timestamp %(date +"%Y%m%d.%H")
+%global build_timestamp %(date +"%Y%m%d")
 %global rel_build %{build_timestamp}.%{build_shortcommit}%{?dist}
 
 

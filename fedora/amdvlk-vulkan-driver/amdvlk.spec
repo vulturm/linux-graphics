@@ -6,7 +6,7 @@
 %global default_xml_location %(test -f default.xml && echo default.xml || echo /builddir/build/SOURCES/default.xml)
 
 %global numeric_ver %(echo %{latest_tag_data} | grep -oP 'v-.*' | grep -oP '[0-9A-Z.]+')
-%global commit_date %(date +"%Y%m%d.%H")
+%global commit_date %(date +"%Y%m%d")
 %global rel_build %{commit_date}%{?dist}
 
 

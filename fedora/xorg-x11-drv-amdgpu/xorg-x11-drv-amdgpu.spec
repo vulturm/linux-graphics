@@ -6,7 +6,7 @@
 %global latest_data %(git ls-remote %{build_repo} | grep -oP '.*refs/tags/xf86-video-amdgpu-[0-9.]+' | sort -Vrk 2 | head -1)
 %global latest_tag %(echo %{latest_data} | grep -oP 'xf86-video-amdgpu-[0-9.]+') 
 %global numeric_ver %(echo %{latest_tag} | grep -oP 'amdgpu.*' | grep -oP '[0-9.]+')
-%global commit_date %(date +"%Y%m%d.%H")
+%global commit_date %(date +"%Y%m%d")
 %global rel_build .%{commit_date}.rel%{numeric_ver}
 
 %global moduledir %(pkg-config xorg-server --variable=moduledir )

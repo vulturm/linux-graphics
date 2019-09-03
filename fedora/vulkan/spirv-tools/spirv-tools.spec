@@ -2,7 +2,7 @@
   
 %global latest_data %(git ls-remote %{build_repo} | grep -P 'refs/tags/v[0-9.]+' | sort -Vrk 2 | head -1)
 %global numeric_ver %(echo %{latest_data} | grep -oP 'tags/.*' | grep -oP '[0-9.]+')
-%global commit_date %(date +"%Y%m%d.%H")
+%global commit_date %(date +"%Y%m%d")
 %global rel_build %{commit_date}%{?dist}
 
 Name:           spirv-tools
