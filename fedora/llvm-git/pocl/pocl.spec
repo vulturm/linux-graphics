@@ -29,7 +29,7 @@ URL:            %{build_repo}
 Source0:        %url/archive/%{build_branch}.tar.gz#/%{name}-%{build_branch}.tar.gz
 
 # FIXME: link
-Patch1001:      0001-wrap-more-stuff-for-64-bit-atomics.patch
+#Patch1001:      0001-wrap-more-stuff-for-64-bit-atomics.patch
 
 # ppc64le builds fine, but: 97% tests passed, 4 tests failed out of 120
 # ppc64 builds fine, but: 87% tests passed, 16 tests failed out of 120
