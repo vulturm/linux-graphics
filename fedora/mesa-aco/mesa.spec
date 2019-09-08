@@ -1,11 +1,29 @@
-%global build_repo https://github.com/daniel-schuermann/mesa
+%global with_aco 1
+%global _build_id_links none
+
+%if 0%{?_with_separatepref:1}
+%define _prefix /opt/mesa-aco
+%define package_name mesa-aco
+%else
+%define package_name mesa
+%endif
 
 %global build_branch master
 
-%define build_shortcommit %(git ls-remote %{build_repo} | grep -w "refs/heads/%{build_branch}" | cut -c1-8)
+%if 0%{?with_aco:1}
+%global build_repo https://github.com/daniel-schuermann/mesa/
 %define numeric_ver %(curl -s https://raw.githubusercontent.com/daniel-schuermann/mesa/master/VERSION | grep -oP '[0-9.]+')
+%define source_url %{build_repo}/archive/%{build_branch}.zip#/mesa-%{build_branch}.zip
+%else
+%global build_repo https://gitlab.freedesktop.org/mesa/mesa/
+%define numeric_ver %(curl -s https://gitlab.freedesktop.org/mesa/mesa/raw/master/VERSION | grep -oP '[0-9.]+')
+%define source_url %{build_repo}/-/archive/%{build_branch}/mesa-%{build_branch}.zip
+%endif
+
+%define build_shortcommit %(git ls-remote %{build_repo} | grep -w "refs/heads/%{build_branch}" | cut -c1-8)
 %global build_timestamp %(date +"%Y%m%d")
 %global rel_build %{build_timestamp}.%{build_shortcommit}%{?dist}
+
 
 ### LTO and debugpackages are not working together
 %if 0%{?fedora} >= 27
@@ -65,16 +83,16 @@
 
 %global sanitize 1
 
-Name:           mesa
-Summary:        Mesa with the ACO compiler patchset, git version
+
+Name:           %{package_name}
+Summary:        Mesa 3D Graphics Library, git version
 Version:        %{numeric_ver}
 Release:        %{rel_build}
-
 
 License:        MIT
 URL:            http://www.mesa3d.org
 
-Source0:        %{build_repo}/archive/%{build_branch}.zip
+Source0:        %{source_url}
 # src/gallium/auxiliary/postprocess/pp_mlaa* have an ... interestingly worded license.
 # Source1 contains email correspondence clarifying the license terms.
 # Fedora opts to ignore the optional part of clause 2 and treat that code as 2 clause BSD.
@@ -395,7 +413,7 @@ LTO_FLAGS="-g0 -flto=8 -ffat-lto-objects -flto-odr-type-merging"
 export CFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export FCFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export FFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
-export CXXFLAGS="$CXXFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
+export CXXFLAGS="$CXXFLAGS -std=c++14 -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export LDFLAGS="$LDFLAG0S -flto=8 "
 
 %meson -Dcpp_std=gnu++11 \
@@ -687,6 +705,9 @@ popd
 %endif
 
 %changelog
+* Sun Sep 08 2019 Mihai Vultur <xanto@egaming.ro>
+- Merge the two implementations.
+
 * Sun Jul 07 2019 Mihai Vultur <xanto@egaming.ro>
 - Implement some version autodetection to reduce maintenance work.
 

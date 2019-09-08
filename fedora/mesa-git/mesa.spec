@@ -1,9 +1,10 @@
+%define package_name mesa
 %global build_branch master
 
 %if 0%{?_with_aco:1}
 %global build_repo https://github.com/daniel-schuermann/mesa/
 %define numeric_ver %(curl -s https://raw.githubusercontent.com/daniel-schuermann/mesa/master/VERSION | grep -oP '[0-9.]+')
-%define source_url %{build_repo}/archive/%{build_branch}.zip
+%define source_url %{build_repo}/archive/%{build_branch}.zip#/mesa-%{build_branch}.zip
 %else
 %global build_repo https://gitlab.freedesktop.org/mesa/mesa/
 %define numeric_ver %(curl -s https://gitlab.freedesktop.org/mesa/mesa/raw/master/VERSION | grep -oP '[0-9.]+')
@@ -74,7 +75,7 @@
 %global sanitize 1
 
 
-Name:           mesa
+Name:           %{package_name}
 Summary:        Mesa 3D Graphics Library, git version
 Version:        %{numeric_ver}
 Release:        %{rel_build}
