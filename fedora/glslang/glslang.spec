@@ -14,7 +14,6 @@ Summary:        OpenGL and OpenGL ES shader front end and validator
 License:        BSD and GPLv3+ and ASL 2.0
 URL:            %{build_repo}
 Source0:        %url/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         nodate.patch
 Patch1:         glslang-default-resource-limits_staticlib.patch
 Patch2:         glslang_tests.patch
 # Patch to build against system spirv-tools
