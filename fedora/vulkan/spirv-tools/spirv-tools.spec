@@ -1,3 +1,5 @@
+%global debug_package %{nil}
+
 %global build_repo https://github.com/KhronosGroup/SPIRV-Tools
   
 %global latest_data %(git ls-remote %{build_repo} | grep -P 'refs/tags/v[0-9.]+' | sort -Vrk 2 | head -1)
