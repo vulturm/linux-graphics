@@ -93,7 +93,6 @@ popd
 %{_bindir}/spirv-link
 %{_bindir}/spirv-opt
 %{_bindir}/spirv-reduce
-%{_bindir}/spirv-stats
 %{_bindir}/spirv-val
 
 %files libs
