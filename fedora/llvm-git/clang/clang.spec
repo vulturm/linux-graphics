@@ -93,7 +93,6 @@ Source1:	%url/clang-tools-extra/archive/%{build_branch}.tar.gz#/%{clang_tools_sr
 %endif
 
 Patch4:		0002-gtest-reorg.patch
-Patch9:		0001-Fix-uninitialized-value-in-ABIArgInfo.patch
 Patch10:	0001-Workaround-GCC-9-bug-when-handling-bitfields.patch
 Patch11:	0001-ToolChain-Add-lgcc_s-to-the-linker-flags-when-using-.patch
 
@@ -237,7 +236,6 @@ pathfix.py -i %{__python3} -pn \
 %setup -q -n %{clang_srcdir}
 
 %patch4 -p1 -b .gtest
-%patch9 -p1 -b .abi-arginfo
 %patch10 -p1 -b .bitfields
 %patch11 -p1 -b .libcxx-fix
 
