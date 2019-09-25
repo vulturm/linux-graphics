@@ -497,6 +497,7 @@ popd
 %{_includedir}/GL/internal/dri_interface.h
 %{_libdir}/pkgconfig/dri.pc
 %{_libdir}/libglapi.so
+%{_libdir}/pkgconfig/gl.pc
 
 %files libEGL
 %{_datadir}/glvnd/egl_vendor.d/50_mesa.json
