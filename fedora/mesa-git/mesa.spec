@@ -498,6 +498,8 @@ popd
 %{_libdir}/pkgconfig/dri.pc
 %{_libdir}/libglapi.so
 %{_libdir}/pkgconfig/gl.pc
+%{_libdir}/pkgconfig/egl.pc
+
 
 %files libEGL
 %{_datadir}/glvnd/egl_vendor.d/50_mesa.json
