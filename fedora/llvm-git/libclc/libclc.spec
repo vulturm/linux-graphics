@@ -1,13 +1,13 @@
 %global build_branch master
 %global build_repo https://github.com/llvm-mirror/libclc
 
-%global maj_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_MAJOR | grep -oP '[0-9]+')
-%global min_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_MINOR | grep -oP '[0-9]+')
-%global patch_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_PATCH | grep -oP '[0-9]+')
+%global maj_ver 10
+%global min_ver 0
+%global patch_ver 0
 
-%define commit %(git ls-remote %{build_repo} | grep -w "refs/heads/%{build_branch}" | awk '{print $1}')
+%define commit 9aa6f350a6ce0f2cfc7e489495af8899ca74e079
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date %(date +"%Y%m%d")
+%global commit_date 20191006
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %define _unpackaged_files_terminate_build 0
@@ -25,7 +25,7 @@ Summary:        An open source implementation of the OpenCL 1.1 library requirem
 
 License:        BSD
 URL:            https://github.com/llvm-mirror
-Source0:        %url/%{name}/archive/%{build_branch}.tar.gz#/%{name}-%{build_branch}.tar.gz
+Source0:        %url/%{name}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
 
 ExclusiveArch:	%{ix86} x86_64 %{arm} aarch64 %{power64} s390x
 
@@ -71,7 +71,7 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -n %{name}-%{build_branch}
+%autosetup -n %{name}-%{commit}
 
 %build
 export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
@@ -94,8 +94,16 @@ export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Sun Oct 06 2019 Mihai Vultur <xanto@egaming.ro>
+- Architecture specific builds might run asynchronous.
+- This might cause that same package build for x86_64 will be different when
+-  built for i686. This is problematic when we want to install multilib packages. 
+- Convert the specfile to template and use it to generate the actual script.
+- This will prevent the random failues and mismatch between arch versions.
+
 * Sun Jul 14 2019 Mihai Vultur <xanto@egaming.ro>
 - Implement some version autodetection to reduce maintenance work.
+- Based on spec files from 'GloriousEggroll' and 'che' coprs.
 
 * Wed Apr 03 2019 Dave Airlie <airlied@redhat.com> - 0.2.0-15.git9f6204e
 - Update to latest upstream snapshot (prior to moving to cmake)

@@ -8,20 +8,18 @@
 %global clang_build_repo https://github.com/llvm-mirror/clang
 %global tools_build_repo https://github.com/llvm-mirror/clang-tools-extra
 
-%global maj_ver %(curl -s https://raw.githubusercontent.com/llvm-mirror/llvm/%{build_branch}/CMakeLists.txt | grep LLVM_VERSION_MAJOR | grep -oP '[0-9]+')
-%global min_ver %(curl -s https://raw.githubusercontent.com/llvm-mirror/llvm/%{build_branch}/CMakeLists.txt | grep LLVM_VERSION_MINOR | grep -oP '[0-9]+')
-%global patch_ver %(curl -s https://raw.githubusercontent.com/llvm-mirror/llvm/%{build_branch}/CMakeLists.txt | grep LLVM_VERSION_PATCH | grep -oP '[0-9]+')
+%global maj_ver 10
+%global min_ver 0
+%global patch_ver 0
 
-%define commit %(git ls-remote %{clang_build_repo} | grep -w "refs/heads/%{build_branch}" | awk '{print $1}')
-%define tools_commit %(git ls-remote %{tools_build_repo} | grep -w "refs/heads/%{build_branch}" | awk '{print $1}')
+%define commit d7f57aaefb1d8d3c483c2112ec6214f8ad5f8450
+%define tools_commit 2e6fcdfebbc3ea2875712b526809234ab728e56e
 
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date %(date +"%Y%m%d")
+%global commit_date 20191006
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %global _default_patch_fuzz 2
-
-
 
 
 %global clang_tools_binaries \
@@ -77,8 +75,8 @@
 
 %global build_install_prefix %{buildroot}%{install_prefix}
 
-%global clang_srcdir %{name}-%{build_branch}
-%global clang_tools_srcdir clang-tools-extra-%{build_branch}
+%global clang_srcdir %{name}-%{commit}
+%global clang_tools_srcdir clang-tools-extra-%{tools_commit}
 
 Name:		%{pkg_name}
 Version:	%{maj_ver}.%{min_ver}.%{patch_ver}
@@ -87,9 +85,9 @@ Summary:	A C language family front-end for LLVM
 
 License:	NCSA
 URL:		https://github.com/llvm-mirror/
-Source0:	%url/%{name}/archive/%{build_branch}.tar.gz#/%{clang_srcdir}.tar.gz
+Source0:  %url/%{name}/archive/%{commit}.tar.gz#/%{clang_srcdir}.tar.gz
 %if !0%{?compat_build}
-Source1:	%url/clang-tools-extra/archive/%{build_branch}.tar.gz#/%{clang_tools_srcdir}.tar.gz
+Source1:  %url/clang-tools-extra/archive/%{tools_commit}.tar.gz#/%{clang_tools_srcdir}.tar.gz
 %endif
 
 Patch4:		0002-gtest-reorg.patch
@@ -441,5 +439,13 @@ chmod u-x %{buildroot}%{_mandir}/man1/scan-build.1*
 
 %endif
 %changelog
+* Sun Oct 06 2019 Mihai Vultur <xanto@egaming.ro>
+- Architecture specific builds might run asynchronous.
+- This might cause that same package build for x86_64 will be different when     
+-  built for i686. This is problematic when we want to install multilib packages.
+- Convert the specfile to template and use it to generate the actual script.
+- This will prevent the random failues and mismatch between arch versions.
+
 * Wed Jul 10 2019 Mihai Vultur <xanto@egaming.ro>
 - Implement some version autodetection to reduce maintenance work.
+- Based on spec files from 'GloriousEggroll' and 'che' coprs.

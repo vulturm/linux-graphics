@@ -1,15 +1,16 @@
 %global build_branch master
 %global pkg_name lldb
 
-%global build_repo https://github.com/llvm-mirror/%{pkg_name}
+%global build_repo https://github.com/llvm-mirror/lldb
 
-%global maj_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_MAJOR | grep -oP '[0-9]+')
-%global min_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_MINOR | grep -oP '[0-9]+')
-%global patch_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_PATCH | grep -oP '[0-9]+')
+%global maj_ver 10
+%global min_ver 0
+%global patch_ver 0
 
-%define commit %(git ls-remote %{build_repo} | grep -w "refs/heads/%{build_branch}" | awk '{print $1}')
+%define commit 47607cb83e9258dc4bbfc530e7d6ca268d159b40
+%global commit_date 20191006
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date %(date +"%Y%m%d")
+
 %global gitrel .%{commit_date}.git%{shortcommit}
 
 
@@ -20,7 +21,7 @@ Summary:	Next generation high-performance debugger
 
 License:	NCSA
 URL:		https://github.com/llvm-mirror/
-Source0:	%url/%{name}/archive/%{build_branch}.tar.gz#/%{name}-%{build_branch}.tar.gz
+Source0:	%url/%{name}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
 
 
 BuildRequires:	cmake
@@ -62,7 +63,7 @@ The package contains the LLDB Python module.
 
 %prep
 
-%setup -q -n %{name}-%{build_branch}
+%setup -q -n %{name}-%{commit}
 
 
 # HACK so that lldb can find its custom readline.so, because we move it
@@ -135,6 +136,13 @@ rm -f %{buildroot}%{python2_sitearch}/six.*
 %{python2_sitearch}/lldb
 
 %changelog
-* Sun Jul 14 2019 Mihai Vultur <xanto@egaming.ro>
-- Implement some version autodetection to reduce maintenance work. 
+* Sun Oct 06 2019 Mihai Vultur <xanto@egaming.ro>
+- Architecture specific builds might run asynchronous.
+- This might cause that same package build for x86_64 will be different when
+-  built for i686. This is problematic when we want to install multilib packages. 
+- Convert the specfile to template and use it to generate the actual script.
+- This will prevent the random failues and mismatch between arch versions.
 
+* Sun Jul 14 2019 Mihai Vultur <xanto@egaming.ro>
+- Implement some version autodetection to reduce maintenance work.
+- Based on spec files from 'GloriousEggroll' and 'che' coprs.

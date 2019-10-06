@@ -1,16 +1,17 @@
 %global build_branch master
 %global pkg_name lld
 
-%global build_repo https://github.com/llvm-mirror/%{pkg_name}
+%global build_repo https://github.com/llvm-mirror/lld
 
-%global maj_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_MAJOR | grep -oP '[0-9]+')
-%global min_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_MINOR | grep -oP '[0-9]+')
-%global patch_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_PATCH | grep -oP '[0-9]+')
+%global maj_ver 10
+%global min_ver 0
+%global patch_ver 0
 
-%define commit %(git ls-remote %{build_repo} | grep -w "refs/heads/%{build_branch}" | awk '{print $1}')
+%define commit 2af29ec2a5f66a224848e0368daf5ba5fc03c342
+%global commit_date 20191006
 
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date %(date +"%Y%m%d")
+
 %global gitrel .%{commit_date}.git%{shortcommit}
 
 
@@ -21,7 +22,7 @@ Summary:	The LLVM Linker
 
 License:	NCSA
 URL:		https://github.com/llvm-mirror/
-Source0:	%url/%{name}/archive/%{build_branch}.tar.gz#/%{name}-%{build_branch}.tar.gz
+Source0:	%url/%{name}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
 
 Patch0:		0001-CMake-Check-for-gtest-headers-even-if-lit.py-is-not-.patch
 #Patch1:		0001-lld-Prefer-using-the-newest-installed-python-version.patch
@@ -59,7 +60,7 @@ Summary:	LLD shared libraries
 Shared libraries for LLD.
 
 %prep
-%autosetup -n %{name}-%{build_branch}
+%autosetup -n %{name}-%{commit}
 
 %build
 
@@ -113,5 +114,13 @@ chrpath --delete %{buildroot}%{_libdir}/*.so*
 %{_libdir}/liblld*.so.*
 
 %changelog
+* Sun Oct 06 2019 Mihai Vultur <xanto@egaming.ro>
+- Architecture specific builds might run asynchronous.
+- This might cause that same package build for x86_64 will be different when
+-  built for i686. This is problematic when we want to install multilib packages. 
+- Convert the specfile to template and use it to generate the actual script.
+- This will prevent the random failues and mismatch between arch versions.
+
 * Sun Jul 14 2019 Mihai Vultur <xanto@egaming.ro>
 - Implement some version autodetection to reduce maintenance work.
+- Based on spec files from 'GloriousEggroll' and 'che' coprs.

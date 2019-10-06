@@ -1,15 +1,15 @@
-%global build_branch master
 %global pkg_name compiler-rt
 
-%global build_repo https://github.com/llvm-mirror/%{pkg_name}
 
-%global maj_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_MAJOR | grep -oP '[0-9]+')
-%global min_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_MINOR | grep -oP '[0-9]+')
-%global patch_ver %(curl -s https://raw.githubusercontent.com/llvm/llvm-project/%{build_branch}/llvm/CMakeLists.txt | grep LLVM_VERSION_PATCH | grep -oP '[0-9]+')
+%global build_repo https://github.com/llvm-mirror/compiler-rt
 
-%define commit %(git ls-remote %{build_repo} | grep -w "refs/heads/%{build_branch}" | awk '{print $1}')
+%global maj_ver 10
+%global min_ver 0
+%global patch_ver 0
+
+%define commit 3154ce262c73bf5daecedbad78183d1d3d1fc648
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date %(date +"%Y%m%d")
+%global commit_date 20191006
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %define _unpackaged_files_terminate_build 0
@@ -21,9 +21,7 @@
 %global debug_package %{nil}
 %endif
 
-#%%global rc_ver 4
-
-%global crt_srcdir compiler-rt-%{build_branch}
+%global crt_srcdir compiler-rt-%{commit}
 
 Name:		%{pkg_name}
 Version:	%{maj_ver}.%{min_ver}.%{patch_ver}
@@ -32,7 +30,7 @@ Summary:	LLVM "compiler-rt" runtime libraries
 
 License:	NCSA or MIT
 URL:		https://github.com/llvm-mirror
-Source0:	%url/%{name}/archive/%{build_branch}.tar.gz#/%{crt_srcdir}.tar.gz
+Source0:	%url/%{name}/archive/%{commit}.tar.gz#/%{crt_srcdir}.tar.gz
 
 Patch0:		0001-PATCH-std-thread-copy.patch
 
@@ -104,8 +102,16 @@ done
 %{_libdir}/clang/%{version}
 
 %changelog
+* Sun Oct 06 2019 Mihai Vultur <xanto@egaming.ro>
+- Architecture specific builds might run asynchronous.
+- This might cause that same package build for x86_64 will be different when
+-  built for i686. This is problematic when we want to install multilib packages. 
+- Convert the specfile to template and use it to generate the actual script.
+- This will prevent the random failues and mismatch between arch versions.
+
 * Sun Jul 14 2019 Mihai Vultur <xanto@egaming.ro>
 - Implement some version autodetection to reduce maintenance work.
+- Based on spec files from 'GloriousEggroll' and 'che' coprs.
 
 * Wed Mar 20 2019 sguelton@redhat.com - 8.0.0-1
 - 8.0.0 final
