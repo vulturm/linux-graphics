@@ -12,11 +12,11 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit d7f57aaefb1d8d3c483c2112ec6214f8ad5f8450
-%define tools_commit 2e6fcdfebbc3ea2875712b526809234ab728e56e
+%define commit afaf7b4576387ad03afacd65a2b3b0726cd631a0
+%define tools_commit a0c78e1b038a3263d36b08bc856a1354c05d1354
 
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191006
+%global commit_date 20191007
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %global _default_patch_fuzz 2
@@ -32,8 +32,8 @@
 	%{_bindir}/clang-reorder-fields \
 	%{_bindir}/clang-rename \
 	%{_bindir}/clang-tidy \
-  %{_bindir}/clang-move \
-  %{_bindir}/pp-trace \
+	%{_bindir}/clang-move \
+	%{_bindir}/pp-trace \
   %{_bindir}/clang-doc
 
 %global clang_binaries \
