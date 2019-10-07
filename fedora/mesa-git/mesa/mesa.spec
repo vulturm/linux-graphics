@@ -1,19 +1,13 @@
 %define package_name mesa
 %global build_branch master
 
-%if 0%{?_with_aco:1}
-%global build_repo https://github.com/daniel-schuermann/mesa/
-%define numeric_ver %(curl -s https://raw.githubusercontent.com/daniel-schuermann/mesa/master/VERSION | grep -oP '[0-9.]+')
-%define source_url %{build_repo}/archive/%{build_branch}.zip#/mesa-%{build_branch}.zip
-%else
-%global build_repo https://gitlab.freedesktop.org/mesa/mesa/
-%define numeric_ver %(curl -s https://gitlab.freedesktop.org/mesa/mesa/raw/master/VERSION | grep -oP '[0-9.]+')
-%define source_url %{build_repo}/-/archive/%{build_branch}/mesa-%{build_branch}.zip
-%endif
+%global build_repo https://gitlab.freedesktop.org/mesa/mesa
+%define version_string 19.3.0
 
-%define build_shortcommit %(git ls-remote %{build_repo} | grep -w "refs/heads/%{build_branch}" | cut -c1-8)
-%global build_timestamp %(date +"%Y%m%d")
-%global rel_build %{build_timestamp}.%{build_shortcommit}%{?dist}
+%define commit 8d0830de05e5d6212a6a0e1b26ea52b0748b0264
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
+%global commit_date 20191007
+%global gitrel .%{commit_date}.%{shortcommit}
 
 
 ### LTO and debugpackages are not working together
@@ -77,13 +71,13 @@
 
 Name:           %{package_name}
 Summary:        Mesa 3D Graphics Library, git version
-Version:        %{numeric_ver}
-Release:        %{rel_build}
+Version:        %{version_string}
+Release:        0.1%{?gitrel}%{?dist}
 
 License:        MIT
 URL:            http://www.mesa3d.org
 
-Source0:        %{source_url}
+Source0:        %{build_repo}/-/archive/%{commit}/mesa-%{commit}.zip
 # src/gallium/auxiliary/postprocess/pp_mlaa* have an ... interestingly worded license.
 # Source1 contains email correspondence clarifying the license terms.
 # Fedora opts to ignore the optional part of clause 2 and treat that code as 2 clause BSD.
@@ -388,7 +382,7 @@ Headers for development with the Vulkan API.
 
 %prep
 %setup -q -c
-%autosetup -n mesa-%{build_branch} -p1
+%autosetup -n mesa-%{commit} -p1
 cp %{SOURCE1} docs/
 
 cp %{SOURCE2} .
@@ -698,6 +692,13 @@ popd
 %endif
 
 %changelog
+* Sun Oct 06 2019 Mihai Vultur <xanto@egaming.ro>
+- Architecture specific builds might run asynchronous.
+- This might cause that same package build for x86_64 will be different when
+-  built for i686. This is problematic when we want to install multilib packages. 
+- Convert the specfile to template and use it to generate the actual script.
+- This will prevent the random failues and mismatch between arch versions.
+
 * Sun Sep 08 2019 Mihai Vultur <xanto@egaming.ro>
 - Merge the two implementations.
 
