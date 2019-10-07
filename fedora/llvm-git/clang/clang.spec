@@ -32,7 +32,9 @@
 	%{_bindir}/clang-reorder-fields \
 	%{_bindir}/clang-rename \
 	%{_bindir}/clang-tidy \
-        %{_bindir}/clang-doc
+  %{_bindir}/clang-move \
+  %{_bindir}/pp-trace \
+  %{_bindir}/clang-doc
 
 %global clang_binaries \
 	%{_bindir}/clang \
