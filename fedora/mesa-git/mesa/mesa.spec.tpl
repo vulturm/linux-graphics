@@ -480,15 +480,7 @@ popd
 %{_libdir}/libGLX_mesa.so.0*
 %{_libdir}/libGLX_system.so.0*
 %files libGL-devel
-%{_includedir}/GL/gl.h
-%{_includedir}/GL/gl_mangle.h
-%{_includedir}/GL/glext.h
-%{_includedir}/GL/glx.h
-%{_includedir}/GL/glx_mangle.h
-%{_includedir}/GL/glxext.h
-%{_includedir}/GL/glcorearb.h
-%dir %{_includedir}/GL/internal
-%{_includedir}/GL/internal/dri_interface.h
+%{_includedir}/GL/*
 %{_libdir}/pkgconfig/dri.pc
 %{_libdir}/libglapi.so
 %{_libdir}/pkgconfig/gl.pc
