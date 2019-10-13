@@ -12,11 +12,11 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit d3ddab8b2613f009318246c52d8b79ddc5fd492d
-%define tools_commit 906fb660adc792e6631b7f944ec7bd67647992e6
+%define commit a4f23f4b48700a9c3a571df3a9601fd76ef3aea9
+%define tools_commit d48801e0334f3d29fe637481aeee513fe9912ad4
 
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191011
+%global commit_date 20191013
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %global _default_patch_fuzz 2
