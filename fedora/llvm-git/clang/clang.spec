@@ -12,11 +12,11 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit a4f23f4b48700a9c3a571df3a9601fd76ef3aea9
-%define tools_commit d48801e0334f3d29fe637481aeee513fe9912ad4
+%define commit e0e9d03fa35a52eaf8ce3823d4a4ff96421e6706
+%define tools_commit b66832303aa29f60631b7e18489c0566ab261924
 
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191013
+%global commit_date 20191015
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %global _default_patch_fuzz 2
@@ -24,12 +24,31 @@
 
 %global clang_tools_binaries \
 	%{_bindir}/clangd \
-	%{_bindir}/pp-trace
+	%{_bindir}/clang-apply-replacements \
+	%{_bindir}/clang-change-namespace \
+	%{_bindir}/clang-include-fixer \
+	%{_bindir}/clang-query \
+	%{_bindir}/clang-refactor \
+	%{_bindir}/clang-reorder-fields \
+	%{_bindir}/clang-rename \
+	%{_bindir}/clang-tidy \
+	%{_bindir}/clang-move \
+	%{_bindir}/pp-trace \
+  %{_bindir}/clang-doc
 
 %global clang_binaries \
 	%{_bindir}/clang \
-	%{_bindir}/clang+* \
-	%{_bindir}/clang-* \
+	%{_bindir}/clang++ \
+	%{_bindir}/clang-%{maj_ver} \
+	%{_bindir}/clang++-%{maj_ver} \
+	%{_bindir}/clang-check \
+	%{_bindir}/clang-cl \
+	%{_bindir}/clang-cpp \
+	%{_bindir}/clang-scan-deps \
+	%{_bindir}/clang-extdef-mapping \
+	%{_bindir}/clang-format \
+	%{_bindir}/clang-import-test \
+	%{_bindir}/clang-offload-bundler \
 	%{_bindir}/diagtool \
 	%{_bindir}/hmaptool
 
