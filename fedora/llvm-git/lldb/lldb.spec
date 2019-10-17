@@ -7,7 +7,7 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 138341722ab625b5cecaee526d689cfbae426b1c
+%define commit 0d781bcb20fcf7ef9e28dcfc5d0bac13dbfc4bca
 %global commit_date 20191017
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
@@ -21,7 +21,7 @@ Summary:	Next generation high-performance debugger
 
 License:	NCSA
 URL:		https://github.com/llvm-mirror/
-Source0:	%url/%{name}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
+Source0:	%{build_repo}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
 
 
 BuildRequires:	cmake

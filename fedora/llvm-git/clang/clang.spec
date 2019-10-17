@@ -12,7 +12,7 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 3b8d539899d6651504edfbaaa2ea68eb9d7aa6ac
+%define commit e4ee647b662bd42a3cc7b96577c1b0bb3b151143
 %define tools_commit 4e1c1408f1a54e3cf318279bc194f52807d732f8
 
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
