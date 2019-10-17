@@ -7,9 +7,9 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 011274a28238f524397923213db6e6514358d05f
+%define commit 9729ecdb6e3c00c6a432ba9d05916d14c6fde0de
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191015
+%global commit_date 20191017
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %define _unpackaged_files_terminate_build 0
@@ -216,7 +216,7 @@ done
 * Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
-* Mon Nov 21 2016 Dan Horák <dan[at]danny.cz> - 3.9.0-3
+* Mon Nov 21 2016 Dan Horak <dan[at]danny.cz> - 3.9.0-3
 - disable debuginfo on s390(x)
 
 * Wed Nov 02 2016 Dave Airlie <airlied@redhat.com> - 3.9.0-2

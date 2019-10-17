@@ -216,7 +216,7 @@ done
 * Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
-* Mon Nov 21 2016 Dan Horák <dan[at]danny.cz> - 3.9.0-3
+* Mon Nov 21 2016 Dan Horak <dan[at]danny.cz> - 3.9.0-3
 - disable debuginfo on s390(x)
 
 * Wed Nov 02 2016 Dave Airlie <airlied@redhat.com> - 3.9.0-2
