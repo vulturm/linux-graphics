@@ -7,7 +7,7 @@
 
 %define commit 9aa6f350a6ce0f2cfc7e489495af8899ca74e079
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191015
+%global commit_date 20191017
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %define _unpackaged_files_terminate_build 0
@@ -123,7 +123,7 @@ export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
 * Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.0-10.git1cb3fbf
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
-* Wed Aug 02 2017 Dan Horák <dan[at]danny.cz> - 0.2.0-9.git1cb3fbf
+* Wed Aug 02 2017 Dan Horak <dan[at]danny.cz> - 0.2.0-9.git1cb3fbf
 - Drop build workarounds
 
 * Wed Jul 26 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.0-8.git1cb3fbf
@@ -138,7 +138,7 @@ export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
 * Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.0-5.20160207gitdc330a3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
-* Wed Aug 10 2016 Dan Horák <dan[at]danny.cz> - 0.2.0-4.20160207gitdc330a3
+* Wed Aug 10 2016 Dan Horak <dan[at]danny.cz> - 0.2.0-4.20160207gitdc330a3
 - Build on s390x
 
 * Sun Apr 10 2016 Peter Robinson <pbrobinson@fedoraproject.org> 0.2.0-3.20160207gitdc330a3
