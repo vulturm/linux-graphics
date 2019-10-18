@@ -1,4 +1,5 @@
 %global compat_build 0
+%define debug_package %{nil}
 %if 0%{?_with_llvm9:1}
   %define build_branch release_90
 %else
@@ -12,11 +13,11 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit e4ee647b662bd42a3cc7b96577c1b0bb3b151143
-%define tools_commit 4e1c1408f1a54e3cf318279bc194f52807d732f8
+%define commit e43eb432de21ed58e59e9fa7514750b901396916
+%define tools_commit f57e6b037bc0b33d791008aafe7f6b34a77fcbc0
 
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191017
+%global commit_date 20191018
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %global _default_patch_fuzz 2
