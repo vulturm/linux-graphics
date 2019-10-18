@@ -1,3 +1,4 @@
+%define debug_package %{nil}
 %if 0%{?_with_llvm9:1}
   %define build_branch release_90
 %else
