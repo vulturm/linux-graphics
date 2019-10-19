@@ -11,9 +11,9 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 4e1c632114c90969ee26809196b2e468bce4333f
+%define commit c6240320003b308f1ed304f5d656ede5a0748bd0
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191018
+%global commit_date 20191019
 %global gitrel .%{commit_date}.git%{shortcommit}
 %global _default_patch_fuzz 2
 
@@ -193,6 +193,7 @@ cd _build
 
 # force off shared libs as cmake macros turns it on.
 %cmake .. -G Ninja \
+ 	-DCMAKE_RULE_MESSAGES:BOOL=OFF \
 	-DBUILD_SHARED_LIBS:BOOL=OFF \
 	-DLLVM_PARALLEL_LINK_JOBS=1 \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
