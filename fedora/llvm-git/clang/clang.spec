@@ -299,7 +299,7 @@ cd _build
 	-DLLVM_BUILD_DOCS=ON \
 	-DLLVM_ENABLE_SPHINX=ON \
 	-DSPHINX_WARNINGS_AS_ERRORS=OFF \
-        -DLLVM_USE_LINKER=gold \
+        -DLLVM_USE_LINKER=lld \
 	\
 	-DCLANG_BUILD_EXAMPLES:BOOL=OFF \
 	-DCLANG_REPOSITORY_STRING="%{?fedora:Fedora}%{?rhel:Red Hat} %{version}-%{release}"
