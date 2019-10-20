@@ -25,33 +25,15 @@
 
 %global clang_tools_binaries \
 	%{_bindir}/clangd \
-	%{_bindir}/clang-apply-replacements \
-	%{_bindir}/clang-change-namespace \
-	%{_bindir}/clang-include-fixer \
-	%{_bindir}/clang-query \
-	%{_bindir}/clang-refactor \
-	%{_bindir}/clang-reorder-fields \
-	%{_bindir}/clang-rename \
-	%{_bindir}/clang-tidy \
-	%{_bindir}/clang-move \
 	%{_bindir}/pp-trace \
-  %{_bindir}/clang-doc
+	%{_bindir}/diagtool \
+	%{_bindir}/hmaptool
+
 
 %global clang_binaries \
 	%{_bindir}/clang \
-	%{_bindir}/clang++ \
-	%{_bindir}/clang-%{maj_ver} \
-	%{_bindir}/clang++-%{maj_ver} \
-	%{_bindir}/clang-check \
-	%{_bindir}/clang-cl \
-	%{_bindir}/clang-cpp \
-	%{_bindir}/clang-scan-deps \
-	%{_bindir}/clang-extdef-mapping \
-	%{_bindir}/clang-format \
-	%{_bindir}/clang-import-test \
-	%{_bindir}/clang-offload-bundler \
-	%{_bindir}/diagtool \
-	%{_bindir}/hmaptool
+	%{_bindir}/clang+* \
+	%{_bindir}/clang-*
 
 %if 0%{?compat_build}
 %global pkg_name clang%{maj_ver}.%{min_ver}
