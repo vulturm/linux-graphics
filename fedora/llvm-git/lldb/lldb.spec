@@ -20,8 +20,8 @@ Release:	0.1%{?gitrel}%{?dist}
 Summary:	Next generation high-performance debugger
 
 License:	NCSA
-URL:		https://github.com/llvm-mirror/
-Source0:	%{build_repo}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
+URL:		https://github.com/llvm-mirror
+Source0:	%url/%{name}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
 
 
 BuildRequires:	cmake

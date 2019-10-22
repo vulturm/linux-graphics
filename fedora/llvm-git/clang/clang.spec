@@ -13,11 +13,11 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit c12eb40f6c6eca83e99bc20f6813dc32e3e68831
+%define commit 65acf43270ea2894dffa0d0b292b92402f80c8cb
 %define tools_commit 5c40544fa40bfb85ec888b6a03421b3905e4a4e7
 
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191021
+%global commit_date 20191022
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %global _default_patch_fuzz 2
@@ -253,7 +253,7 @@ cd _build
   -DCMAKE_RULE_MESSAGES:BOOL=OFF \
 	-DLLVM_PARALLEL_LINK_JOBS=1 \
 	-DLLVM_LINK_LLVM_DYLIB:BOOL=ON \
-	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+	-DCMAKE_BUILD_TYPE=Release \
 	-DPYTHON_EXECUTABLE=%{__python3} \
 	-DCMAKE_SKIP_RPATH:BOOL=ON \
 	-DCMAKE_INSTALL_RPATH:BOOL=OFF \
@@ -288,7 +288,7 @@ cd _build
 	-DCLANG_BUILD_EXAMPLES:BOOL=OFF \
 	-DCLANG_REPOSITORY_STRING="%{?fedora:Fedora}%{?rhel:Red Hat} %{version}-%{release}"
 
-ninja
+ninja -j 1
 
 %install
 DESTDIR=%{buildroot} ninja install -C _build

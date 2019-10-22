@@ -7,7 +7,7 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 59231e5aff254f28b7ea7bcfd32cd759511d5844
+%define commit 69445f095c22aac2388f939bedebf224a6efcdaf
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global commit_date 20191022
 
