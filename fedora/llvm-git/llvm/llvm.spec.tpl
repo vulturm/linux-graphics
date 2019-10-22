@@ -325,11 +325,11 @@ cp -R _build/unittests %{build_llvm_libdir}/
 rm -rf `find %{build_llvm_libdir} -iname 'cmake*'`
 
 # Workaround missing ${_IMPORT_PREFIX}
-sed -i.bak 's|%{buildroot}%{_prefix}|${_IMPORT_PREFIX}|g' %{buildroot}%{_libdir}/cmake/%{name}/LLVMExports-relwithdebinfo.cmake
+sed -i.bak 's|%{buildroot}%{_prefix}|${_IMPORT_PREFIX}|g' %{buildroot}%{_libdir}/cmake/%{name}/LLVMExports-*.cmake
 
 ## Checking what we changed and then removing the backup file. Copr logs it then.
-diff -u %{buildroot}%{_libdir}/cmake/%{name}/LLVMExports-relwithdebinfo.cmake.bak %{buildroot}%{_libdir}/cmake/%{name}/LLVMExports-relwithdebinfo.cmake || :
-rm -f %{buildroot}%{_libdir}/cmake/%{name}/LLVMExports-relwithdebinfo.cmake.bak
+diff -u %{buildroot}%{_libdir}/cmake/%{name}/LLVMExports-*.cmake.bak %{buildroot}%{_libdir}/cmake/%{name}/LLVMExports-*.cmake || :
+rm -f %{buildroot}%{_libdir}/cmake/%{name}/LLVMExports-*.cmake.bak
 
 %else
 
