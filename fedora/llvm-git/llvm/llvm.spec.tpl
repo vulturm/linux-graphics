@@ -196,7 +196,7 @@ cd _build
  	-DCMAKE_RULE_MESSAGES:BOOL=OFF \
 	-DBUILD_SHARED_LIBS:BOOL=OFF \
 	-DLLVM_PARALLEL_LINK_JOBS=1 \
-	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+	-DCMAKE_BUILD_TYPE=Release \
 	-DCMAKE_SKIP_RPATH:BOOL=ON \
 	-DCMAKE_INSTALL_RPATH:BOOL=OFF \
 %ifarch s390 %{arm} %ix86
@@ -256,7 +256,7 @@ cd _build
 	-DLLVM_INSTALL_SPHINX_HTML_DIR=%{build_pkgdocdir}/html \
 	-DSPHINX_EXECUTABLE=%{_bindir}/sphinx-build-3
 
-ninja -vvv
+ninja
 
 %install
 ninja -C _build -v install

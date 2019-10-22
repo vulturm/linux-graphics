@@ -253,7 +253,7 @@ cd _build
   -DCMAKE_RULE_MESSAGES:BOOL=OFF \
 	-DLLVM_PARALLEL_LINK_JOBS=1 \
 	-DLLVM_LINK_LLVM_DYLIB:BOOL=ON \
-	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+	-DCMAKE_BUILD_TYPE=Release \
 	-DPYTHON_EXECUTABLE=%{__python3} \
 	-DCMAKE_SKIP_RPATH:BOOL=ON \
 	-DCMAKE_INSTALL_RPATH:BOOL=OFF \
@@ -288,7 +288,7 @@ cd _build
 	-DCLANG_BUILD_EXAMPLES:BOOL=OFF \
 	-DCLANG_REPOSITORY_STRING="%{?fedora:Fedora}%{?rhel:Red Hat} %{version}-%{release}"
 
-ninja
+ninja -j 1
 
 %install
 DESTDIR=%{buildroot} ninja install -C _build
