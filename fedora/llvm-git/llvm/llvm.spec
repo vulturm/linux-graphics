@@ -13,7 +13,7 @@
 
 %define commit 2c4ca6832fa6b306ee6a7010bfb80a3f2596f824
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191022
+%global commit_date 20191023
 %global gitrel .%{commit_date}.git%{shortcommit}
 %global _default_patch_fuzz 2
 
@@ -325,11 +325,11 @@ cp -R _build/unittests %{build_llvm_libdir}/
 rm -rf `find %{build_llvm_libdir} -iname 'cmake*'`
 
 # Workaround missing ${_IMPORT_PREFIX}
-sed -i.bak 's|%{buildroot}%{_prefix}|${_IMPORT_PREFIX}|g' %{buildroot}%{_libdir}/cmake/%{name}/LLVMExports-relwithdebinfo.cmake
+sed -i.bak 's|%{buildroot}%{_prefix}|${_IMPORT_PREFIX}|g' %{buildroot}%{_libdir}/cmake/%{name}/LLVMExports-*.cmake
 
 ## Checking what we changed and then removing the backup file. Copr logs it then.
-diff -u %{buildroot}%{_libdir}/cmake/%{name}/LLVMExports-relwithdebinfo.cmake.bak %{buildroot}%{_libdir}/cmake/%{name}/LLVMExports-relwithdebinfo.cmake || :
-rm -f %{buildroot}%{_libdir}/cmake/%{name}/LLVMExports-relwithdebinfo.cmake.bak
+diff -u %{buildroot}%{_libdir}/cmake/%{name}/LLVMExports-*.cmake.bak %{buildroot}%{_libdir}/cmake/%{name}/LLVMExports-*.cmake || :
+rm -f %{buildroot}%{_libdir}/cmake/%{name}/LLVMExports-*.cmake.bak
 
 %else
 
