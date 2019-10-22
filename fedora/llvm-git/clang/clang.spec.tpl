@@ -25,15 +25,17 @@
 
 %global clang_tools_binaries \
 	%{_bindir}/clangd \
-	%{_bindir}/pp-trace \
-	%{_bindir}/diagtool \
-	%{_bindir}/hmaptool
+	%{_bindir}/clang-* \
+	%{_bindir}/pp-trace
 
 
 %global clang_binaries \
 	%{_bindir}/clang \
 	%{_bindir}/clang+* \
-	%{_bindir}/clang-*
+	%{_bindir}/clang-* \
+	%{_bindir}/diagtool \
+	%{_bindir}/hmaptool
+
 
 %if 0%{?compat_build}
 %global pkg_name clang%{maj_ver}.%{min_ver}
