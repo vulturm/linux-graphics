@@ -65,7 +65,7 @@ The package contains the LLDB Python module.
 curl -k -L %{url}/%{name}/archive/%{commit}.tar.gz -o %{name}-%{commit}.tar.gz
 pwd
 find . 
-%setup -q -n %{name}-%{commit}
+%autosetup -n %{name}-%{commit} -p1
 
 
 # HACK so that lldb can find its custom readline.so, because we move it
