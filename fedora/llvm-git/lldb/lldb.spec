@@ -62,7 +62,9 @@ Requires:	python2-six
 The package contains the LLDB Python module.
 
 %prep
-
+curl -k -L %{url}/%{name}/archive/%{commit}.tar.gz -o %{name}-%{commit}.tar.gz
+pwd
+find . 
 %setup -q -n %{name}-%{commit}
 
 
