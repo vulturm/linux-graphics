@@ -1,4 +1,3 @@
-%undefine _disable_source_fetch
 %global build_branch master
 %global pkg_name lldb
 
@@ -22,7 +21,7 @@ Summary:	Next generation high-performance debugger
 
 License:	NCSA
 URL:		https://github.com/llvm-mirror
-Source0:	%{url}/%{name}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
+Source0:	%url/%{name}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
 
 
 BuildRequires:	cmake
@@ -63,7 +62,7 @@ Requires:	python2-six
 The package contains the LLDB Python module.
 
 %prep
-curl -k -L %{url}/%{name}/archive/%{commit}.tar.gz -o %{name}-%{commit}.tar.gz
+
 %setup -q -n %{name}-%{commit}
 
 
