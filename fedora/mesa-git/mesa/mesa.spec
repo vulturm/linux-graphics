@@ -4,7 +4,7 @@
 %global build_repo https://gitlab.freedesktop.org/mesa/mesa
 %define version_string 19.3.0
 
-%define commit fff884e09d2f1f560a1106d9b6f70eabec84b0bc
+%define commit 3168b8defaf5b33faa1b9f53bbddae40474568c5
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global commit_date 20191024
 %global gitrel .%{commit_date}.%{shortcommit}
