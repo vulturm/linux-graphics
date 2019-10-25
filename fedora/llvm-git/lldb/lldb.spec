@@ -8,7 +8,7 @@
 %global patch_ver 0
 
 %define commit d01083a850f577b85501a0902b52fd0930de72c7
-%global commit_date 20191023
+%global commit_date 20191025
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 %global gitrel .%{commit_date}.git%{shortcommit}
@@ -62,10 +62,8 @@ Requires:	python2-six
 The package contains the LLDB Python module.
 
 %prep
-curl -k -L %{url}/%{name}/archive/%{commit}.tar.gz -o %{name}-%{commit}.tar.gz
-pwd
-find . 
-%autosetup -n %{name}-%{commit} -p1
+
+%setup -q -n %{name}-%{commit}
 
 
 # HACK so that lldb can find its custom readline.so, because we move it

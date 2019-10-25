@@ -1,4 +1,5 @@
 %global compat_build 0
+%define debug_package %{nil}
 %if 0%{?_with_llvm9:1}
   %define build_branch release_90
 %else
@@ -16,7 +17,7 @@
 %define tools_commit 5c40544fa40bfb85ec888b6a03421b3905e4a4e7
 
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191023
+%global commit_date 20191025
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %global _default_patch_fuzz 2
