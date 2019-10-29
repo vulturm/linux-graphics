@@ -13,7 +13,7 @@
 
 %define commit 2c4ca6832fa6b306ee6a7010bfb80a3f2596f824
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191027
+%global commit_date 20191029
 %global gitrel .%{commit_date}.git%{shortcommit}
 %global _default_patch_fuzz 2
 

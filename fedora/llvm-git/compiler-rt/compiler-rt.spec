@@ -9,7 +9,7 @@
 
 %define commit 69445f095c22aac2388f939bedebf224a6efcdaf
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191027
+%global commit_date 20191029
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %define _unpackaged_files_terminate_build 0
