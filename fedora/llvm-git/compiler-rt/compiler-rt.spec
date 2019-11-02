@@ -1,15 +1,15 @@
 %global pkg_name compiler-rt
 
 
-%global build_repo https://github.com/llvm-mirror/compiler-rt
+%global build_repo https://github.com/llvm/llvm-project
 
 %global maj_ver 10
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 69445f095c22aac2388f939bedebf224a6efcdaf
+%define commit c4b757be026150eee32050e120026b03d92eb421
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191101
+%global commit_date 20191102
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %define _unpackaged_files_terminate_build 0
@@ -21,7 +21,7 @@
 %global debug_package %{nil}
 %endif
 
-%global crt_srcdir compiler-rt-%{commit}
+%global crt_srcdir llvm-project-%{commit}/compiler-rt
 
 Name:		%{pkg_name}
 Version:	%{maj_ver}.%{min_ver}.%{patch_ver}
@@ -29,8 +29,8 @@ Release:	0.1%{?gitrel}%{?dist}
 Summary:	LLVM "compiler-rt" runtime libraries
 
 License:	NCSA or MIT
-URL:		https://github.com/llvm-mirror
-Source0:	%url/%{name}/archive/%{commit}.tar.gz#/%{crt_srcdir}.tar.gz
+URL:      https://llvm.org
+Source0:  %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 
 Patch0:		0001-PATCH-std-thread-copy.patch
 
@@ -102,6 +102,9 @@ done
 %{_libdir}/clang/%{version}
 
 %changelog
+* Sat Nov 02 2019 Mihai Vultur <xanto@egaming.ro>
+- Now that they have migrated to github, change to official source url.
+
 * Sun Oct 06 2019 Mihai Vultur <xanto@egaming.ro>
 - Architecture specific builds might run asynchronous.
 - This might cause that same package build for x86_64 will be different when

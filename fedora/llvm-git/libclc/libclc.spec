@@ -1,13 +1,13 @@
 %global build_branch master
-%global build_repo https://github.com/llvm-mirror/libclc
+%global build_repo https://github.com/llvm/llvm-project
 
 %global maj_ver 10
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 9aa6f350a6ce0f2cfc7e489495af8899ca74e079
+%define commit c4b757be026150eee32050e120026b03d92eb421
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191101
+%global commit_date 20191102
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %define _unpackaged_files_terminate_build 0
@@ -24,8 +24,8 @@ Release:        0.1%{?gitrel}%{?dist}
 Summary:        An open source implementation of the OpenCL 1.1 library requirements
 
 License:        BSD
-URL:            https://github.com/llvm-mirror
-Source0:        %url/%{name}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
+URL:            https://llvm.org
+Source0:        %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 
 ExclusiveArch:	%{ix86} x86_64 %{arm} aarch64 %{power64} s390x
 
@@ -71,7 +71,7 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -n %{name}-%{commit}
+%autosetup -n llvm-project-%{commit}/%{name}
 
 %build
 export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
@@ -94,6 +94,9 @@ export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Sat Nov 02 2019 Mihai Vultur <xanto@egaming.ro>
+- Now that they have migrated to github, change to official source url.
+
 * Sun Oct 06 2019 Mihai Vultur <xanto@egaming.ro>
 - Architecture specific builds might run asynchronous.
 - This might cause that same package build for x86_64 will be different when

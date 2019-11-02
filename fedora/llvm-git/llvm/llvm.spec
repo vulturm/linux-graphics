@@ -5,15 +5,15 @@
   %define build_branch master
 %endif
 
-%global build_repo https://github.com/llvm-mirror/llvm
+%global build_repo https://github.com/llvm/llvm-project
 
 %global maj_ver 10
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 2c4ca6832fa6b306ee6a7010bfb80a3f2596f824
+%define commit c4b757be026150eee32050e120026b03d92eb421
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191101
+%global commit_date 20191102
 %global gitrel .%{commit_date}.git%{shortcommit}
 %global _default_patch_fuzz 2
 
@@ -70,18 +70,17 @@
 %global build_install_prefix %{buildroot}%{install_prefix}
 %global build_pkgdocdir %{buildroot}%{_pkgdocdir}
 
-Name:		%{pkg_name}
+Name:		  %{pkg_name}
 Version:	%{maj_ver}.%{min_ver}.%{patch_ver}
 Release:	0.1%{?gitrel}%{?dist}
 Summary:	The Low Level Virtual Machine
 
 License:	NCSA
-URL:		https://github.com/llvm-mirror/
-Source0:  %url/%{name}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
+URL:      https://llvm.org
+Source0:  %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 Source1:	run-lit-tests
 
 Patch5:		0001-PATCH-llvm-config.patch
-Patch7:		0001-PATCH-Filter-out-cxxflags-not-supported-by-clang.patch
 
 BuildRequires:	gcc
 BuildRequires:	gcc-c++
@@ -174,7 +173,7 @@ LLVM's modified googletest sources.
 %endif
 
 %prep
-%autosetup -n %{name}-%{commit} -p1
+%autosetup -n llvm-project-%{commit}/llvm -p1
 
 pathfix.py -i %{__python3} -pn \
 	test/BugPoint/compile-custom.ll.py \
@@ -477,6 +476,9 @@ fi
 %endif
 
 %changelog
+* Sat Nov 02 2019 Mihai Vultur <xanto@egaming.ro>
+- Now that they have migrated to github, change to official source url.
+
 * Sun Oct 06 2019 Mihai Vultur <xanto@egaming.ro>
 - Architecture specific builds might run asynchronous.
 - This might cause that same package build for x86_64 will be different when
