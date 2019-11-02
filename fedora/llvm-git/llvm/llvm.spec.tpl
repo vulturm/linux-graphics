@@ -81,7 +81,6 @@ Source0:  %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 Source1:	run-lit-tests
 
 Patch5:		0001-PATCH-llvm-config.patch
-Patch7:		0001-PATCH-Filter-out-cxxflags-not-supported-by-clang.patch
 
 BuildRequires:	gcc
 BuildRequires:	gcc-c++
