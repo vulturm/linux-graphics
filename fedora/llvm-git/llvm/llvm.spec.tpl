@@ -70,14 +70,14 @@
 %global build_install_prefix %{buildroot}%{install_prefix}
 %global build_pkgdocdir %{buildroot}%{_pkgdocdir}
 
-Name:		%{pkg_name}
+Name:		  %{pkg_name}
 Version:	%{maj_ver}.%{min_ver}.%{patch_ver}
 Release:	0.1%{?gitrel}%{?dist}
 Summary:	The Low Level Virtual Machine
 
 License:	NCSA
-URL:		https://github.com/llvm-mirror/
-Source0:  %url/%{name}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
+URL:      https://llvm.org
+Source0:  %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 Source1:	run-lit-tests
 
 Patch5:		0001-PATCH-llvm-config.patch
@@ -174,7 +174,7 @@ LLVM's modified googletest sources.
 %endif
 
 %prep
-%autosetup -n %{name}-%{commit} -p1
+%autosetup -n llvm-project-%{commit}/llvm -p1
 
 pathfix.py -i %{__python3} -pn \
 	test/BugPoint/compile-custom.ll.py \
@@ -477,6 +477,9 @@ fi
 %endif
 
 %changelog
+* Sat Nov 02 2019 Mihai Vultur <xanto@egaming.ro>
+- Now that they have migrated to github, change to official source url.
+
 * Sun Oct 06 2019 Mihai Vultur <xanto@egaming.ro>
 - Architecture specific builds might run asynchronous.
 - This might cause that same package build for x86_64 will be different when

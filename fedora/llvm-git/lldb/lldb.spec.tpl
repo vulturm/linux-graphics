@@ -20,8 +20,8 @@ Release:	0.1%{?gitrel}%{?dist}
 Summary:	Next generation high-performance debugger
 
 License:	NCSA
-URL:		https://github.com/llvm-mirror
-Source0:	%url/%{name}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
+URL:      https://llvm.org
+Source0:  %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 
 
 BuildRequires:	cmake
@@ -63,7 +63,7 @@ The package contains the LLDB Python module.
 
 %prep
 
-%setup -q -n %{name}-%{commit}
+%setup -q -n llvm-project-%{commit}/%{name}
 
 
 # HACK so that lldb can find its custom readline.so, because we move it
@@ -136,6 +136,9 @@ rm -f %{buildroot}%{python2_sitearch}/six.*
 %{python2_sitearch}/lldb
 
 %changelog
+* Sat Nov 02 2019 Mihai Vultur <xanto@egaming.ro>
+- Now that they have migrated to github, change to official source url.
+
 * Sun Oct 06 2019 Mihai Vultur <xanto@egaming.ro>
 - Architecture specific builds might run asynchronous.
 - This might cause that same package build for x86_64 will be different when

@@ -6,15 +6,13 @@
   %define build_branch master
 %endif
 
-%global clang_build_repo https://github.com/llvm-mirror/clang
-%global tools_build_repo https://github.com/llvm-mirror/clang-tools-extra
+%global build_repo BUILD_REPO
 
 %global maj_ver MAJ_VER
 %global min_ver MIN_VER
 %global patch_ver PATCH_VER
 
 %define commit COMMIT
-%define tools_commit TOOLS_COMM
 
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global commit_date CODE_DATE
@@ -62,8 +60,8 @@
 
 %global build_install_prefix %{buildroot}%{install_prefix}
 
-%global clang_srcdir %{name}-%{commit}
-%global clang_tools_srcdir clang-tools-extra-%{tools_commit}
+%global clang_srcdir llvm-project-%{commit}/clang
+%global clang_tools_srcdir llvm-project-%{commit}/clang-tools-extra
 
 Name:		%{pkg_name}
 Version:	%{maj_ver}.%{min_ver}.%{patch_ver}
@@ -71,11 +69,8 @@ Release:	0.1%{?gitrel}%{?dist}
 Summary:	A C language family front-end for LLVM
 
 License:	NCSA
-URL:		https://github.com/llvm-mirror/
-Source0:  %url/%{name}/archive/%{commit}.tar.gz#/%{clang_srcdir}.tar.gz
-%if !0%{?compat_build}
-Source1:  %url/clang-tools-extra/archive/%{tools_commit}.tar.gz#/%{clang_tools_srcdir}.tar.gz
-%endif
+URL:      https://llvm.org
+Source0:  %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 
 Patch4:		0002-gtest-reorg.patch
 Patch10:	0001-Workaround-GCC-9-bug-when-handling-bitfields.patch
@@ -209,22 +204,24 @@ Requires:      python3
 
 %prep
 %if 0%{?compat_build}
-%autosetup -n %{clang_srcdir} -p1
-%else
-%setup -T -q -b 1 -n %{clang_tools_srcdir}
 
+%autosetup -D -n %{clang_srcdir} -p1
+
+%else
+
+%setup -D -q -n %{clang_tools_srcdir}
 
 pathfix.py -i %{__python3} -pn \
-	clang-tidy/tool/*.py \
-	clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py
+  clang-tidy/tool/*.py \
+  clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py
 
-%setup -q -n %{clang_srcdir}
+%setup -D -T -q -n %{clang_srcdir}
 
 %patch4 -p1 -b .gtest
 %patch10 -p1 -b .bitfields
 %patch11 -p1 -b .libcxx-fix
 
-mv ../%{clang_tools_srcdir} tools/extra
+mv ../clang-tools-extra tools/extra
 
 pathfix.py -i %{__python3} -pn \
 	tools/clang-format/*.py \
@@ -426,6 +423,9 @@ chmod u-x %{buildroot}%{_mandir}/man1/scan-build.1*
 
 %endif
 %changelog
+* Sat Nov 02 2019 Mihai Vultur <xanto@egaming.ro>
+- Now that they have migrated to github, change to official source url.
+
 * Sun Oct 06 2019 Mihai Vultur <xanto@egaming.ro>
 - Architecture specific builds might run asynchronous.
 - This might cause that same package build for x86_64 will be different when     

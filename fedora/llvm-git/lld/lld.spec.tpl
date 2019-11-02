@@ -21,8 +21,8 @@ Release:	0.1%{?gitrel}%{?dist}
 Summary:	The LLVM Linker
 
 License:	NCSA
-URL:		https://github.com/llvm-mirror/
-Source0:	%url/%{name}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
+URL:      https://llvm.org
+Source0:  %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 
 Patch0:		0001-CMake-Check-for-gtest-headers-even-if-lit.py-is-not-.patch
 #Patch1:		0001-lld-Prefer-using-the-newest-installed-python-version.patch
@@ -60,7 +60,7 @@ Summary:	LLD shared libraries
 Shared libraries for LLD.
 
 %prep
-%autosetup -n %{name}-%{commit}
+%autosetup -n llvm-project-%{commit}/%{name}
 
 %build
 
@@ -114,6 +114,9 @@ chrpath --delete %{buildroot}%{_libdir}/*.so*
 %{_libdir}/liblld*.so.*
 
 %changelog
+* Sat Nov 02 2019 Mihai Vultur <xanto@egaming.ro>
+- Now that they have migrated to github, change to official source url.
+
 * Sun Oct 06 2019 Mihai Vultur <xanto@egaming.ro>
 - Architecture specific builds might run asynchronous.
 - This might cause that same package build for x86_64 will be different when
