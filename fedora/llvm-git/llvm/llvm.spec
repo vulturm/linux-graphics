@@ -420,7 +420,6 @@ fi
 %if %{with gold}
 %{_libdir}/%{name}/lib/LLVMgold.so
 %endif
-%{pkg_libdir}/libLLVM-%{maj_ver}*.%{min_ver}*.so
 %{pkg_libdir}/libLTO.so*
 %exclude %{pkg_libdir}/libLTO.so
 %endif
@@ -455,7 +454,7 @@ fi
 %if !0%{?compat_build}
 %{_libdir}/*.a
 %exclude %{_libdir}/libLLVMTestingSupport.a
-%{_libdir}/cmake/llvm/LLVMStaticExports.cmake
+%{_libdir}/cmake/llvm/*.cmake
 %else
 %{_libdir}/%{name}/lib/*.a
 %endif
