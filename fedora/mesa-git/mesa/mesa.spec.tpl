@@ -72,7 +72,7 @@
 Name:           %{package_name}
 Summary:        Mesa 3D Graphics Library, git version
 Version:        %{version_string}
-Release:        0.1%{?gitrel}%{?dist}
+Release:        0.2%{?gitrel}%{?dist}
 
 License:        MIT
 URL:            http://www.mesa3d.org
@@ -82,8 +82,6 @@ Source0:        %{build_repo}/-/archive/%{commit}/mesa-%{commit}.zip
 # Source1 contains email correspondence clarifying the license terms.
 # Fedora opts to ignore the optional part of clause 2 and treat that code as 2 clause BSD.
 Source1:        Mesa-MLAA-License-Clarification-Email.txt
-
-Source2:	glesv2.pc
 
 Patch3:         0003-evergreen-big-endian.patch
 
@@ -184,12 +182,6 @@ Obsoletes:      mesa-dri-filesystem < %{?epoch:%{epoch}:}%{version}-%{release}
 %description filesystem
 %{summary}.
 
-%package khr-devel
-Summary:        Mesa Khronos development headers
-
-%description khr-devel
-%{summary}.
-
 %package libGL
 Summary:        Mesa libGL runtime libraries
 Requires:       %{name}-libglapi%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
@@ -202,7 +194,6 @@ Requires:       libglvnd-glx%{?_isa} >= 1:1.0.1-0.6.99
 Summary:        Mesa libGL development package
 Requires:       %{name}-libGL%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires:       libglvnd-devel%{?_isa}
-Requires:       %{name}-khr-devel%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 Provides:       libGL-devel
 Provides:       libGL-devel%{?_isa}
 
@@ -220,30 +211,11 @@ Requires:       libglvnd-egl%{?_isa}
 Summary:        Mesa libEGL development package
 Requires:       %{name}-libEGL%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires:       libglvnd-devel%{?_isa}
-Requires:       %{name}-khr-devel%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-khr-devel%{?_isa}
 Provides:       libEGL-devel
 Provides:       libEGL-devel%{?_isa}
 
 %description libEGL-devel
-%{summary}.
-
-%package libGLES
-Summary:        Mesa libGLES runtime libraries
-Requires:       %{name}-libglapi%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:       libglvnd-gles%{?_isa}
-
-%description libGLES
-%{summary}.
-
-%package libGLES-devel
-Summary:        Mesa libGLES development package
-Requires:       %{name}-libGLES%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:       libglvnd-devel%{?_isa}
-Requires:       %{name}-khr-devel%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Provides:       libGLES-devel
-Provides:       libGLES-devel%{?_isa}
-
-%description libGLES-devel
 %{summary}.
 
 %package dri-drivers
@@ -385,8 +357,6 @@ Headers for development with the Vulkan API.
 %autosetup -n mesa-%{commit} -p1
 cp %{SOURCE1} docs/
 
-cp %{SOURCE2} .
-
 %build
 
 ## enable LTO
@@ -442,8 +412,6 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
 %install
 %meson_install
 
-install glesv2.pc %{buildroot}%{_libdir}/pkgconfig/
-
 # libvdpau opens the versioned name, don't bother including the unversioned
 rm -vf %{buildroot}%{_libdir}/vdpau/*.so
 # likewise glvnd
@@ -472,10 +440,6 @@ popd
 %endif
 %endif
 
-%files khr-devel
-%dir %{_includedir}/KHR
-%{_includedir}/KHR/khrplatform.h
-
 %files libGL
 %{_libdir}/libGLX_mesa.so.0*
 %{_libdir}/libGLX_system.so.0*
@@ -483,8 +447,6 @@ popd
 %{_includedir}/GL/*
 %{_libdir}/pkgconfig/dri.pc
 %{_libdir}/libglapi.so
-%{_libdir}/pkgconfig/gl.pc
-%{_libdir}/pkgconfig/egl.pc
 
 
 %files libEGL
@@ -492,26 +454,8 @@ popd
 %{_libdir}/libEGL_mesa.so.0*
 %files libEGL-devel
 %dir %{_includedir}/EGL
-%{_includedir}/EGL/eglext.h
-%{_includedir}/EGL/egl.h
 %{_includedir}/EGL/eglmesaext.h
-%{_includedir}/EGL/eglplatform.h
 %{_includedir}/EGL/eglextchromium.h
-
-%files libGLES
-# No files, all provided by libglvnd
-%files libGLES-devel
-%dir %{_includedir}/GLES2
-%{_includedir}/GLES2/gl2platform.h
-%{_includedir}/GLES2/gl2.h
-%{_includedir}/GLES2/gl2ext.h
-%dir %{_includedir}/GLES3
-%{_includedir}/GLES3/gl3platform.h
-%{_includedir}/GLES3/gl3.h
-%{_includedir}/GLES3/gl3ext.h
-%{_includedir}/GLES3/gl31.h
-%{_includedir}/GLES3/gl32.h
-%{_libdir}/pkgconfig/glesv2.pc
 
 %ldconfig_scriptlets libglapi
 %files libglapi
@@ -684,6 +628,9 @@ popd
 %endif
 
 %changelog
+* Sun Nov 03 2019 Peter Robinson <pbrobinson@gmail.com>
+- adjust mesa-khr-devel requires now provided by libglvnd
+
 * Sun Oct 06 2019 Mihai Vultur <xanto@egaming.ro>
 - Architecture specific builds might run asynchronous.
 - This might cause that same package build for x86_64 will be different when
