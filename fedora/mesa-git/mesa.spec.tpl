@@ -77,7 +77,7 @@ Release:        0.2%{?gitrel}%{?dist}
 License:        MIT
 URL:            http://www.mesa3d.org
 
-Source0:        %{build_repo}/-/archive/%{commit}/mesa-%{commit}.zip
+Source0:        %{build_repo}/archive/%{commit}.tar.gz#/mesa-%{commit}.tar.gz
 # src/gallium/auxiliary/postprocess/pp_mlaa* have an ... interestingly worded license.
 # Source1 contains email correspondence clarifying the license terms.
 # Fedora opts to ignore the optional part of clause 2 and treat that code as 2 clause BSD.
