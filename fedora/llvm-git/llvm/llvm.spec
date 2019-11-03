@@ -95,7 +95,6 @@ BuildRequires:	multilib-rpm-config
 %if %{with gold}
 BuildRequires:	binutils-devel
 %endif
-BuildRequires:	libstdc++-static
 %ifarch %{valgrind_arches}
 # Enable extra functionality when run the LLVM JIT under valgrind.
 BuildRequires:	valgrind-devel
@@ -185,7 +184,7 @@ sed -i 's~@TOOLS_DIR@~%{_bindir}~' %{SOURCE1}
 mkdir -p _build
 cd _build
 
-%ifarch s390 s390x %{arm} %ix86
+%ifarch s390 %{arm} %ix86
 # Decrease debuginfo verbosity to reduce memory consumption during final library linking
 %global optflags %(echo %{optflags} | sed 's/-g /-g1 /')
 %endif
@@ -255,7 +254,12 @@ cd _build
 	-DLLVM_INSTALL_SPHINX_HTML_DIR=%{build_pkgdocdir}/html \
 	-DSPHINX_EXECUTABLE=%{_bindir}/sphinx-build-3
 
-ninja
+# Build libLLVM.so first.  This ensures that when libLLVM.so is linking, there
+# are no other compile jobs running.  This will help reduce OOM errors on the
+# builders without having to artificially limit the number of concurrent jobs.
+
+%ninja_build LLVM
+%ninja_build
 
 %install
 ninja -C _build -v install
@@ -485,6 +489,9 @@ fi
 -  built for i686. This is problematic when we want to install multilib packages. 
 - Convert the specfile to template and use it to generate the actual script.
 - This will prevent the random failues and mismatch between arch versions.
+
+* Fri Sep 27 2019 Tom Stellard <tstellar@redhat.com> - 9.0.0-2
+- Remove unneeded BuildRequires: libstdc++-static
 
 * Sun Jul 14 2019 Mihai Vultur <xanto@egaming.ro>
 - Implement some version autodetection to reduce maintenance work.
