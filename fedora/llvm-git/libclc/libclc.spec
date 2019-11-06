@@ -71,7 +71,10 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -n llvm-project-%{commit}/%{name}
+#force downloading the project, seems that copr dist-cache is poisoned with bogus archive
+curl -Lo /builddir/build/SOURCES/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
+find .
+%autosetup -vn llvm-project-%{commit}/%{name}
 
 %build
 export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
