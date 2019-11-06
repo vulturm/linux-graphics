@@ -7,8 +7,8 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 743461090a2027058cd438ed643ed5ed939cf1ca
-%global commit_date 20191105
+%define commit 35cf9a1fc5d2ab7c171c968737092874676ce8ea
+%global commit_date 20191106
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 %global gitrel .%{commit_date}.git%{shortcommit}
@@ -62,6 +62,8 @@ Requires:	python2-six
 The package contains the LLDB Python module.
 
 %prep
+#force downloading the project, seems that copr dist-cache is poisoned with bogus archive
+curl -Lo /builddir/build/SOURCES/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 
 %setup -q -n llvm-project-%{commit}/%{name}
 
@@ -136,6 +138,9 @@ rm -f %{buildroot}%{python2_sitearch}/six.*
 %{python2_sitearch}/lldb
 
 %changelog
+* Wed Nov 06 2019 Mihai Vultur <xanto@egaming.ro>
+- Force downloading of archive source due to bad copr cache.
+
 * Sat Nov 02 2019 Mihai Vultur <xanto@egaming.ro>
 - Now that they have migrated to github, change to official source url.
 

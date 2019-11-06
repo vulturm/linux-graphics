@@ -62,6 +62,8 @@ Requires:	python2-six
 The package contains the LLDB Python module.
 
 %prep
+#force downloading the project, seems that copr dist-cache is poisoned with bogus archive
+curl -Lo /builddir/build/SOURCES/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 
 %setup -q -n llvm-project-%{commit}/%{name}
 
@@ -136,6 +138,9 @@ rm -f %{buildroot}%{python2_sitearch}/six.*
 %{python2_sitearch}/lldb
 
 %changelog
+* Wed Nov 06 2019 Mihai Vultur <xanto@egaming.ro>
+- Force downloading of archive source due to bad copr cache.
+
 * Sat Nov 02 2019 Mihai Vultur <xanto@egaming.ro>
 - Now that they have migrated to github, change to official source url.
 

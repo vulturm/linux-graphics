@@ -5,9 +5,9 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 743461090a2027058cd438ed643ed5ed939cf1ca
+%define commit 35cf9a1fc5d2ab7c171c968737092874676ce8ea
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191105
+%global commit_date 20191106
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %define _unpackaged_files_terminate_build 0
@@ -73,8 +73,7 @@ developing applications that use %{name}.
 %prep
 #force downloading the project, seems that copr dist-cache is poisoned with bogus archive
 curl -Lo /builddir/build/SOURCES/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
-find .
-%autosetup -vn llvm-project-%{commit}/%{name}
+%autosetup -n llvm-project-%{commit}/%{name}
 
 %build
 export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
@@ -97,6 +96,9 @@ export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Wed Nov 06 2019 Mihai Vultur <xanto@egaming.ro>
+- Force downloading of archive source due to bad copr cache.
+
 * Sat Nov 02 2019 Mihai Vultur <xanto@egaming.ro>
 - Now that they have migrated to github, change to official source url.
 

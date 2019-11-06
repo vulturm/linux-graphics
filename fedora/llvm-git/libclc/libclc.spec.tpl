@@ -71,6 +71,8 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
+#force downloading the project, seems that copr dist-cache is poisoned with bogus archive
+curl -Lo /builddir/build/SOURCES/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 %autosetup -n llvm-project-%{commit}/%{name}
 
 %build
@@ -94,6 +96,9 @@ export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Wed Nov 06 2019 Mihai Vultur <xanto@egaming.ro>
+- Force downloading of archive source due to bad copr cache.
+
 * Sat Nov 02 2019 Mihai Vultur <xanto@egaming.ro>
 - Now that they have migrated to github, change to official source url.
 
