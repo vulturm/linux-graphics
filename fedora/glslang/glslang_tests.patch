@@ -1,15 +1,15 @@
---- glslang-715c353a15836e5ae192a64a4cf54e2ce7e8d66a/Test/runtests
-+++ glslang-715c353a15836e5ae192a64a4cf54e2ce7e8d66a-new/Test/runtests
-@@ -2,8 +2,8 @@
+--- a/Test/runtests
++++ b/Test/runtests
+@@ -7,8 +7,8 @@
  
- TARGETDIR=localResults
+ TARGETDIR=${1:-localResults}
  BASEDIR=baseResults
--EXE=../build/install/bin/glslangValidator
--REMAPEXE=../build/install/bin/spirv-remap
-+EXE=../build/StandAlone/glslangValidator
-+REMAPEXE=../build/StandAlone/spirv-remap
+-EXE=${2:-../build/install/bin/glslangValidator}
+-REMAPEXE=${3:-../build/install/bin/spirv-remap}
++EXE=${2:-../build/StandAlone/glslangValidator}
++REMAPEXE=${3:-../build/StandAlone/spirv-remap}
  HASERROR=0
- mkdir -p localResults
+ mkdir -p $TARGETDIR
  
 
 --- glslang-715c353a15836e5ae192a64a4cf54e2ce7e8d66a/Test/glslangValidator
@@ -18,4 +18,3 @@
  #!/usr/bin/env bash
 -../build/install/bin/glslangValidator $*
 +../build/StandAlone/glslangValidator $*
-
