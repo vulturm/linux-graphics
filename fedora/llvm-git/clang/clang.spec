@@ -1,10 +1,4 @@
 %global compat_build 0
-%define debug_package %{nil}
-%if 0%{?_with_llvm9:1}
-  %define build_branch release_90
-%else
-  %define build_branch master
-%endif
 
 %global build_repo https://github.com/llvm/llvm-project
 
@@ -12,10 +6,10 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit b95bb0847a1ea366dda69901c24415e0d00a9527
+%define commit fdf3d1766bbabb48a397fae646facbe2690313f6
 
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191107
+%global commit_date 20191111
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %global _default_patch_fuzz 2

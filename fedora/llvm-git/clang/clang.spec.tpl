@@ -1,10 +1,4 @@
 %global compat_build 0
-%define debug_package %{nil}
-%if 0%{?_with_llvm9:1}
-  %define build_branch release_90
-%else
-  %define build_branch master
-%endif
 
 %global build_repo BUILD_REPO
 
