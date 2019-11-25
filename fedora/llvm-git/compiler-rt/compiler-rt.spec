@@ -7,7 +7,7 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 214683f3b2d6f421c346debf41d545de18cc0caa
+%define commit 1c33d7130ef3eec81651d0eaa19bcce8d12c3fb4
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global commit_date 20191126
 
@@ -90,9 +90,38 @@ done
 mv -v %{buildroot}%{_prefix}/%{libclang_rt_installdir}/libclang_rt* %{buildroot}%{_libdir}/clang/%{version}/lib
 mkdir -p %{buildroot}%{_libdir}/clang/%{version}/lib/linux/
 pushd %{buildroot}%{_libdir}/clang/%{version}/lib
-for i in *.a *.syms *.so; do
+for i in *.a *.so; do
 	ln -s ../$i linux/$i
 done
+popd
+
+# multilib support: also create symlink from lib to lib64
+# fixes rhbz#1678240
+%ifarch %{ix86}
+%post
+if test "`uname -m`" = x86_64
+then
+  cd %{_libdir}/clang/%{version}/lib
+  mkdir -p ../../../../lib64/clang/%{version}/lib
+  for i in *.a *.so
+  do
+    ln -s ../../../../%{_lib}/clang/%{version}/lib/$i ../../../../lib64/clang/%{version}/lib/$i
+  done
+fi
+
+%preun
+
+if test "`uname -m`" = x86_64
+then
+  cd %{_libdir}/clang/%{version}/lib
+  for i in *.a *.so
+  do
+    rm ../../../../lib64/clang/%{version}/lib/$i
+  done
+  rmdir -p ../../../../lib64/clang/%{version}/lib 2>/dev/null 1>/dev/null || :
+fi
+
+%endif
 
 %check
 #make check-all -C _build
@@ -115,6 +144,9 @@ done
 * Sun Jul 14 2019 Mihai Vultur <xanto@egaming.ro>
 - Implement some version autodetection to reduce maintenance work.
 - Based on spec files from 'GloriousEggroll' and 'che' coprs.
+
+* Tue Jun 18 2019 sguelton@redhat.com - 8.0.0-2
+- Fix rhbz#1678240
 
 * Wed Mar 20 2019 sguelton@redhat.com - 8.0.0-1
 - 8.0.0 final

@@ -5,7 +5,7 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 214683f3b2d6f421c346debf41d545de18cc0caa
+%define commit 1c33d7130ef3eec81651d0eaa19bcce8d12c3fb4
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global commit_date 20191126
 
@@ -26,6 +26,7 @@ Summary:        An open source implementation of the OpenCL 1.1 library requirem
 License:        BSD
 URL:            https://llvm.org
 Source0:        %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
+Patch0:         libclc-install.patch
 
 ExclusiveArch:	%{ix86} x86_64 %{arm} aarch64 %{power64} s390x
 
@@ -75,6 +76,7 @@ developing applications that use %{name}.
 #force downloading the project, seems that copr dist-cache is poisoned with bogus archive
 curl -Lo %{_sourcedir}/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 %autosetup -n llvm-project-%{commit}/%{name}
+%patch0 -p0
 
 %build
 export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
@@ -99,6 +101,9 @@ cd _build
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Tue Nov 26 2019 Rudolf Kastl <che666@gmail.com>
+- Fix libclc install
+
 * Wed Nov 06 2019 Mihai Vultur <xanto@egaming.ro>
 - Force downloading of archive source due to bad copr cache.
 
