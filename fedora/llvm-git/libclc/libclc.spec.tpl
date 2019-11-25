@@ -34,6 +34,7 @@ BuildRequires:  libedit-devel
 BuildRequires:  llvm-devel >= 3.9
 BuildRequires:  python
 BuildRequires:  zlib-devel
+BuildRequires:  cmake
 
 %description
 libclc is an open source, BSD licensed implementation of the library
@@ -72,18 +73,20 @@ developing applications that use %{name}.
 
 %prep
 #force downloading the project, seems that copr dist-cache is poisoned with bogus archive
-curl -Lo /builddir/build/SOURCES/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
+curl -Lo %{_sourcedir}/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 %autosetup -n llvm-project-%{commit}/%{name}
 
 %build
 export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
-%set_build_flags
-./configure.py --prefix=%{_prefix} --libexecdir=%{_libdir}/%{shortname}/ --pkgconfigdir=%{_libdir}/pkgconfig/
-
+mkdir -p _build
+cd _build
+%cmake ..
 %make_build
 
 %install
+cd _build
 %make_install
+
 
 %files
 %license LICENSE.TXT
