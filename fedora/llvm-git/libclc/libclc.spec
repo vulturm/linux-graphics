@@ -5,9 +5,9 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 9e676d9c7e6423961c5f6a31cfa2256259848dbc
+%define commit 214683f3b2d6f421c346debf41d545de18cc0caa
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191125
+%global commit_date 20191126
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %define _unpackaged_files_terminate_build 0
@@ -81,11 +81,12 @@ export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
 mkdir -p _build
 cd _build
 %cmake ..
-
 %make_build
 
 %install
+cd _build
 %make_install
+
 
 %files
 %license LICENSE.TXT
