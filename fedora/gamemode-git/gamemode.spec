@@ -1,12 +1,12 @@
 %define package_name gamemode
 
 %global build_repo https://github.com/FeralInteractive/gamemode
-%define version_string 1.5-dev
+%define version_string 1.5
 
 %define commit 08f778a541c553ec2488710ad105e93d79399718
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global commit_date 20191205
-
+%global gitrel .%{commit_date}.git%{shortcommit}
 
 Name:		  %{package_name}
 Version:	%{version_string}
@@ -14,7 +14,7 @@ Release:	0.1%{?gitrel}%{?dist}
 Summary:	Optimize system performance for games on demand
 License:	BSD
 URL:		  %{build_repo}
-Source0:  %{build_repo}/archive/%{commit}.tar.gz#/%{package_name}-%{commit}.tar.gz
+Source0:  https://github.com/FeralInteractive/gamemode/archive/%{commit}.tar.gz#/%{package_name}-%{commit}.tar.gz
 
 BuildRequires: gcc
 BuildRequires: asciidoc
@@ -42,7 +42,9 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 Files for development with %{name}.
 
 %prep
-%setup -q
+#force downloading the project, seems that copr dist-cache is poisoned with bogus archive
+git clone --recursive %{build_repo} %{_builddir}/%{package_name}-%{commit}
+%autosetup -p1 -D -T -n %{package_name}-%{commit}
 
 %build
 %meson
