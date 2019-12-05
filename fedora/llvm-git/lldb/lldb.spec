@@ -7,8 +7,8 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 859bf4d2bea2404bd2eac92451f2db4371ec6eb4
-%global commit_date 20191203
+%define commit decee04e630dedff8fe988b340ac015e510bf687
+%global commit_date 20191205
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 %global gitrel .%{commit_date}.git%{shortcommit}
@@ -63,7 +63,7 @@ The package contains the LLDB Python module.
 
 %prep
 #force downloading the project, seems that copr dist-cache is poisoned with bogus archive
-curl -Lo %{_sourcedir}/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
+curl -Lo /builddir/build/SOURCES/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 
 %setup -q -n llvm-project-%{commit}/%{name}
 
