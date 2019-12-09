@@ -15,7 +15,7 @@ License:        BSD and GPLv3+ and ASL 2.0
 URL:            %{build_repo}
 Source0:        %url/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch1:         glslang-default-resource-limits_staticlib.patch
-Patch2:         glslang_tests.patch
+Patch2:         glslang-lib-install.patch
 # Patch to build against system spirv-tools
 Patch3:         https://patch-diff.githubusercontent.com/raw/KhronosGroup/glslang/pull/1722.patch#/0001-pkg-config-compatibility.patch
 
@@ -73,7 +73,6 @@ install -pm 0644 build/StandAlone/libglslang-default-resource-limits.a %{buildro
 %{_bindir}/spirv-remap
 
 %files devel
-%{_includedir}/SPIRV/
 %{_includedir}/glslang/
 %{_libdir}/libHLSL.a
 %{_libdir}/libOGLCompiler.a
@@ -84,6 +83,7 @@ install -pm 0644 build/StandAlone/libglslang-default-resource-limits.a %{buildro
 %{_libdir}/libglslang-default-resource-limits.a
 %{_libdir}/pkgconfig/glslang.pc
 %{_libdir}/pkgconfig/spirv.pc
+%{_libdir}/cmake/*
 
 %changelog
 * Sun Aug 04 2019 Mihai Vultur <xanto@egaming.ro>

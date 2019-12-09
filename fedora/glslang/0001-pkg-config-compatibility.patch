@@ -1,41 +1,23 @@
-From d2a8230cc05d77dad82a60329881244814797e4c Mon Sep 17 00:00:00 2001
-From: Rafael Amador Galvan <rafael.amador@gmail.com>
-Date: Fri, 8 Mar 2019 11:39:58 -0600
-Subject: [PATCH 1/2] pkg-config compatibility
-
----
- CMakeLists.txt              | 13 ++++++++-----
- SPIRV/CMakeLists.txt        | 19 +++++++++++++++++--
- SPIRV/SpvTools.cpp          |  4 ++--
- SPIRV/spirv.pc.cmake.in     | 11 +++++++++++
- StandAlone/CMakeLists.txt   |  9 ++++++++-
- glslang/CMakeLists.txt      |  3 +++
- glslang/glslang.pc.cmake.in | 11 +++++++++++
- 7 files changed, 60 insertions(+), 10 deletions(-)
- create mode 100644 SPIRV/spirv.pc.cmake.in
- create mode 100644 glslang/glslang.pc.cmake.in
-
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index aafa70ed1..21ecef08d 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -57,6 +57,13 @@ macro(glslang_pch SRCS PCHCPP)
- endmacro(glslang_pch)
+diff -up glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/CMakeLists.txt.dma glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/CMakeLists.txt
+--- glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/CMakeLists.txt.dma	2019-11-02 02:51:21.000000000 +1000
++++ glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/CMakeLists.txt	2019-11-13 15:06:21.418739152 +1000
+@@ -69,6 +69,13 @@ endmacro(glslang_pch)
  
  project(glslang)
-+
+ 
 +# using pkg-config to configure include paths and link libraries
 +include(FindPkgConfig)
 +pkg_check_modules(SPIRV_TOOLS REQUIRED SPIRV-Tools>=2019.2.1)
 +if(BUILD_SHARED_LIBS)
 +    pkg_check_modules(SPIRV_TOOLS_SHARED REQUIRED SPIRV-Tools-shared>=2019.2.1)
 +endif(BUILD_SHARED_LIBS)
- # make testing optional
- include(CTest)
- 
-@@ -117,11 +124,7 @@ endfunction(glslang_set_link_args)
- # We depend on these for later projects, so they should come first.
- add_subdirectory(External)
++
+ if(ENABLE_CTEST)
+     include(CTest)
+ endif()
+@@ -163,11 +170,7 @@ if(BUILD_EXTERNAL AND IS_DIRECTORY ${CMA
+ 	add_subdirectory(External)
+ endif()
  
 -if(NOT TARGET SPIRV-Tools-opt)
 -    set(ENABLE_OPT OFF)
@@ -46,13 +28,64 @@ index aafa70ed1..21ecef08d 100644
      message(STATUS "optimizer enabled")
      add_definitions(-DENABLE_OPT=1)
  else()
-diff --git a/SPIRV/CMakeLists.txt b/SPIRV/CMakeLists.txt
-index 1997e74c3..1760a065b 100644
---- a/SPIRV/CMakeLists.txt
-+++ b/SPIRV/CMakeLists.txt
-@@ -48,6 +48,10 @@ set_property(TARGET SPIRV PROPERTY FOLDER glslang)
- set_property(TARGET SPIRV PROPERTY POSITION_INDEPENDENT_CODE ON)
- target_include_directories(SPIRV PUBLIC ..)
+diff -up glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/External/CMakeLists.txt.dma glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/External/CMakeLists.txt
+--- glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/External/CMakeLists.txt.dma	2019-11-02 02:51:21.000000000 +1000
++++ glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/External/CMakeLists.txt	2019-11-13 15:06:21.418739152 +1000
+@@ -35,10 +35,3 @@ if(BUILD_TESTING)
+     endif()
+ endif()
+ 
+-if(ENABLE_OPT AND NOT TARGET SPIRV-Tools-opt)
+-    if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/spirv-tools)
+-        set(SPIRV_SKIP_TESTS ON CACHE BOOL "Skip building SPIRV-Tools tests")
+-        add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/spirv-tools spirv-tools)
+-    endif()
+-endif()
+-
+diff -up glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/glslang/CMakeLists.txt.dma glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/glslang/CMakeLists.txt
+--- glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/glslang/CMakeLists.txt.dma	2019-11-13 15:06:05.678579864 +1000
++++ glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/glslang/CMakeLists.txt	2019-11-13 15:07:16.046291974 +1000
+@@ -76,6 +76,7 @@ set(HEADERS
+     MachineIndependent/preprocessor/PpContext.h
+     MachineIndependent/preprocessor/PpTokens.h)
+ 
++set(VERSION 7.11.3113)
+ glslang_pch(SOURCES MachineIndependent/pch.cpp)
+ 
+ add_library(glslang ${LIB_TYPE} ${BISON_GLSLParser_OUTPUT_SOURCE} ${SOURCES} ${HEADERS})
+@@ -112,7 +113,9 @@ if(ENABLE_GLSLANG_INSTALL)
+         install(TARGETS glslang EXPORT glslangTargets
+                 ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+     endif()
+-	install(EXPORT glslangTargets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
++     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/glslang.pc.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/glslang.pc @ONLY)
++     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/glslang.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
++     install(EXPORT glslangTargets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
+ endif(ENABLE_GLSLANG_INSTALL)
+ 
+ if(ENABLE_GLSLANG_INSTALL)
+diff -up glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/glslang/glslang.pc.cmake.in.dma glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/glslang/glslang.pc.cmake.in
+--- glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/glslang/glslang.pc.cmake.in.dma	2019-11-13 15:06:21.419739162 +1000
++++ glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/glslang/glslang.pc.cmake.in	2019-11-13 15:06:21.419739162 +1000
+@@ -0,0 +1,11 @@
++    prefix=@CMAKE_INSTALL_PREFIX@
++    exec_prefix=@CMAKE_INSTALL_PREFIX@
++    libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
++    includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
++    
++    Name: @PROJECT_NAME@
++    Description: OpenGL and OpenGL ES shader front end and validator
++    Requires:
++    Version: @VERSION@
++    Libs: -L${libdir} -lglslang -lOSDependent -lHLSL -lOGLCompiler -lSPVRemapper
++    Cflags: -I${includedir}
+\ No newline at end of file
+diff -up glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/SPIRV/CMakeLists.txt.dma glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/SPIRV/CMakeLists.txt
+--- glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/SPIRV/CMakeLists.txt.dma	2019-11-13 15:06:05.678579864 +1000
++++ glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/SPIRV/CMakeLists.txt	2019-11-13 15:06:21.438739355 +1000
+@@ -40,6 +40,10 @@ target_include_directories(SPIRV PUBLIC
+ 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+ 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
  
 +
 +set(SPIRV_NAME spirv)
@@ -61,7 +94,7 @@ index 1997e74c3..1760a065b 100644
  if (ENABLE_SPVREMAPPER)
      add_library(SPVRemapper ${LIB_TYPE} ${SPVREMAP_SOURCES} ${SPVREMAP_HEADERS})
      set_property(TARGET SPVRemapper PROPERTY FOLDER glslang)
-@@ -61,13 +65,21 @@ if(WIN32 AND BUILD_SHARED_LIBS)
+@@ -53,15 +57,21 @@ if(WIN32 AND BUILD_SHARED_LIBS)
      endif()
  endif()
  
@@ -73,47 +106,32 @@ index 1997e74c3..1760a065b 100644
 +    target_compile_options(SPIRV PUBLIC ${SPIRV_TOOLS_SHARED_CFLAGS_OTHER})
 +    target_link_libraries(SPIRV ${SPIRV_TOOLS_SHARED_LIBRARIES})
 +endif(BUILD_SHARED_LIBS)
-+
++  
  if(ENABLE_OPT)
      target_include_directories(SPIRV
          PRIVATE ${spirv-tools_SOURCE_DIR}/include
          PRIVATE ${spirv-tools_SOURCE_DIR}/source
      )
 -    target_link_libraries(SPIRV glslang SPIRV-Tools-opt)
--    target_include_directories(SPIRV PUBLIC ../External)
+-    target_include_directories(SPIRV PUBLIC
+-		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../External>
+-		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/External>)
 +    target_link_libraries(SPIRV glslang)
  else()
      target_link_libraries(SPIRV glslang)
  endif(ENABLE_OPT)
-@@ -96,5 +108,8 @@ if(ENABLE_GLSLANG_INSTALL)
-                 ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-     endif()
+@@ -94,5 +104,8 @@ if(ENABLE_GLSLANG_INSTALL)
+ 	install(EXPORT SPVRemapperTargets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
+ 	install(EXPORT SPIRVTargets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
  
 +    # spirv.pc Configuration
 +    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/spirv.pc.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/spirv.pc @ONLY)
-+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/spirv.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
-     install(FILES ${HEADERS} ${SPVREMAP_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/SPIRV/)
++    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/spirv.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)	
+     install(FILES ${HEADERS} ${SPVREMAP_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/glslang/SPIRV/)
  endif(ENABLE_GLSLANG_INSTALL)
-diff --git a/SPIRV/SpvTools.cpp b/SPIRV/SpvTools.cpp
-index eec06e0ac..723a64452 100644
---- a/SPIRV/SpvTools.cpp
-+++ b/SPIRV/SpvTools.cpp
-@@ -43,8 +43,8 @@
- #include <iostream>
- 
- #include "SpvTools.h"
--#include "spirv-tools/optimizer.hpp"
--#include "spirv-tools/libspirv.h"
-+#include <spirv-tools/optimizer.hpp>
-+#include <spirv-tools/libspirv.h>
- 
- namespace glslang {
- 
-diff --git a/SPIRV/spirv.pc.cmake.in b/SPIRV/spirv.pc.cmake.in
-new file mode 100644
-index 000000000..dfcad940b
---- /dev/null
-+++ b/SPIRV/spirv.pc.cmake.in
+diff -up glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/SPIRV/spirv.pc.cmake.in.dma glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/SPIRV/spirv.pc.cmake.in
+--- glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/SPIRV/spirv.pc.cmake.in.dma	2019-11-13 15:06:21.438739355 +1000
++++ glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/SPIRV/spirv.pc.cmake.in	2019-11-13 15:06:21.438739355 +1000
 @@ -0,0 +1,11 @@
 +    prefix=@CMAKE_INSTALL_PREFIX@
 +    exec_prefix=@CMAKE_INSTALL_PREFIX@
@@ -127,11 +145,24 @@ index 000000000..dfcad940b
 +    Libs: -L${libdir} -lSPIRV
 +    Cflags: -I${includedir}
 \ No newline at end of file
-diff --git a/StandAlone/CMakeLists.txt b/StandAlone/CMakeLists.txt
-index 5cea53d9f..89a7da9c4 100644
---- a/StandAlone/CMakeLists.txt
-+++ b/StandAlone/CMakeLists.txt
-@@ -23,6 +23,14 @@ set(LIBRARIES
+diff -up glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/SPIRV/SpvTools.cpp.dma glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/SPIRV/SpvTools.cpp
+--- glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/SPIRV/SpvTools.cpp.dma	2019-11-02 02:51:21.000000000 +1000
++++ glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/SPIRV/SpvTools.cpp	2019-11-13 15:06:21.438739355 +1000
+@@ -43,8 +43,8 @@
+ #include <iostream>
+ 
+ #include "SpvTools.h"
+-#include "spirv-tools/optimizer.hpp"
+-#include "spirv-tools/libspirv.h"
++#include <spirv-tools/optimizer.hpp>
++#include <spirv-tools/libspirv.h>
+ 
+ namespace glslang {
+ 
+diff -up glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/StandAlone/CMakeLists.txt.dma glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/StandAlone/CMakeLists.txt
+--- glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/StandAlone/CMakeLists.txt.dma	2019-11-13 15:06:05.678579864 +1000
++++ glslang-7f77b2e8669ae06acbee9c9867be8b13e4054f9c/StandAlone/CMakeLists.txt	2019-11-13 15:06:21.439739365 +1000
+@@ -24,6 +24,14 @@ set(LIBRARIES
      SPVRemapper
      glslang-default-resource-limits)
  
@@ -146,76 +177,13 @@ index 5cea53d9f..89a7da9c4 100644
  if(WIN32)
      set(LIBRARIES ${LIBRARIES} psapi)
  elseif(UNIX)
-@@ -33,7 +41,6 @@ endif(WIN32)
+@@ -34,9 +42,6 @@ endif(WIN32)
  
  target_link_libraries(glslangValidator ${LIBRARIES})
  target_link_libraries(spirv-remap ${LIBRARIES})
--target_include_directories(glslangValidator PUBLIC ../External)
+-target_include_directories(glslangValidator PUBLIC 
+-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../External>
+-	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/External>)
  
  if(WIN32)
      source_group("Source" FILES ${SOURCES})
-diff --git a/glslang/CMakeLists.txt b/glslang/CMakeLists.txt
-index 5f51476ba..daf717fab 100644
---- a/glslang/CMakeLists.txt
-+++ b/glslang/CMakeLists.txt
-@@ -80,6 +80,7 @@ set(HEADERS
- #                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
- # set(BISON_GLSLParser_OUTPUT_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/MachineIndependent/glslang_tab.cpp)
- 
-+set(VERSION 7.11.3113)
- glslang_pch(SOURCES MachineIndependent/pch.cpp)
- 
- add_library(glslang ${LIB_TYPE} ${BISON_GLSLParser_OUTPUT_SOURCE} ${SOURCES} ${HEADERS})
-@@ -113,6 +114,8 @@ if(ENABLE_GLSLANG_INSTALL)
-         install(TARGETS glslang
-                 ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-     endif()
-+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/glslang.pc.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/glslang.pc @ONLY)
-+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/glslang.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
- endif(ENABLE_GLSLANG_INSTALL)
- 
- if(ENABLE_GLSLANG_INSTALL)
-diff --git a/glslang/glslang.pc.cmake.in b/glslang/glslang.pc.cmake.in
-new file mode 100644
-index 000000000..921497eb6
---- /dev/null
-+++ b/glslang/glslang.pc.cmake.in
-@@ -0,0 +1,11 @@
-+    prefix=@CMAKE_INSTALL_PREFIX@
-+    exec_prefix=@CMAKE_INSTALL_PREFIX@
-+    libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
-+    includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
-+    
-+    Name: @PROJECT_NAME@
-+    Description: OpenGL and OpenGL ES shader front end and validator
-+    Requires:
-+    Version: @VERSION@
-+    Libs: -L${libdir} -lglslang -lOSDependent -lHLSL -lOGLCompiler -lSPVRemapper
-+    Cflags: -I${includedir}
-\ No newline at end of file
-
-From 0ebd323091567c65be3f2831a3bcac6223b0aa52 Mon Sep 17 00:00:00 2001
-From: Rafael Amador Galvan <rafael.amador@gmail.com>
-Date: Fri, 8 Mar 2019 11:50:49 -0600
-Subject: [PATCH 2/2] removed the section belonging to the SPIRV-Tools
- dependency
-
----
- External/CMakeLists.txt | 7 -------
- 1 file changed, 7 deletions(-)
-
-diff --git a/External/CMakeLists.txt b/External/CMakeLists.txt
-index 4d9690134..24f03237a 100644
---- a/External/CMakeLists.txt
-+++ b/External/CMakeLists.txt
-@@ -34,10 +34,3 @@ if(BUILD_TESTING)
-     endif()
- endif()
- 
--if(ENABLE_OPT AND NOT TARGET SPIRV-Tools-opt)
--    if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/spirv-tools)
--        set(SPIRV_SKIP_TESTS ON CACHE BOOL "Skip building SPIRV-Tools tests")
--        add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/spirv-tools spirv-tools)
--    endif()
--endif()
--
