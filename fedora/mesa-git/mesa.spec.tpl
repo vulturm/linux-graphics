@@ -163,7 +163,7 @@ BuildRequires:  pkgconfig(valgrind)
 BuildRequires:  python3-devel
 BuildRequires:  python3-mako
 %if 0%{?with_hardware}
-BuildRequires:  vulkan-devel
+BuildRequires:  vulkan-headers
 %endif
 ## vulkan hud requires
 %if 0%{?with_vulkan_overlay}
