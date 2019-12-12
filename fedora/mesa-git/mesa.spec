@@ -4,9 +4,9 @@
 %global build_repo https://github.com/mesa3d/mesa
 %define version_string 20.0.0
 
-%define commit dcb4230e5e51c1f2ff84c436134c231996af85e9
+%define commit 2c5eb1df681e28c23e24219eab803b6d4da5aa38
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191212.10
+%global commit_date 20191212.12
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -163,7 +163,7 @@ BuildRequires:  pkgconfig(valgrind)
 BuildRequires:  python3-devel
 BuildRequires:  python3-mako
 %if 0%{?with_hardware}
-BuildRequires:  vulkan-devel
+BuildRequires:  vulkan-headers
 %endif
 ## vulkan hud requires
 %if 0%{?with_vulkan_overlay}
