@@ -6,7 +6,7 @@
 
 %define commit ce52b49348111d6e6277d1899d39440228ceaed8
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191214.10
+%global commit_date 20191214.18
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -404,7 +404,7 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -D osmesa=gallium \
   -D shared-glapi=true \
   -D gallium-opencl=icd \
-  -D vulkan-overlay-layer=true \
+  -D vulkan-overlay-layer=%{?with_vulkan_overlay:true}%{!?with_vulkan_overlay:false} \
   -D tools=[]
   %{nil}
 %meson_build
@@ -616,6 +616,7 @@ popd
 %{_datadir}/vulkan/icd.d/radeon_icd.*.json
 %endif
 %if 0%{?with_vulkan_overlay}
+%{_bindir}/mesa-overlay-control.py
 %{_libdir}/libVkLayer_MESA_overlay.so
 %{_datadir}/vulkan/explicit_layer.d/VkLayer_MESA_overlay.json
 %endif
@@ -628,6 +629,9 @@ popd
 %endif
 
 %changelog
+* Sat Dec 14 2019 Mihai Vultur <xanto@egaming.ro>
+- new mesa-overlay-control.py script added to the install list
+
 * Sun Nov 03 2019 Peter Robinson <pbrobinson@gmail.com>
 - adjust mesa-khr-devel requires now provided by libglvnd
 
