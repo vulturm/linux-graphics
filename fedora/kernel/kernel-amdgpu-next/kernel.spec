@@ -290,9 +290,9 @@ Summary: The Linux kernel
 %define nopatches 1
 %endif
 
-# %if %{nopatches}
-# %define variant -vanilla
-# %endif
+# %%if %%{nopatches}
+# %%define variant .vanilla
+# %%endif
 
 %if !%{debugbuildsenabled}
 %define with_debug 0
