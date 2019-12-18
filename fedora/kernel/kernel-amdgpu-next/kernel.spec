@@ -1522,7 +1522,9 @@ git commit -a -m "Stable update"
 # Note: Even in the "nopatches" path some patches (build tweaks and compile
 # fixes) will always get applied; see patch defition above for details
 
-git am %{patches}
+%if !%{nopatches}
+ git am %{patches}
+%endif
 
 # END OF PATCH APPLICATIONS
 
