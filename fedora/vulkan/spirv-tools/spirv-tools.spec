@@ -17,6 +17,8 @@ License:        ASL 2.0
 URL:            %{build_repo}
 Source0:        %url/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
+Patch0: fix-cmake-install.patch
+
 BuildRequires:  cmake3
 BuildRequires:  gcc-c++
 BuildRequires:  ninja-build
@@ -49,27 +51,8 @@ Development files for %{name}
 
 %prep
 %autosetup -p1 -n SPIRV-Tools-%{version}
-# be more relaxed
-for i in android_test/Android.mk \
-  CMakeLists.txt \
-  Android.mk
-do
-  sed -i "s/-Werror//g" $i
-done
 
 %build
-## enable LTO
-export CFLAGS="%{build_cflags}"
-export CXXFLAGS="%{build_cxxflags}"
-export LDFLAGS="%{build_ldflags}"
-
-LTO_FLAGS="-g0 -flto=8 -ffat-lto-objects -flto-odr-type-merging"
-export CFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
-export FCFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
-export FFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
-export CXXFLAGS="$CXXFLAGS -std=c++14 -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
-export LDFLAGS="$LDFLAG0S -flto=8 "
-
 %__mkdir_p %_target_platform
 pushd %_target_platform
 %cmake3 -DCMAKE_BUILD_TYPE=Release \
@@ -106,6 +89,7 @@ popd
 
 %files devel
 %{_includedir}/spirv-tools/
+%{_libdir}/cmake/*
 %{_libdir}/pkgconfig/SPIRV-Tools-shared.pc
 %{_libdir}/pkgconfig/SPIRV-Tools.pc
 
