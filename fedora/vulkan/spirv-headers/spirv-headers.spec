@@ -1,19 +1,26 @@
+%define package_name spirv-headers
+%global build_branch master
+
 %global build_repo https://github.com/KhronosGroup/SPIRV-Headers
-  
-%global latest_data %(git ls-remote %{build_repo} | grep -P 'refs/tags/[0-9.]+' | sort -Vrk 2 | head -1)
-%global numeric_ver %(echo %{latest_data} | grep -oP 'tags/.*' | grep -oP '[0-9.]+')
-%global commit_date %(date +"%Y%m%d")
-%global rel_build %{commit_date}%{?dist}
+%global version_file https://raw.githubusercontent.com/KhronosGroup/SPIRV-Headers/{}/CMakeLists.txt
+%global version_regex reg_beg SPIRV-Headers VERSION ([0-9.]+) reg_end
 
-Name:           spirv-headers
-Version:        %{numeric_ver}
-Release:        %{rel_build}
+%define version_string 1.4.1
 
+%define commit 204cd131c42b90d129073719f2766293ce35c081
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
+%global commit_date 20191230
+%global gitrel .%{commit_date}.%{shortcommit}
+
+
+Name:           %{package_name}
 Summary:        Header files from the SPIR-V registry
+Version:        %{version_string}
+Release:        0.2%{?gitrel}%{?dist}
 
 License:        MIT
 URL:            %{build_repo}
-Source0:        %url/archive/%{version}/%{name}-%{version}.tar.gz
+Source0:        %{build_repo}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
 
 BuildArch:      noarch
 
@@ -41,7 +48,7 @@ This includes:
 * The XML registry fil
 
 %prep
-%autosetup -n SPIRV-Headers-%{version}
+%autosetup -n %{name}-%{commit}
 chmod a-x include/spirv/1.2/spirv.py
 
 
