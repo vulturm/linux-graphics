@@ -1,7 +1,8 @@
 %global build_repo https://github.com/KhronosGroup/glslang
 
 %global latest_data %(git ls-remote %{build_repo} | grep -P 'refs/tags/[0-9.]+' | sort -Vrk 2 | head -1)
-%global numeric_ver %(echo %{latest_data} | grep -oP 'tags/.*' | grep -oP '[0-9.]+')
+#%%global numeric_ver %(echo %{latest_data} | grep -oP 'tags/.*' | grep -oP '[0-9.]+')
+%global numeric_ver 7.13.3496
 %global commit_date %(date +"%Y%m%d")
 %global rel_build %{commit_date}%{?dist}
 
