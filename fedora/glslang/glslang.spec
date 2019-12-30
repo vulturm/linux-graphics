@@ -18,6 +18,7 @@ Patch1:         glslang-default-resource-limits_staticlib.patch
 Patch2:         glslang-lib-install.patch
 # Patch to build against system spirv-tools
 Patch3:         https://patch-diff.githubusercontent.com/raw/KhronosGroup/glslang/pull/1722.patch#/0001-pkg-config-compatibility.patch
+Patch4:         %url/commit/b5d9dee710f2bda42afbc6f2ce84b5836908d021.patch#/fix_relative_header_paths.patch
 
 BuildRequires:  cmake3
 BuildRequires:  gcc-c++
