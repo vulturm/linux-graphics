@@ -5,9 +5,9 @@
 
 %global build_repo https://github.com/KhronosGroup/SPIRV-Tools
 %global version_file https://raw.githubusercontent.com/KhronosGroup/SPIRV-Tools/{}/CHANGES
-%global version_regex reg_beg ^v([^ ]+) .+$ reg_end
+%global version_regex reg_beg v([0-9.]+)(-dev)? [0-9]+-[0-9]+-[0-9]+ reg_end
 
-%define version_string None
+%define version_string 2020.1
 
 %define commit 8aa423930db37e37086665efcc55944d577c06e5
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
