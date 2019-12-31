@@ -7,11 +7,11 @@
 %global version_file https://raw.githubusercontent.com/KhronosGroup/SPIRV-Tools/{}/CHANGES
 %global version_regex reg_beg ^v([^ ]+) .+$ reg_end
 
-%define version_string VERSION_STRING
+%define version_string None
 
-%define commit COMMIT
+%define commit 8aa423930db37e37086665efcc55944d577c06e5
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date CODE_DATE
+%global commit_date 20191231
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -57,7 +57,7 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Development files for %{name}
 
 %prep
-%autosetup -p1 -n SPIRV-Tools-%{version}
+%autosetup -p1 -n SPIRV-Tools-%{commit}
 
 %build
 %__mkdir_p %_target_platform
