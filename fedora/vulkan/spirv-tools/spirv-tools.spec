@@ -5,7 +5,7 @@
 
 %global build_repo https://github.com/KhronosGroup/SPIRV-Tools
 %global version_file https://raw.githubusercontent.com/KhronosGroup/SPIRV-Tools/{}/CHANGES
-%global version_regex reg_beg v([0-9.]+)(-dev)? [0-9]+-[0-9]+-[0-9]+ reg_end
+%global version_string_regex reg_beg v([0-9.]+)(-dev)? [0-9]+-[0-9]+-[0-9]+ reg_end
 
 %define version_string 2020.1
 

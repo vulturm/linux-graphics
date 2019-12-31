@@ -3,7 +3,7 @@
 
 %global build_repo https://github.com/KhronosGroup/SPIRV-Headers
 %global version_file https://raw.githubusercontent.com/KhronosGroup/SPIRV-Headers/{}/CMakeLists.txt
-%global version_regex reg_beg SPIRV-Headers VERSION ([0-9.]+) reg_end
+%global version_string_regex reg_beg SPIRV-Headers VERSION ([0-9.]+) reg_end
 
 %define version_string VERSION_STRING
 

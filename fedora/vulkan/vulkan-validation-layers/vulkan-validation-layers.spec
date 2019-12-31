@@ -1,19 +1,26 @@
+%define package_name vulkan-validation-layers
+%global build_branch master
+
 %global build_repo https://github.com/KhronosGroup/Vulkan-ValidationLayers
+%global version_file https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/{}/.gitignore
+%global version_tag_regex reg_beg sdk-(.*) reg_end
 
-%global latest_data %(git ls-remote %{build_repo} | grep 'refs/tags/sdk-' | sort -Vrk 2 | head -1)
-%global numeric_ver %(echo %{latest_data} | grep -oP 'sdk.*' | grep -oP '[0-9.]+')
-%global commit_date %(date +"%Y%m%d")
-%global rel_build %{commit_date}%{?dist}
+%define version_string 1.1.130.0
+
+%define commit e4a2b7f227824917f252bb8f5fde8580eacc5c38
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
+%global commit_date 20191231
+%global gitrel .%{commit_date}.%{shortcommit}
 
 
-Name:           vulkan-validation-layers
-Version:        %{numeric_ver}
-Release:        %{rel_build}
+Name:           %{package_name}
+Version:        %{version_string}
+Release:        0.2%{?gitrel}%{?dist}
 Summary:        Vulkan validation layers
 
 License:        ASL 2.0
 URL:            %{build_repo}
-Source0:        %url/archive/sdk-%{version}.tar.gz#/Vulkan-ValidationLayers-sdk-%{version}.tar.gz
+Source0:        %{build_repo}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
 Patch0:         fix_shared.patch
 
 
@@ -46,7 +53,7 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -p1 -n Vulkan-ValidationLayers-sdk-%{version}
+%autosetup -p1 -n Vulkan-ValidationLayers-sdk-%{commit}
 
 
 %build
