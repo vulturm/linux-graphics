@@ -57,7 +57,7 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Development files for %{name}
 
 %prep
-%autosetup -p1 -n SPIRV-Tools-%{version}
+%autosetup -p1 -n SPIRV-Tools-%{commit}
 
 %build
 %__mkdir_p %_target_platform
