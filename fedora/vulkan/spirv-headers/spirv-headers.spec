@@ -49,7 +49,7 @@ This includes:
 
 %prep
 #force downloading the project, seems that copr dist-cache is poisoned with bogus archive
-curl -Lo %{_sourcedir}/%{name}-%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz
+curl -Lo %{_sourcedir}/%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz
 %autosetup -n SPIRV-Headers-%{commit}
 
 chmod a-x include/spirv/1.2/spirv.py
