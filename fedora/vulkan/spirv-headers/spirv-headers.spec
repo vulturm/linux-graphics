@@ -3,9 +3,9 @@
 
 %global build_repo https://github.com/KhronosGroup/SPIRV-Headers
 %global version_file https://raw.githubusercontent.com/KhronosGroup/SPIRV-Headers/{}/CMakeLists.txt
-%global version_string_regex reg_beg SPIRV-Headers VERSION ([0-9.]+) reg_end
+%global version_tag_regex reg_beg ([0-9.]+[0-9]) reg_end
 
-%define version_string 1.4.1
+%define version_string 1.5.1
 
 %define commit 204cd131c42b90d129073719f2766293ce35c081
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
