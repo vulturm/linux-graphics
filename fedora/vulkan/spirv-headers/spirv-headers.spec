@@ -9,7 +9,7 @@
 
 %define commit 204cd131c42b90d129073719f2766293ce35c081
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191231
+%global commit_date 20200101
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -20,7 +20,7 @@ Release:        0.2%{?gitrel}%{?dist}
 
 License:        MIT
 URL:            %{build_repo}
-Source0:        %{build_repo}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
+Source0:        %{build_repo}/archive/%{commit}.tar.gz
 
 BuildArch:      noarch
 
@@ -48,7 +48,10 @@ This includes:
 * The XML registry fil
 
 %prep
-%autosetup -n %{name}-%{commit}
+#force downloading the project, seems that copr dist-cache is poisoned with bogus archive
+curl -Lo %{_sourcedir}/%{name}-%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz
+%autosetup -n SPIRV-Headers-%{commit}
+
 chmod a-x include/spirv/1.2/spirv.py
 
 
