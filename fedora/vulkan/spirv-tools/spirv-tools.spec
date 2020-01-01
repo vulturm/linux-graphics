@@ -22,9 +22,7 @@ Summary:        API and commands for processing SPIR-V modules
 
 License:        ASL 2.0
 URL:            %{build_repo}
-Source0:        %{build_repo}/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
-
-Patch0: fix-cmake-install.patch
+Source0:        %{build_repo}/archive/%{commit}.tar.gz
 
 BuildRequires:  cmake3
 BuildRequires:  gcc-c++
@@ -57,6 +55,8 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Development files for %{name}
 
 %prep
+#force downloading the project, seems that copr dist-cache is poisoned with bogus archive
+curl -Lo %{_sourcedir}/%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz
 %autosetup -p1 -n SPIRV-Tools-%{commit}
 
 %build
