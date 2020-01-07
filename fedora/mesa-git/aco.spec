@@ -4,9 +4,9 @@
 %global build_repo https://github.com/daniel-schuermann/mesa
 %define version_string 20.0.0
 
-%define commit 3409c06e26d8fec1eeaaf8eaef55dbd0405f141b
+%define commit 7b444ba5ef1818f81c1892c5babd02ed18186b02
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20191204
+%global commit_date 20200107.15
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -163,7 +163,7 @@ BuildRequires:  pkgconfig(valgrind)
 BuildRequires:  python3-devel
 BuildRequires:  python3-mako
 %if 0%{?with_hardware}
-BuildRequires:  vulkan-devel
+BuildRequires:  vulkan-headers
 %endif
 ## vulkan hud requires
 %if 0%{?with_vulkan_overlay}
@@ -404,7 +404,7 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -D osmesa=gallium \
   -D shared-glapi=true \
   -D gallium-opencl=icd \
-  -D vulkan-overlay-layer=true \
+  -D vulkan-overlay-layer=%{?with_vulkan_overlay:true}%{!?with_vulkan_overlay:false} \
   -D tools=[]
   %{nil}
 %meson_build
@@ -616,6 +616,7 @@ popd
 %{_datadir}/vulkan/icd.d/radeon_icd.*.json
 %endif
 %if 0%{?with_vulkan_overlay}
+%{_bindir}/mesa-overlay-control.py
 %{_libdir}/libVkLayer_MESA_overlay.so
 %{_datadir}/vulkan/explicit_layer.d/VkLayer_MESA_overlay.json
 %endif
@@ -628,6 +629,9 @@ popd
 %endif
 
 %changelog
+* Sat Dec 14 2019 Mihai Vultur <xanto@egaming.ro>
+- new mesa-overlay-control.py script added to the install list
+
 * Sun Nov 03 2019 Peter Robinson <pbrobinson@gmail.com>
 - adjust mesa-khr-devel requires now provided by libglvnd
 
