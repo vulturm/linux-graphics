@@ -75,8 +75,7 @@ developing applications that use %{name}.
 %prep
 #force downloading the project, seems that copr dist-cache is poisoned with bogus archive
 curl -Lo %{_sourcedir}/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
-%autosetup -n llvm-project-%{commit}/%{name}
-%patch0 -p0
+%autosetup -p0 -n llvm-project-%{commit}/%{name}
 
 %build
 export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
