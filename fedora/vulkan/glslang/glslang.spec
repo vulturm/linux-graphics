@@ -5,11 +5,11 @@
 %global version_file https://raw.githubusercontent.com/KhronosGroup/glslang/{}/.gitignore
 %global version_tag_regex reg_beg ([0-9.]+[0-9]) reg_end
 
-%define version_string 7.13.3496
+%define version_string 8.13.3559
 
-%define commit 6334d594f68c2ba36e3e9bf91aac185ac3875717
+%define commit d203754bc1160cbb14e80de238042a2b9b439917
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200101
+%global commit_date 20200113
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -23,11 +23,11 @@ Source0:        %{build_repo}/archive/%{commit}.tar.gz
 Summary:        OpenGL and OpenGL ES shader front end and validator
 
 License:        BSD and GPLv3+ and ASL 2.0
-Patch1:         glslang-default-resource-limits_staticlib.patch
-Patch2:         glslang-lib-install.patch
+#Patch1:         glslang-default-resource-limits_staticlib.patch
+#Patch2:         glslang-lib-install.patch
 ## Patch to build against system spirv-tools
 #Patch2:         https://patch-diff.githubusercontent.com/raw/KhronosGroup/glslang/pull/1722.patch#/0001-pkg-config-compatibility.patch
-Patch3:         %url/commit/b5d9dee710f2bda42afbc6f2ce84b5836908d021.patch#/fix_relative_header_paths.patch
+#Patch3:         %%url/commit/b5d9dee710f2bda42afbc6f2ce84b5836908d021.patch#/fix_relative_header_paths.patch
 
 BuildRequires:  cmake3
 BuildRequires:  gcc-c++
