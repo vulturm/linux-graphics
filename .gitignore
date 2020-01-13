@@ -1,0 +1,16 @@
+#-- those files are dynamically generated
+# Swap files
+*.swo
+*.swp
+
+# Python related
+*.pyc
+.cache
+*/rpmbuild/BUILD/*
+*.gz
+*/__pycache__/
+
+# Vagrant
+.vagrant
+*.log
+
