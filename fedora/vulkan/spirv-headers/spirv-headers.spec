@@ -9,7 +9,7 @@
 
 %define commit 204cd131c42b90d129073719f2766293ce35c081
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200115
+%global commit_date 20200116
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
