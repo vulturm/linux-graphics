@@ -7,9 +7,9 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit c0176916a4824812d25a5a22c4ff7c95857b0cd6
+%define commit baa84d8cde940278d6fb37917ac0d64c127b528f
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200117
+%global commit_date 20200118
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %define _unpackaged_files_terminate_build 0
@@ -94,6 +94,14 @@ for i in *.a *.syms *.so; do
 	ln -s ../$i linux/$i
 done
 
+# This fixes errors such as
+# *** ERROR: ambiguous python shebang. Change it to python3 (or python2) explicitly.
+# We patch all sources below for which we got a report/error.
+pathfix.py -i "%{__python3} %{py3_shbang_opts}" -p -n \
+  /usr/bin/hwasan_symbolize
+
+
+
 %check
 #make check-all -C _build
 
@@ -102,6 +110,9 @@ done
 %{_libdir}/clang/%{version}
 
 %changelog
+* Sat Jan 18 2020 Mihai Vultur <xanto@egaming.ro>
+- Fix ambigous python shebang.
+
 * Sat Nov 02 2019 Mihai Vultur <xanto@egaming.ro>
 - Now that they have migrated to github, change to official source url.
 
