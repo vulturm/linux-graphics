@@ -53,7 +53,7 @@ instrumentation, and Blocks C language extension.
 %prep
 %autosetup -n %{crt_srcdir} -p1
 
-pathfix.py -i %{__python3} -pn .
+pathfix.py -i "%{__python3} %{py3_shbang_opts}" -p -n .
 
 %build
 mkdir -p _build
@@ -93,13 +93,7 @@ pushd %{buildroot}%{_libdir}/clang/%{version}/lib
 for i in *.a *.syms *.so; do
 	ln -s ../$i linux/$i
 done
-
-# This fixes errors such as
-# *** ERROR: ambiguous python shebang. Change it to python3 (or python2) explicitly.
-# We patch all sources below for which we got a report/error.
-pathfix.py -i "%{__python3} %{py3_shbang_opts}" -p -n \
-  /usr/bin/hwasan_symbolize
-
+pathfix.py -i "%{__python3} %{py3_shbang_opts}" -p -n .
 
 
 %check
