@@ -53,7 +53,7 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -p1 -n Vulkan-ValidationLayers-sdk-%{commit}
+%autosetup -p1 -n Vulkan-ValidationLayers-%{commit}
 
 
 %build
