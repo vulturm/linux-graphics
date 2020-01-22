@@ -4,9 +4,9 @@
 %global build_repo https://github.com/mesa3d/mesa
 %define version_string 20.0.0
 
-%define commit e45ea781f859fcfa44ca2aacda05bcfe59aef0e0
+%define commit 39e7492d33c89ee7049d5bc07267d131cc6a1ff9
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200122.10
+%global commit_date 20200122.14
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -379,14 +379,14 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
 %else
   -D gallium-drivers=swrast,virgl \
 %endif
-  -D vulkan-drivers=amd,intel \
+  -D vulkan-drivers=%{?vulkan_drivers} \
   -D dri3=true \
   -D egl=true \
-  -D gallium-extra-hud=true \
-  -D gallium-nine=true \
-  -D gallium-omx=bellagio \
-  -D gallium-va=true \
-  -D gallium-vdpau=true \
+  -D gallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
+  -D gallium-nine=%{?with_nine:true}%{!?with_nine:false} \
+  -D gallium-omx=%{?with_omx:bellagio}%{!?with_omx:disabled} \
+  -D gallium-va=%{?with_vaapi:true}%{!?with_vaapi:false} \
+  -D gallium-vdpau=%{?with_vdpau:true}%{!?with_vdpau:false} \
   -D gallium-xa=true \
   -D gallium-xvmc=false \
   -D gbm=true \
@@ -403,7 +403,7 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -D lmsensors=true \
   -D osmesa=gallium \
   -D shared-glapi=true \
-  -D gallium-opencl=icd \
+  -D gallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
   -D vulkan-overlay-layer=%{?with_vulkan_overlay:true}%{!?with_vulkan_overlay:false} \
   -D tools=[]
   %{nil}
