@@ -4,9 +4,9 @@
 %global build_repo https://github.com/mesa3d/mesa
 %define version_string 20.0.0
 
-%define commit 48ab21109cf2eb114ea0b0a298e4c58954323ff6
+%define commit 54e54ec3e8112e56ef229be483bb1772df6fc0de
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200123.10
+%global commit_date 20200123.14
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -364,7 +364,7 @@ export CFLAGS="%{build_cflags}"
 export CXXFLAGS="%{build_cxxflags}"
 export LDFLAGS="%{build_ldflags}"
 
-LTO_FLAGS="-g0 -flto=8 -ffat-lto-objects -flto-odr-type-merging"
+LTO_FLAGS="-fcommon -g0 -flto=8 -ffat-lto-objects -flto-odr-type-merging"
 export CFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export FCFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export FFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
