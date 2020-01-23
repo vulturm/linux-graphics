@@ -54,6 +54,8 @@ instrumentation, and Blocks C language extension.
 %autosetup -n %{crt_srcdir} -p1
 
 pathfix.py -i "%{__python3} %{py3_shbang_opts}" -p -n .
+pathfix.py -i "%{__python3} %{py3_shbang_opts}" -p -n \
+  lib/hwasan/scripts/hwasan_symbolize
 
 %build
 mkdir -p _build
