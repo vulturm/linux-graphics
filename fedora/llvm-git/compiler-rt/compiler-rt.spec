@@ -7,9 +7,9 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 5260bc2497bb593ed4a01de5cfe84ed6f7b529b1
+%define commit 9d9b470e69acfca321f005490cfba14fe5247229
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200121
+%global commit_date 20200123
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %define _unpackaged_files_terminate_build 0
@@ -96,6 +96,7 @@ for i in *.a *.syms *.so; do
 	ln -s ../$i linux/$i
 done
 pathfix.py -i "%{__python3} %{py3_shbang_opts}" -p -n .
+
 
 %check
 #make check-all -C _build
