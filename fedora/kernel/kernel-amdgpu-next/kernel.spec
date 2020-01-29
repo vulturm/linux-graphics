@@ -1,5 +1,6 @@
 # We have to override the new %%install behavior because, well... the kernel is special.
 %global __spec_install_pre %{___build_pre}
+%global _default_patch_fuzz 2
 
 # At the time of this writing (2019-03), RHEL8 packages use w2.xzdio
 # compression for rpms (xz, level 2).
@@ -854,23 +855,12 @@ Patch504: 0001-mm-kmemleak-skip-late_init-if-not-skip-disable.patch
 # https://lkml.org/lkml/2019/8/29/1772
 Patch505: ARM-fix-__get_user_check-in-case-uaccess_-calls-are-not-inlined.patch
 
-# CVE-2019-14895 rhbz 1774870 1776139
-Patch525: mwifiex-fix-possible-heap-overflow-in-mwifiex_process_country_ie.patch
-
-# CVE-2019-14896 rhbz 1774875 1776143
-# CVE-2019-14897 rhbz 1774879 1776146
-Patch526: libertas-Fix-two-buffer-overflows-at-parsing-bss-descriptor.patch
-
-# CVE-2019-14901 rhbz 1773519 1776184
-Patch527: mwifiex-Fix-heap-overflow-in-mmwifiex_process_tdls_action_frame.patch
-
-# Test fix for PPC build
-Patch528: netfilter_ppc_fix.patch
-
 # END OF PATCH DEFINITIONS
 
 %endif
 
+# GCC 10 build fix for x86_64
+Patch528: 0001-x86-Don-t-declare-__force_order-in-kaslr_64.c.patch
 
 %description
 The kernel meta package
@@ -1944,7 +1934,6 @@ BuildKernel() {
 %endif
 
     # then drop all but the needed Makefiles/Kconfig files
-    rm -rf $RPM_BUILD_ROOT/lib/modules/$KernelVer/build/Documentation
     rm -rf $RPM_BUILD_ROOT/lib/modules/$KernelVer/build/scripts
     rm -rf $RPM_BUILD_ROOT/lib/modules/$KernelVer/build/include
     cp .config $RPM_BUILD_ROOT/lib/modules/$KernelVer/build
@@ -2851,12 +2840,7 @@ fi
 /lib/modules/%{KVERREL}%{?3:+%{3}}/source\
 /lib/modules/%{KVERREL}%{?3:+%{3}}/updates\
 /lib/modules/%{KVERREL}%{?3:+%{3}}/bls.conf\
-%{_datadir}/doc/kernel-keys/%{KVERREL}%{?3:+%{3}}/kernel-signing-ca.cer\
-%ifarch s390x ppc64le\
-%if 0%{!?4:1}\
-%{_datadir}/doc/kernel-keys/%{KVERREL}%{?3:+%{3}}/%{signing_key_filename} \
-%endif\
-%endif\
+%{_datadir}/doc/kernel-keys/%{KVERREL}%{?3:+%{3}}\
 %if %{1}\
 /lib/modules/%{KVERREL}%{?3:+%{3}}/vdso\
 %endif\
