@@ -23,11 +23,10 @@ Source0:        %{build_repo}/archive/%{commit}.tar.gz
 Summary:        OpenGL and OpenGL ES shader front end and validator
 
 License:        BSD and GPLv3+ and ASL 2.0
-#Patch1:         glslang-default-resource-limits_staticlib.patch
-#Patch2:         glslang-lib-install.patch
-## Patch to build against system spirv-tools
-#Patch2:         https://patch-diff.githubusercontent.com/raw/KhronosGroup/glslang/pull/1722.patch#/0001-pkg-config-compatibility.patch
-#Patch3:         %%url/commit/b5d9dee710f2bda42afbc6f2ce84b5836908d021.patch#/fix_relative_header_paths.patch
+Patch1:         glslang-default-resource-limits_staticlib.patch
+# Patch to build against system spirv-tools (rebased locally)
+#Patch3:         https://patch-diff.githubusercontent.com/raw/KhronosGroup/glslang/pull/1722.patch#/0001-pkg-config-compatibility.patch
+Patch3:         0001-pkg-config-compatibility.patch
 
 BuildRequires:  cmake3
 BuildRequires:  gcc-c++
@@ -70,10 +69,13 @@ popd
 %install
 %{ninja_install} -C build
 
+# we don't want them in here
+rm -rf %{buildroot}%{_includedir}/SPIRV
+
 %ifnarch s390x ppc64
 %check
 pushd Test
-./runtests
+./runtests localResults ../build/StandAlone/glslangValidator ../build/StandAlone/spirv-remap
 popd
 %endif
 
@@ -99,6 +101,9 @@ install -pm 0644 build/StandAlone/libglslang-default-resource-limits.a %{buildro
 %{_libdir}/cmake/*
 
 %changelog
+* Wed Jan 29 2020 Dave Airlie <airlied@redhat.com> - 8.13.3559-1
+- Update to latest git snapshot
+
 * Sun Aug 04 2019 Mihai Vultur <xanto@egaming.ro>
 - Implement some version autodetection to reduce maintenance work.
 
