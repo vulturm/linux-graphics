@@ -64,6 +64,7 @@ developing applications that use %{name}.
 %cmake3 -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DGLSLANG_INSTALL_DIR=%{_prefix} \
+        -DBUILD_LAYER_SUPPORT_FILES:BOOL=ON \
         -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir}/vulkan/ .
 %ninja_build
 

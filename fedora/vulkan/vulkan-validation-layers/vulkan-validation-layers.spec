@@ -7,9 +7,9 @@
 
 %define version_string 1.2.131.1
 
-%define commit 0d4e65db4a4f2a82a427f8d22a640b4cd0a4f3e7
+%define commit 103c58a7dd2b1155d7f43d9daaa60403252ac2b2
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200129
+%global commit_date 20200131
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -64,6 +64,7 @@ developing applications that use %{name}.
 %cmake3 -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DGLSLANG_INSTALL_DIR=%{_prefix} \
+        -DBUILD_LAYER_SUPPORT_FILES:BOOL=ON \
         -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir}/vulkan/ .
 %ninja_build
 
