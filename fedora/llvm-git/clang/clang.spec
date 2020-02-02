@@ -361,6 +361,7 @@ chmod u-x %{buildroot}%{_mandir}/man1/scan-build.1*
 %{_mandir}/man1/diagtool.1.gz
 %{_emacs_sitestartdir}/clang-format.el
 %{_datadir}/clang/*.*
+%{_includedir}/clang-tidy/*
 %endif
 
 %files libs
