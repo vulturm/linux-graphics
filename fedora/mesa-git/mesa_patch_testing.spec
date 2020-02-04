@@ -1,12 +1,12 @@
 %define package_name mesa
 %global build_branch master
 
-%global build_repo https://github.com/vulturm/mesa
-%define version_string 20.0.0
+%global build_repo https://github.com/mesa3d/mesa
+%define version_string 20.1.0
 
-%define commit 39e7492d33c89ee7049d5bc07267d131cc6a1ff9
+%define commit 65a6dc5139fddd5e01eaedcc57fc67e0a6a28c94
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200122.15
+%global commit_date 20200205.00
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -352,6 +352,16 @@ Requires:       vulkan-devel
 %description vulkan-devel
 Headers for development with the Vulkan API.
 
+%package egl-icd
+Summary:        Mesa egl ICD files
+BuildArch:      noarch
+Requires:       %{name}-libEGL%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+
+%description egl-icd
+Mesa egl ICD files
+
+
+
 %prep
 %setup -q -c
 %autosetup -n mesa-%{commit} -p1
@@ -450,7 +460,6 @@ popd
 
 
 %files libEGL
-%{_datadir}/glvnd/egl_vendor.d/50_mesa.json
 %{_libdir}/libEGL_mesa.so.0*
 %files libEGL-devel
 %dir %{_includedir}/EGL
@@ -627,6 +636,11 @@ popd
 %{_includedir}/vulkan/*.h
 %endif
 %endif
+
+%files egl-icd
+%{_datadir}/glvnd/egl_vendor.d/50_mesa.json
+
+
 
 %changelog
 * Sat Dec 14 2019 Mihai Vultur <xanto@egaming.ro>
