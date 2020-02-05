@@ -7,11 +7,11 @@
 %global version_file https://raw.githubusercontent.com/KhronosGroup/SPIRV-Tools/{}/CHANGES
 %global version_string_regex reg_beg v([0-9.]+)(-dev)? [0-9]+-[0-9]+-[0-9]+ reg_end
 
-%define version_string 2020.1
+%define version_string 2020.2
 
-%define commit 7a2d408dea60aa1f8d53e123b01277c41b8f83b9
+%define commit 9e52bc0d0c1d6a54eedabdfc5f9850c8d2cba2f8
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200201
+%global commit_date 20200205
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
