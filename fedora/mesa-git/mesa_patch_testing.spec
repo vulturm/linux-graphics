@@ -1,12 +1,12 @@
 %define package_name mesa
 %global build_branch master
 
-%global build_repo https://github.com/mesa3d/mesa
+%global build_repo https://github.com/vulturm/mesa
 %define version_string 20.1.0
 
-%define commit 65a6dc5139fddd5e01eaedcc57fc67e0a6a28c94
+%define commit 23c137612bea1e319ecdfb894c020b6651f4909a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200205.00
+%global commit_date 20200205.21
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -84,6 +84,7 @@ Source0:        %{build_repo}/archive/%{commit}.tar.gz#/mesa-%{commit}.tar.gz
 Source1:        Mesa-MLAA-License-Clarification-Email.txt
 
 Patch3:         0003-evergreen-big-endian.patch
+Patch4:         0001-Link-with-libclang-cpp.patch
 
 
 # Disable rgb10 configs by default:
@@ -203,6 +204,7 @@ Provides:       libGL-devel%{?_isa}
 %package libEGL
 Summary:        Mesa libEGL runtime libraries
 Requires:       libglvnd-egl%{?_isa}
+Obsoletes:      egl-icd
 
 %description libEGL
 %{summary}.
@@ -352,16 +354,6 @@ Requires:       vulkan-devel
 %description vulkan-devel
 Headers for development with the Vulkan API.
 
-%package egl-icd
-Summary:        Mesa egl ICD files
-BuildArch:      noarch
-Requires:       %{name}-libEGL%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-
-%description egl-icd
-Mesa egl ICD files
-
-
-
 %prep
 %setup -q -c
 %autosetup -n mesa-%{commit} -p1
@@ -374,7 +366,7 @@ export CFLAGS="%{build_cflags}"
 export CXXFLAGS="%{build_cxxflags}"
 export LDFLAGS="%{build_ldflags}"
 
-LTO_FLAGS="-g0 -flto=8 -ffat-lto-objects -flto-odr-type-merging"
+LTO_FLAGS="-fcommon -g0 -flto=8 -ffat-lto-objects -flto-odr-type-merging"
 export CFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export FCFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export FFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
@@ -460,6 +452,7 @@ popd
 
 
 %files libEGL
+%{_datadir}/glvnd/egl_vendor.d/50_mesa*.json
 %{_libdir}/libEGL_mesa.so.0*
 %files libEGL-devel
 %dir %{_includedir}/EGL
@@ -637,12 +630,11 @@ popd
 %endif
 %endif
 
-%files egl-icd
-%{_datadir}/glvnd/egl_vendor.d/50_mesa.json
-
-
-
 %changelog
+* Thu Jan 23 2020 Tom Stellard <tstellar@redhat.com>
+- Link against libclang-cpp.so
+- https://fedoraproject.org/wiki/Changes/Stop-Shipping-Individual-Component-Libraries-In-clang-lib-Package
+
 * Sat Dec 14 2019 Mihai Vultur <xanto@egaming.ro>
 - new mesa-overlay-control.py script added to the install list
 
