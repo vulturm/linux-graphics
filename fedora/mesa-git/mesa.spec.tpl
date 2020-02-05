@@ -204,6 +204,7 @@ Provides:       libGL-devel%{?_isa}
 %package libEGL
 Summary:        Mesa libEGL runtime libraries
 Requires:       libglvnd-egl%{?_isa}
+Obsoletes:      egl-icd
 
 %description libEGL
 %{summary}.
@@ -451,7 +452,7 @@ popd
 
 
 %files libEGL
-%{_datadir}/glvnd/egl_vendor.d/50_mesa.json
+%{_datadir}/glvnd/egl_vendor.d/50_mesa*.json
 %{_libdir}/libEGL_mesa.so.0*
 %files libEGL-devel
 %dir %{_includedir}/EGL
