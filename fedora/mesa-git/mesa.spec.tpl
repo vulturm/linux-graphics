@@ -84,6 +84,7 @@ Source0:        %{build_repo}/archive/%{commit}.tar.gz#/mesa-%{commit}.tar.gz
 Source1:        Mesa-MLAA-License-Clarification-Email.txt
 
 Patch3:         0003-evergreen-big-endian.patch
+Patch4:         0001-Link-with-libclang-cpp.patch
 
 
 # Disable rgb10 configs by default:
@@ -629,6 +630,10 @@ popd
 %endif
 
 %changelog
+* Thu Jan 23 2020 Tom Stellard <tstellar@redhat.com>
+- Link against libclang-cpp.so
+- https://fedoraproject.org/wiki/Changes/Stop-Shipping-Individual-Component-Libraries-In-clang-lib-Package
+
 * Sat Dec 14 2019 Mihai Vultur <xanto@egaming.ro>
 - new mesa-overlay-control.py script added to the install list
 
