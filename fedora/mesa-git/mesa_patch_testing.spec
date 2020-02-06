@@ -6,7 +6,7 @@
 
 %define commit 6f7caf555a79b2d8f77f2ff18d2d314d45b803c7
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200206.00
+%global commit_date 20200206.08
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -72,7 +72,7 @@
 Name:           %{package_name}
 Summary:        Mesa 3D Graphics Library, git version
 Version:        %{version_string}
-Release:        0.2%{?gitrel}%{?dist}
+Release:        0.3%{?gitrel}%{?dist}
 
 License:        MIT
 URL:            http://www.mesa3d.org
