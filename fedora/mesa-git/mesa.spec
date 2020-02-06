@@ -204,7 +204,7 @@ Provides:       libGL-devel%{?_isa}
 %package libEGL
 Summary:        Mesa libEGL runtime libraries
 Requires:       libglvnd-egl%{?_isa}
-Obsoletes:      egl-icd
+Obsoletes:      egl-icd < %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description libEGL
 %{summary}.
