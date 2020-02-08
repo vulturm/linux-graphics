@@ -6,7 +6,7 @@
 
 %define commit 14c0d58c7f235f6562bd68d046b3d19a1953b07d
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200203.20
+%global commit_date 20200208.21
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -72,7 +72,7 @@
 Name:           %{package_name}
 Summary:        Mesa 3D Graphics Library, git version
 Version:        %{version_string}
-Release:        0.2%{?gitrel}%{?dist}
+Release:        0.3%{?gitrel}%{?dist}
 
 License:        MIT
 URL:            http://www.mesa3d.org
@@ -84,6 +84,7 @@ Source0:        %{build_repo}/archive/%{commit}.tar.gz#/mesa-%{commit}.tar.gz
 Source1:        Mesa-MLAA-License-Clarification-Email.txt
 
 Patch3:         0003-evergreen-big-endian.patch
+Patch4:         0001-Link-with-libclang-cpp.patch
 
 
 # Disable rgb10 configs by default:
@@ -203,6 +204,7 @@ Provides:       libGL-devel%{?_isa}
 %package libEGL
 Summary:        Mesa libEGL runtime libraries
 Requires:       libglvnd-egl%{?_isa}
+Obsoletes:      egl-icd < %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description libEGL
 %{summary}.
@@ -364,14 +366,14 @@ export CFLAGS="%{build_cflags}"
 export CXXFLAGS="%{build_cxxflags}"
 export LDFLAGS="%{build_ldflags}"
 
-LTO_FLAGS="-fcommon -g0 -flto=8 -ffat-lto-objects -flto-odr-type-merging"
+LTO_FLAGS="-fcommon -g0 -ffat-lto-objects -flto-odr-type-merging"
 export CFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export FCFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export FFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export CXXFLAGS="$CXXFLAGS -std=c++14 -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export LDFLAGS="$LDFLAG0S -flto=8 "
 
-%meson -Dcpp_std=gnu++11 \
+%meson -Dcpp_std=gnu++14 \
   -D platforms=x11,wayland,drm,surfaceless \
   -D dri-drivers=%{?dri_drivers} \
 %if 0%{?with_hardware}
@@ -450,7 +452,7 @@ popd
 
 
 %files libEGL
-%{_datadir}/glvnd/egl_vendor.d/50_mesa.json
+%{_datadir}/glvnd/egl_vendor.d/50_mesa*.json
 %{_libdir}/libEGL_mesa.so.0*
 %files libEGL-devel
 %dir %{_includedir}/EGL
@@ -629,6 +631,13 @@ popd
 %endif
 
 %changelog
+* Sat Feb 08 2020 Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+- Prevent radeonsi crashing when compiled with GCC10 on Rawhide.
+
+* Thu Jan 23 2020 Tom Stellard <tstellar@redhat.com>
+- Link against libclang-cpp.so
+- https://fedoraproject.org/wiki/Changes/Stop-Shipping-Individual-Component-Libraries-In-clang-lib-Package
+
 * Sat Dec 14 2019 Mihai Vultur <xanto@egaming.ro>
 - new mesa-overlay-control.py script added to the install list
 
