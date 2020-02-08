@@ -366,14 +366,14 @@ export CFLAGS="%{build_cflags}"
 export CXXFLAGS="%{build_cxxflags}"
 export LDFLAGS="%{build_ldflags}"
 
-LTO_FLAGS="-fcommon -g0 -flto=8 -ffat-lto-objects -flto-odr-type-merging"
+LTO_FLAGS="-fcommon -g0 -ffat-lto-objects -flto-odr-type-merging"
 export CFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export FCFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export FFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export CXXFLAGS="$CXXFLAGS -std=c++14 -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export LDFLAGS="$LDFLAG0S -flto=8 "
 
-%meson -Dcpp_std=gnu++11 \
+%meson -Dcpp_std=gnu++14 \
   -D platforms=x11,wayland,drm,surfaceless \
   -D dri-drivers=%{?dri_drivers} \
 %if 0%{?with_hardware}
@@ -631,6 +631,9 @@ popd
 %endif
 
 %changelog
+* Sat Feb 08 2020 Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+- Prevent radeonsi crashing when compiled with GCC10 on Rawhide.
+
 * Thu Jan 23 2020 Tom Stellard <tstellar@redhat.com>
 - Link against libclang-cpp.so
 - https://fedoraproject.org/wiki/Changes/Stop-Shipping-Individual-Component-Libraries-In-clang-lib-Package
