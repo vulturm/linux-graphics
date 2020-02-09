@@ -29,6 +29,7 @@
 %global platform_drivers ,i915,i965
 %global with_vmware 1
 %global with_xa     1
+%global with_zink   1
 %global vulkan_drivers intel,amd
 %else
 %ifnarch s390x
@@ -168,9 +169,13 @@ BuildRequires:  vulkan-headers
 %endif
 ## vulkan hud requires
 %if 0%{?with_vulkan_overlay}
-BuildRequires: glslang
-BuildRequires: lm_sensors-devel
+BuildRequires:  glslang
+BuildRequires:  lm_sensors-devel
+BuildRequires:  /usr/bin/pathfix.py
 %endif 
+%if 0%{?with_zink}
+BuildRequires:  pkgconfig(vulkan)
+%endif
 
 %description
 %{summary}.
@@ -377,7 +382,7 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -D platforms=x11,wayland,drm,surfaceless \
   -D dri-drivers=%{?dri_drivers} \
 %if 0%{?with_hardware}
-  -D gallium-drivers=swrast,virgl,r300,nouveau%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi,r600}%{?with_iris:,iris}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost} \
+  -D gallium-drivers=swrast,virgl,r300,nouveau%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi,r600}%{?with_iris:,iris}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_zink:,zink} \
 %else
   -D gallium-drivers=swrast,virgl \
 %endif
@@ -568,6 +573,9 @@ popd
 %if 0%{?with_iris}
 %{_libdir}/dri/iris_dri.so
 %endif
+%if 0%{?with_zink}
+%{_libdir}/dri/zink_dri.so
+%endif
 %endif
 %if 0%{?with_hardware}
 %dir %{_libdir}/gallium-pipe
@@ -631,6 +639,9 @@ popd
 %endif
 
 %changelog
+* Sun Feb 09 2020 Mihai Vultur <xanto@egaming.ro>
+- Enable zink.
+
 * Sat Feb 08 2020 Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
 - Prevent radeonsi crashing when compiled with GCC10 on Rawhide.
 
