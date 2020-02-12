@@ -82,7 +82,7 @@ Summary: The Linux kernel
 # gitX tags, so a 3 here would become part of release "0.rcX.gitX.3"
 #
 %global baserelease 1
-%global fedora_build %(date +"%Y%m%d")
+%global fedora_build @@fedora_build@@
 
 # base_sublevel is the kernel version we're starting with and patching
 # on top of -- for example, 3.1-rc7-git1 starts with a 3.0 base,
