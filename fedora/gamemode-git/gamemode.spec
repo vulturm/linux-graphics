@@ -3,9 +3,9 @@
 %global build_repo https://github.com/FeralInteractive/gamemode
 %define version_string 1.6
 
-%define commit d5620e88df9c9d2c7aaa62aad84a8c328e14dd2f
+%define commit 883d7c15ff316e91bfecfad523fbd7a443e768fc
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200123
+%global commit_date 20200227
 %global gitrel .%{commit_date}.git%{shortcommit}
 
 Name:		  %{package_name}
