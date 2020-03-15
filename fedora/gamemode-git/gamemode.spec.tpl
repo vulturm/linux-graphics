@@ -44,6 +44,19 @@ Files for development with %{name}.
 %prep
 #force downloading the project, seems that copr dist-cache is poisoned with bogus archive
 git clone --recursive %{build_repo} %{_builddir}/%{package_name}-%{commit}
+pushd %{_builddir}/%{package_name}-%{commit}
+git config -f .gitmodules --get-regexp '^submodule\..*\.path$' |
+    while read path_key path
+    do
+        url_key=$(echo $path_key | sed 's/\.path/.url/')
+        url=$(git config -f .gitmodules --get "$url_key")
+        git config -f .gitmodules submodule..shallow true
+        rmdir --ignore-fail-on-non-empty "$path"
+        git submodule add --depth 1 -- $url $path
+    done
+
+popd
+
 %autosetup -p1 -D -T -n %{package_name}-%{commit}
 
 %build
@@ -78,6 +91,9 @@ git clone --recursive %{build_repo} %{_builddir}/%{package_name}-%{commit}
 
 
 %changelog
+* Sun Mar 15 2020 Mihai Vultur <xanto@egaming.ro> - git
+- Also clone submodules.
+
 * Thu Dec 05 2019 Mihai Vultur <xanto@egaming.ro> - git
 - Build git version.
 
