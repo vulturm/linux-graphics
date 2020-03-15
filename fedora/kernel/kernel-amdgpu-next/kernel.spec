@@ -859,9 +859,6 @@ Patch505: ARM-fix-__get_user_check-in-case-uaccess_-calls-are-not-inlined.patch
 
 %endif
 
-# GCC 10 build fix for x86_64
-Patch528: 0001-x86-Don-t-declare-__force_order-in-kaslr_64.c.patch
-
 %description
 The kernel meta package
 
@@ -1512,9 +1509,9 @@ git commit -a -m "Stable update"
 # Note: Even in the "nopatches" path some patches (build tweaks and compile
 # fixes) will always get applied; see patch defition above for details
 
-#%if !%{nopatches}
+%if !%{nopatches}
  git am %{patches}
-#%endif
+%endif
 
 # END OF PATCH APPLICATIONS
 
