@@ -5,7 +5,7 @@
 
 %define commit 7515c640c33a45f1d6c43e0e11cb172117803c66
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200305
+%global commit_date 20200315
 %global gitrel .%{commit_date}.git%{shortcommit}
 
 Name:		  %{package_name}
@@ -44,6 +44,7 @@ Files for development with %{name}.
 %prep
 #force downloading the project, seems that copr dist-cache is poisoned with bogus archive
 git clone --recursive %{build_repo} %{_builddir}/%{package_name}-%{commit}
+
 %autosetup -p1 -D -T -n %{package_name}-%{commit}
 
 %build
