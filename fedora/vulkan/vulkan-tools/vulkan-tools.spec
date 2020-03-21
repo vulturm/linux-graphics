@@ -1,7 +1,7 @@
 %global build_repo https://github.com/KhronosGroup/Vulkan-Tools
 
-%global latest_data %(git ls-remote %{build_repo} | grep 'refs/tags/sdk-' | sort -Vrk 2 | head -1)
-%global numeric_ver %(echo %{latest_data} | grep -oP 'sdk.*' | grep -oP '[0-9.]+')
+%global latest_data %(git ls-remote %{build_repo} | grep 'refs/tags/v' | sort -Vrk 2 | head -1)
+%global numeric_ver %(echo %{latest_data} | grep -oP 'v.*' | grep -oP '[0-9.]+')
 %global commit_date %(date +"%Y%m%d")
 %global rel_build %{commit_date}%{?dist}
 
@@ -12,7 +12,7 @@ Summary:        Vulkan tools
 
 License:        ASL 2.0
 URL:            %{build_repo}
-Source0:        %url/archive/sdk-%{version}.tar.gz#/Vulkan-Tools-%{version}.tar.gz       
+Source0:        %url/archive/v%{version}.tar.gz#/Vulkan-Tools-%{version}.tar.gz
 
 
 BuildRequires:  gcc
@@ -37,7 +37,7 @@ Obsoletes:      vulkan-demos < %{version}-%{release}
 Vulkan tools
 
 %prep
-%autosetup -n Vulkan-Tools-sdk-%{version} -p1
+%autosetup -n Vulkan-Tools-%{version} -p1
 
 
 %build

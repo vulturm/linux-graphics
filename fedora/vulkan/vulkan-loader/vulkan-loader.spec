@@ -1,7 +1,7 @@
 %global build_repo https://github.com/KhronosGroup/Vulkan-Loader
 
-%global latest_data %(git ls-remote %{build_repo} | grep 'refs/tags/sdk-' | sort -Vrk 2 | head -1)
-%global numeric_ver %(echo %{latest_data} | grep -oP 'sdk.*' | grep -oP '[0-9.]+')
+%global latest_data %(git ls-remote %{build_repo} | grep 'refs/tags/v' | sort -Vrk 2 | head -1)
+%global numeric_ver %(echo %{latest_data} | grep -oP 'v.*' | grep -oP '[0-9.]+')
 %global commit_date %(date +"%Y%m%d")
 %global rel_build %{commit_date}%{?dist}
 
@@ -12,7 +12,7 @@ Summary:        Vulkan ICD desktop loader
 
 License:        ASL 2.0
 URL:            %{build_repo}
-Source0:        %url/archive/sdk-%{version}.tar.gz#/Vulkan-Loader-%{version}.tar.gz       
+Source0:        %url/archive/v%{version}.tar.gz#/Vulkan-Loader-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -59,7 +59,7 @@ developing applications that use %{name}.
 
 
 %prep
-%autosetup -n Vulkan-Loader-sdk-%{version}
+%autosetup -n Vulkan-Loader-%{version}
 
 
 %build

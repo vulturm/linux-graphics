@@ -1,7 +1,7 @@
 %global build_repo https://github.com/KhronosGroup/Vulkan-Headers
 
-%global latest_data %(git ls-remote %{build_repo} | grep 'refs/tags/sdk-' | sort -Vrk 2 | head -1)
-%global numeric_ver %(echo %{latest_data} | grep -oP 'sdk.*' | grep -oP '[0-9.]+')
+%global latest_data %(git ls-remote %{build_repo} | grep 'refs/tags/v' | sort -Vrk 2 | head -1)
+%global numeric_ver %(echo %{latest_data} | grep -oP 'v.*' | grep -oP '[0-9.]+')
 %global commit_date %(date +"%Y%m%d")
 %global rel_build %{commit_date}%{?dist}
 
@@ -13,7 +13,7 @@ Summary:        Vulkan Header files and API registry
 
 License:        ASL 2.0
 URL:            %{build_repo}
-Source0:        %url/archive/sdk-%{numeric_ver}.tar.gz#/Vulkan-Headers-sdk-%{numeric_ver}.tar.gz
+Source0:        %url/archive/v%{numeric_ver}.tar.gz#/Vulkan-Headers-%{numeric_ver}.tar.gz
 
 BuildRequires:  cmake3
 BuildArch:      noarch       
@@ -22,7 +22,7 @@ BuildArch:      noarch
 Vulkan Header files and API registry
 
 %prep
-%autosetup -n Vulkan-Headers-sdk-%{version}
+%autosetup -n Vulkan-Headers-%{version}
 
 
 %build
