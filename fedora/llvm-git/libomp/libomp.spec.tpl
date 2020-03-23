@@ -69,12 +69,10 @@ Requires: python3-lit
 OpenMP regression tests
 
 %prep
-%prep
 #force downloading the project, seems that copr dist-cache is poisoned with bogus archive
-curl -Lo /builddir/build/SOURCES/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
+curl -Lo %{_sourcedir}/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 
-%setup -q -n llvm-project-%{commit}/openmp -p1
-
+%autosetup -n llvm-project-%{commit}/openmp -p1
 
 %build
 mkdir -p _build
