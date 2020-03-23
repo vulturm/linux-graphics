@@ -1,7 +1,17 @@
-%global git_commit 4ceade0
-#%%global rc_ver 1
-%global baserelease 0.0.58.200321.4ceade0
-%global libomp_srcdir openmp-%{version}%{?rc_ver:rc%{rc_ver}}.src
+%global build_branch master
+%global pkg_name libomp
+
+%global build_repo https://github.com/llvm/llvm-project
+
+%global maj_ver 11
+%global min_ver 0
+%global patch_ver 0
+
+%define commit 72d1419bfba2a1c4d842ab57849a22d9260a1bb6
+%global commit_date 20200323
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
+
+%global gitrel .%{commit_date}.git%{shortcommit}
 
 
 %ifarch ppc64le
@@ -10,20 +20,16 @@
 %global libomp_arch %{_arch}
 %endif
 
-Name: libomp
-Version: 11.0.0
-Release: %{baserelease}%{?rc_ver:.rc%{rc_ver}}%{?dist}
+Name:		%{pkg_name}
+Version:	%{maj_ver}.%{min_ver}.%{patch_ver}
+Release:	0.1%{?gitrel}%{?dist}
 Summary: OpenMP runtime for clang
 
 License: NCSA
-URL: http://openmp.llvm.org	
-Source0: http://%{?rc_ver:pre}releases.llvm.org/%{version}/%{?rc_ver:rc%{rc_ver}}/%{libomp_srcdir}.tar.xz
+URL: http://openmp.llvm.org 
+Source0:  %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 Source1: run-lit-tests
 Source2: lit.fedora.cfg.py
-%if %{undefined git_commit}
-Source3: https://%{?rc_ver:pre}releases.llvm.org/%{version}/%{?rc_ver:rc%{rc_ver}}/%{libomp_srcdir}.tar.xz.sig
-Source4: https://prereleases.llvm.org/%{version}/hans-gpg-key.asc
-%endif
 
 Patch0: 0001-CMake-Make-LIBOMP_HEADERS_INSTALL_PATH-a-cache-varia.patch
 
@@ -63,19 +69,24 @@ Requires: python3-lit
 OpenMP regression tests
 
 %prep
-%autosetup -n openmp-%{version}%{?rc_ver:rc%{rc_ver}}.src -p1
+%prep
+#force downloading the project, seems that copr dist-cache is poisoned with bogus archive
+curl -Lo /builddir/build/SOURCES/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
+
+%setup -q -n llvm-project-%{commit}/openmp -p1
+
 
 %build
 mkdir -p _build
 cd _build
 
 %cmake .. \
-	-DLIBOMP_INSTALL_ALIASES=OFF \
-	-DLIBOMP_HEADERS_INSTALL_PATH:PATH=%{_libdir}/clang/%{version}/include \
+  -DLIBOMP_INSTALL_ALIASES=OFF \
+  -DLIBOMP_HEADERS_INSTALL_PATH:PATH=%{_libdir}/clang/%{version}/include \
 %if 0%{?__isa_bits} == 64
-	-DOPENMP_LIBDIR_SUFFIX=64 \
+  -DOPENMP_LIBDIR_SUFFIX=64 \
 %else
-	-DOPENMP_LIBDIR_SUFFIX= \
+  -DOPENMP_LIBDIR_SUFFIX= \
 %endif
 
 %make_build
@@ -134,6 +145,10 @@ rm -rf %{buildroot}%{_libdir}/libarcher_static.a
 %{_libexecdir}/tests/libomp/
 
 %changelog
+* Mon Mar 23 2020 Mihai Vultur <xanto@egaming.ro>
+- Modified the spec by tstellar.
+- Implemented some version autodetection to reduce maintenance work.
+
 * Fri Jan 31 2020 sguelton@redhat.com - 10.0.0-0.1.rc1
 - 10.0.0 rc1
 
@@ -217,3 +232,4 @@ rm -rf %{buildroot}%{_libdir}/libarcher_static.a
 
 * Mon May 15 2017 Tom Stellard <tstellar@redhat.com> - 5.0.0-1
 - Initial version.
+
