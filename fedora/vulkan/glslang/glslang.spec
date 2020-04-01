@@ -7,9 +7,9 @@
 
 %define version_string 8.13.3559
 
-%define commit 1f0fcbe5a30fdc9632a8bff36277103fabf0797c
+%define commit 1fff3623550471d20d2a4d0afeeb0bedf28edc54
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200322
+%global commit_date 20200401
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -23,7 +23,7 @@ Source0:        %{build_repo}/archive/%{commit}.tar.gz
 Summary:        OpenGL and OpenGL ES shader front end and validator
 
 License:        BSD and GPLv3+ and ASL 2.0
-Patch1:         glslang-default-resource-limits_staticlib.patch
+#Patch1:         glslang-default-resource-limits_staticlib.patch
 # Patch to build against system spirv-tools (rebased locally)
 #Patch3:         https://patch-diff.githubusercontent.com/raw/KhronosGroup/glslang/pull/1722.patch#/0001-pkg-config-compatibility.patch
 Patch3:         0001-pkg-config-compatibility.patch
