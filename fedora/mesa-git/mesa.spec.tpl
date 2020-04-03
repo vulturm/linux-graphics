@@ -85,7 +85,6 @@ Source0:        %{build_repo}/archive/%{commit}.tar.gz#/mesa-%{commit}.tar.gz
 Source1:        Mesa-MLAA-License-Clarification-Email.txt
 
 Patch3:         0003-evergreen-big-endian.patch
-Patch4:         0001-Link-with-libclang-cpp.patch
 
 
 # Disable rgb10 configs by default:
