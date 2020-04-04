@@ -2,11 +2,11 @@
 %global build_branch master
 
 %global build_repo https://github.com/daniel-schuermann/mesa
-%define version_string 20.0.0
+%define version_string 20.1.0
 
-%define commit 7a965bd4c38e8368de9e06605a4b13c18c251826
+%define commit 548fab0d5be348bc52da8d51c24a6c2be0765be0
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200226.10
+%global commit_date 20200404.05
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -85,7 +85,6 @@ Source0:        %{build_repo}/archive/%{commit}.tar.gz#/mesa-%{commit}.tar.gz
 Source1:        Mesa-MLAA-License-Clarification-Email.txt
 
 Patch3:         0003-evergreen-big-endian.patch
-Patch4:         0001-Link-with-libclang-cpp.patch
 
 
 # Disable rgb10 configs by default:
