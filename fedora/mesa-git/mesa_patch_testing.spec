@@ -2,11 +2,11 @@
 %global build_branch master
 
 %global build_repo https://github.com/vulturm/mesa
-%define version_string 20.1.0
+%define version_string 500
 
 %define commit 6f7caf555a79b2d8f77f2ff18d2d314d45b803c7
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200227.16
+%global commit_date 20200421.18
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -85,7 +85,6 @@ Source0:        %{build_repo}/archive/%{commit}.tar.gz#/mesa-%{commit}.tar.gz
 Source1:        Mesa-MLAA-License-Clarification-Email.txt
 
 Patch3:         0003-evergreen-big-endian.patch
-Patch4:         0001-Link-with-libclang-cpp.patch
 
 
 # Disable rgb10 configs by default:
