@@ -2,7 +2,7 @@
 %global build_branch master
 
 %global build_repo https://github.com/vulturm/mesa
-%define version_string 1
+%define version_string 500
 
 %define commit 6f7caf555a79b2d8f77f2ff18d2d314d45b803c7
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
