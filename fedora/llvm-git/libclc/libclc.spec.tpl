@@ -78,10 +78,10 @@ curl -Lo %{_sourcedir}/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{com
 %autosetup -p0 -n llvm-project-%{commit}/%{name}
 
 %build
-export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
+export CFLAGS="%{build_cflags} -nogpulib -D__extern_always_inline=inline"
 mkdir -p _build
 cd _build
-%cmake ..
+%{__cmake} .. -DCMAKE_INSTALL_INCLUDEDIR:PATH=%{_includedir} -DCMAKE_INSTALL_DATADIR:PATH=%{_libdir}
 %make_build
 
 %install
