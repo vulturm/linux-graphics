@@ -1,12 +1,13 @@
 %define package_name mesa
 %global build_branch master
+%global _default_patch_fuzz 2
 
 %global build_repo https://github.com/mesa3d/mesa
 %define version_string 20.1.0
 
 %define commit b4cc116339f4eec9ddeba2b2efc9b07f06ae6d40
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200428.05
+%global commit_date 20200428.10
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -64,6 +65,8 @@
 %endif
 
 %global with_vulkan_overlay 1
+%global with_vulkan_device_select 1
+
 
 %global dri_drivers %{?base_drivers}%{?platform_drivers}
 
@@ -411,6 +414,7 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -D shared-glapi=true \
   -D gallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
   -D vulkan-overlay-layer=%{?with_vulkan_overlay:true}%{!?with_vulkan_overlay:false} \
+  -D vulkan-device-select-layer=%{?with_vulkan_device_select:true}%{!?with_vulkan_device_select:false} \
   -D tools=[]
   %{nil}
 %meson_build
@@ -629,6 +633,10 @@ popd
 %{_libdir}/libVkLayer_MESA_overlay.so
 %{_datadir}/vulkan/explicit_layer.d/VkLayer_MESA_overlay.json
 %endif
+%if 0%{?with_vulkan_device_select}
+%{_libdir}/libVkLayer_MESA_device_select.so
+%{_datadir}/vulkan/implicit_layer.d/VkLayer_MESA_device_select.json
+%endif
 
 %files vulkan-devel
 %if 0%{?with_hardware}
@@ -638,6 +646,9 @@ popd
 %endif
 
 %changelog
+* Tue Apr 20 2020 Mihai Vultur <xanto@egaming.ro>
+- Enable vulkan-device-select-layer.
+
 * Sun Feb 09 2020 Mihai Vultur <xanto@egaming.ro>
 - Enable zink.
 
