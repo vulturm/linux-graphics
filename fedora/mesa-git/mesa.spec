@@ -5,9 +5,9 @@
 %global build_repo https://github.com/mesa3d/mesa
 %define version_string 20.1.0
 
-%define commit b4cc116339f4eec9ddeba2b2efc9b07f06ae6d40
+%define commit 8e03cf15f9516642ba7f7cd7b7a2d7aad835796a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200428.10
+%global commit_date 20200428.15
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
