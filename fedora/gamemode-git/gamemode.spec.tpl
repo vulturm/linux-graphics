@@ -17,6 +17,7 @@ URL:		  %{build_repo}
 Source0:  https://github.com/FeralInteractive/gamemode/archive/%{commit}.tar.gz#/%{package_name}-%{commit}.tar.gz
 
 BuildRequires: gcc
+BuildRequires: inih
 BuildRequires: asciidoc
 BuildRequires: meson
 BuildRequires: pkgconfig(dbus-1)
