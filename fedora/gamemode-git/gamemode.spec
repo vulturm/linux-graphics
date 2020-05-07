@@ -18,6 +18,7 @@ Source0:  https://github.com/FeralInteractive/gamemode/archive/%{commit}.tar.gz#
 
 BuildRequires: gcc
 BuildRequires: inih
+BuildRequires: cmake
 BuildRequires: asciidoc
 BuildRequires: meson
 BuildRequires: pkgconfig(dbus-1)
