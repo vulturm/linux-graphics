@@ -5,9 +5,9 @@
 %global build_repo https://github.com/daniel-schuermann/mesa
 %define version_string 20.1.0
 
-%define commit 3968b9381f811473dbb654ee4f66450a5d244719
+%define commit fcfc78fa2a0a480bac15f7fe9c4c5680098d55d5
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200502.15
+%global commit_date 20200515.00
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
