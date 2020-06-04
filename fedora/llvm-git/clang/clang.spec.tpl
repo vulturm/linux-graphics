@@ -240,6 +240,8 @@ cd _build
 %global optflags %(echo %{optflags} | sed 's/-g /-g1 /')
 %endif
 
+LDFLAGS="%{__global_ldflags} -ldl"
+
 %cmake .. -G Ninja \
   -DCMAKE_RULE_MESSAGES:BOOL=OFF \
 	-DLLVM_PARALLEL_LINK_JOBS=1 \
