@@ -28,20 +28,24 @@ Patch0:		0001-CMake-Check-for-gtest-headers-even-if-lit.py-is-not-.patch
 #Patch1:		0001-lld-Prefer-using-the-newest-installed-python-version.patch
 #Patch2:		0001-Partial-support-of-SHT_GROUP-without-flag.patch
 
-BuildRequires:	gcc
-BuildRequires:	gcc-c++
-BuildRequires:	cmake
-BuildRequires:	llvm-devel = %{version}
-BuildRequires:  llvm-static = %{version}
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  cmake
+BuildRequires:  llvm-devel = %{version}
 BuildRequires:  llvm-test = %{version}
-BuildRequires:	ncurses-devel
-BuildRequires:	zlib-devel
-BuildRequires:	chrpath
+BuildRequires:  ncurses-devel
+BuildRequires:  zlib-devel
+BuildRequires:  chrpath
 
 # For make check:
-BuildRequires:	python3-rpm-macros
-BuildRequires:	python3-lit
-BuildRequires:	llvm-googletest
+BuildRequires:  python3-rpm-macros
+BuildRequires:  python3-lit
+BuildRequires:  llvm-googletest = %{version}
+
+Requires(post): %{_sbindir}/update-alternatives
+Requires(preun): %{_sbindir}/update-alternatives
+
+Requires: lld-libs = %{version}-%{release}
 
 %description
 The LLVM project linker.
