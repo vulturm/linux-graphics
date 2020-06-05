@@ -5,7 +5,7 @@
 %global build_repo https://github.com/vulturm/mesa
 %define version_string 20.2.0
 
-%define commit 664c0d5a127b7956f4db0e03324f4e7e38ccb2fb
+%define commit 7b0bb26f2947c3aac35f629fe382196ff8750c60
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global commit_date 20200605.15
 %global gitrel .%{commit_date}.%{shortcommit}
