@@ -95,7 +95,7 @@ BuildRequires:  chrpath
 # hardcode the 666 instead of 660 for device nodes
 Patch1001:      libdrm-make-dri-perms-okay.patch
 # remove backwards compat not needed on Fedora
-Patch1002:      libdrm-2.4.0-no-bc.patch
+# Patch1002:      libdrm-2.4.0-no-bc.patch
 
 %description
 Direct Rendering Manager runtime library
@@ -299,6 +299,9 @@ cp %{SOURCE1} %{buildroot}%{_docdir}/libdrm
 %endif
 
 %changelog
+* Sun Jun 07 2020 Mihai Vultur <xanto@egaming.ro>
+- Remove no_bc patch. Makes our life easier from a patch maintenance standpoint.
+
 * Tue Jul 09 2019 Mihai Vultur <xanto@egaming.ro> - git
 - Update to git version
 
