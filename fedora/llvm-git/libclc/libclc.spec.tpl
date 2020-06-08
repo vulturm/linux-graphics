@@ -92,8 +92,6 @@ cd _build
 %files
 %license LICENSE.TXT
 %doc README.TXT CREDITS.TXT
-%dir %{_libdir}/%{shortname}
-%{_libdir}/%{shortname}/*.bc
 %{_includedir}/%{shortname}
 
 %files devel
