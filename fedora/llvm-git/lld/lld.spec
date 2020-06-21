@@ -7,8 +7,8 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit af4f2eb476361e6da42d6f66a68cada763625c32
-%global commit_date 20200619
+%define commit db90d315706b5d5a06cb79607cef1a8d581d0ba8
+%global commit_date 20200621
 
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
