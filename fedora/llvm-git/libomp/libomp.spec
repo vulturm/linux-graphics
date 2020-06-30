@@ -132,6 +132,7 @@ rm -rf %{buildroot}%{_libdir}/libarcher_static.a
 %endif
 
 %files devel
+%{_includedir}/ompt-multiplex.h
 %{_libdir}/clang/%{version}/include/omp.h
 %ifnarch %{arm}
 %{_libdir}/clang/%{version}/include/omp-tools.h
