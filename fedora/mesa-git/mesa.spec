@@ -3,11 +3,11 @@
 %global _default_patch_fuzz 2
 
 %global build_repo https://github.com/mesa3d/mesa
-%define version_string 20.2.0
+%define version_string 20.3.0
 
-%define commit c6aadbae71562c14166a6e7942867eaf56b3e017
+%define commit a92cfa66b4ebf51b59fda81bd65d83f4ca013e7e
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200806.15
+%global commit_date 20200806.20
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
