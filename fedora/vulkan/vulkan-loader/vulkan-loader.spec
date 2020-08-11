@@ -64,11 +64,11 @@ developing applications that use %{name}.
 
 %build
 %cmake3 -GNinja -DCMAKE_BUILD_TYPE=Release .
-%ninja_build
+%cmake3_build
 
 
 %install
-%ninja_install
+%cmake3_install
 
 # create the filesystem
 mkdir -p %{buildroot}%{_sysconfdir}/vulkan/{explicit,implicit}_layer.d/ \

@@ -7,11 +7,12 @@
 %global version_file https://raw.githubusercontent.com/KhronosGroup/SPIRV-Tools/{}/CHANGES
 %global version_string_regex reg_beg v([0-9.]+)(-dev)? [0-9]+-[0-9]+-[0-9]+ reg_end
 
-%define version_string 2020.3
+%define version_string 2020.5
+%undefine __cmake_in_source_build
 
-%define commit 5547553a0c7b1ed2138fc0b8e131df20f8386a0f
+%define commit b7056e7e031a3398dba00fb32a9f8ced22624ad2
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200425
+%global commit_date 20200811
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -60,18 +61,15 @@ curl -Lo %{_sourcedir}/%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz
 %autosetup -p1 -n SPIRV-Tools-%{commit}
 
 %build
-%__mkdir_p %_target_platform
-pushd %_target_platform
 %cmake3 -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_LIBDIR=%{_lib} \
         -DSPIRV-Headers_SOURCE_DIR=%{_prefix} \
         -DPYTHON_EXECUTABLE=%{__python3} \
-        -GNinja ..
-%ninja_build
-popd
+        -GNinja
+%cmake3_build
 
 %install
-%ninja_install -C %_target_platform
+%cmake3_install
 
 %ldconfig_scriptlets libs
 

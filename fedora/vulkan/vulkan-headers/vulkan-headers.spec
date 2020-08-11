@@ -27,11 +27,11 @@ Vulkan Header files and API registry
 
 %build
 %cmake3 -DCMAKE_INSTALL_LIBDIR=%{_libdir} .
-%make_build
+%cmake3_build
 
 
 %install
-%make_install
+%cmake3_install
 
 
 %files

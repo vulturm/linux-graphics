@@ -5,11 +5,11 @@
 %global version_file https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/{}/.gitignore
 %global version_tag_regex reg_beg sdk-(.*) reg_end
 
-%define version_string 1.2.135.0
+%define version_string 1.2.148.0
 
-%define commit 1512acdf047fe856f33fecd8e7b52823e4ffbdda
+%define commit fcfe5a3b19d5b26bd7c9cb10c469cc4f1cdab373
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200425
+%global commit_date 20200811
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -66,11 +66,11 @@ developing applications that use %{name}.
         -DGLSLANG_INSTALL_DIR=%{_prefix} \
         -DBUILD_LAYER_SUPPORT_FILES:BOOL=ON \
         -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir}/vulkan/ .
-%ninja_build
+%cmake3_build
 
 
 %install
-%ninja_install
+%cmake3_install
 
 
 %ldconfig_scriptlets
@@ -86,6 +86,9 @@ developing applications that use %{name}.
 %{_includedir}/vulkan/
 
 %changelog
+* Tue Aug 11 2020 Mihai Vultur <xanto@egaming.ro>
+- Fix CMake to do out-of-source builds: https://fedoraproject.org/wiki/Changes/CMake_to_do_out-of-source_builds
+
 * Sun Jul 28 2019 Mihai Vultur <xanto@egaming.ro>
 - Implement some version autodetection to reduce maintenance work.
 

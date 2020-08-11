@@ -41,12 +41,12 @@ Vulkan tools
 
 
 %build
-%cmake3 -GNinja -DCMAKE_BUILD_TYPE=Release -DGLSLANG_INSTALL_DIR=%{_bindir} .
-%ninja_build
+%cmake3 -GNinja -DCMAKE_BUILD_TYPE=Release -DGLSLANG_INSTALL_DIR=%{_bindir}
+%cmake3_build
 
 
 %install
-%ninja_install
+%cmake3_install
 
 %files
 %license LICENSE.txt
@@ -54,6 +54,9 @@ Vulkan tools
 %{_bindir}/*
 
 %changelog
+* Tue Aug 11 2020 Mihai Vultur <xanto@egaming.ro>
+- Fix CMake to do out-of-source builds: https://fedoraproject.org/wiki/Changes/CMake_to_do_out-of-source_builds
+
 * Tue Jul 16 2019 Mihai Vultur <xanto@egaming.ro>
 - Implement some version autodetection to reduce maintenance work.
 

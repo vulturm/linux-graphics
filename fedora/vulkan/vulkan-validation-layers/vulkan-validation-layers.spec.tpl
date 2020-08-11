@@ -66,11 +66,11 @@ developing applications that use %{name}.
         -DGLSLANG_INSTALL_DIR=%{_prefix} \
         -DBUILD_LAYER_SUPPORT_FILES:BOOL=ON \
         -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir}/vulkan/ .
-%ninja_build
+%cmake3_build
 
 
 %install
-%ninja_install
+%cmake3_install
 
 
 %ldconfig_scriptlets
@@ -86,6 +86,9 @@ developing applications that use %{name}.
 %{_includedir}/vulkan/
 
 %changelog
+* Tue Aug 11 2020 Mihai Vultur <xanto@egaming.ro>
+- Fix CMake to do out-of-source builds: https://fedoraproject.org/wiki/Changes/CMake_to_do_out-of-source_builds
+
 * Sun Jul 28 2019 Mihai Vultur <xanto@egaming.ro>
 - Implement some version autodetection to reduce maintenance work.
 

@@ -8,6 +8,7 @@
 %global version_string_regex reg_beg v([0-9.]+)(-dev)? [0-9]+-[0-9]+-[0-9]+ reg_end
 
 %define version_string VERSION_STRING
+%undefine __cmake_in_source_build
 
 %define commit COMMIT
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
@@ -60,18 +61,15 @@ curl -Lo %{_sourcedir}/%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz
 %autosetup -p1 -n SPIRV-Tools-%{commit}
 
 %build
-%__mkdir_p %_target_platform
-pushd %_target_platform
 %cmake3 -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_LIBDIR=%{_lib} \
         -DSPIRV-Headers_SOURCE_DIR=%{_prefix} \
         -DPYTHON_EXECUTABLE=%{__python3} \
-        -GNinja ..
-%ninja_build
-popd
+        -GNinja
+%cmake3_build
 
 %install
-%ninja_install -C %_target_platform
+%cmake3_install
 
 %ldconfig_scriptlets libs
 
