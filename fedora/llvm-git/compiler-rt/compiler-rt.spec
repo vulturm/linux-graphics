@@ -7,9 +7,9 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 2a11d5dcc97a454bfd6db0771709cd554a5ccfac
+%define commit 8144a7d8fc00c1ed779cb2dfabd826eedb19f296
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200809
+%global commit_date 20200811
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %define _unpackaged_files_terminate_build 0
@@ -37,6 +37,7 @@ Patch0:		0001-PATCH-std-thread-copy.patch
 BuildRequires:	gcc
 BuildRequires:	gcc-c++
 BuildRequires:	cmake
+BuildRequires:  ninja-build
 BuildRequires:	python3
 # We need python3-devel for pathfix.py.
 BuildRequires:	python3-devel
@@ -58,9 +59,7 @@ pathfix.py -i "%{__python3} %{py3_shbang_opts}" -p -n \
   lib/hwasan/scripts/hwasan_symbolize
 
 %build
-mkdir -p _build
-cd _build
-%cmake .. \
+%cmake  -GNinja \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 	-DLLVM_CONFIG_PATH:FILEPATH=%{_bindir}/llvm-config-%{__isa_bits} \
 	\
@@ -71,11 +70,10 @@ cd _build
 %endif
 	-DCOMPILER_RT_INCLUDE_TESTS:BOOL=OFF # could be on?
 
-make %{?_smp_mflags}
+%cmake_build
 
 %install
-cd _build
-make install DESTDIR=%{buildroot}
+%cmake_install
 
 mkdir -p %{buildroot}%{_libdir}/clang/%{version}/lib
 
@@ -102,10 +100,14 @@ pathfix.py -i "%{__python3} %{py3_shbang_opts}" -p -n .
 #make check-all -C _build
 
 %files
+%license LICENSE.TXT
 %{_includedir}/*
 %{_libdir}/clang/%{version}
 
 %changelog
+* Mon Jul 20 2020 sguelton@redhat.com
+- Use modern cmake macros
+
 * Sat Jan 18 2020 Mihai Vultur <xanto@egaming.ro>
 - Fix ambigous python shebang.
 

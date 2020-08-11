@@ -63,41 +63,43 @@
 %global build_install_prefix %{buildroot}%{install_prefix}
 %global build_pkgdocdir %{buildroot}%{_pkgdocdir}
 
-Name:		  %{pkg_name}
-Version:	%{maj_ver}.%{min_ver}.%{patch_ver}
-Release:	0.1%{?gitrel}%{?dist}
-Summary:	The Low Level Virtual Machine
+Name:     %{pkg_name}
+Version:  %{maj_ver}.%{min_ver}.%{patch_ver}
+Release:  0.1%{?gitrel}%{?dist}
+Summary:  The Low Level Virtual Machine
 
-License:	NCSA
+License:  NCSA
 URL:      https://llvm.org
 Source0:  %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
-Source1:	run-lit-tests
+Source1:  run-lit-tests
 
-Patch5:		0001-PATCH-llvm-config.patch
+Patch5:   0001-PATCH-llvm-config.patch
 
-BuildRequires:	gcc
-BuildRequires:	gcc-c++
-BuildRequires:	cmake
-BuildRequires:	ninja-build
-BuildRequires:	zlib-devel
-BuildRequires:	libffi-devel
-BuildRequires:	ncurses-devel
-BuildRequires:	python3-sphinx
-BuildRequires:	python3-recommonmark
-BuildRequires:	multilib-rpm-config
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  cmake
+BuildRequires:  ninja-build
+BuildRequires:  zlib-devel
+BuildRequires:  libffi-devel
+BuildRequires:  ncurses-devel
+BuildRequires:  python3-sphinx
+BuildRequires:  python3-recommonmark
+BuildRequires:  multilib-rpm-config
 %if %{with gold}
-BuildRequires:	binutils-devel
+BuildRequires:  binutils-devel
 %endif
 %ifarch %{valgrind_arches}
 # Enable extra functionality when run the LLVM JIT under valgrind.
-BuildRequires:	valgrind-devel
+BuildRequires:  valgrind-devel
 %endif
 # LLVM's LineEditor library will use libedit if it is available.
-BuildRequires:	libedit-devel
+BuildRequires:  libedit-devel
 # We need python3-devel for pathfix.py.
-BuildRequires:	python3-devel
+BuildRequires:  python3-devel
 
-Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+
+Provides: llvm(major) = %{maj_ver}
 
 %description
 LLVM is a compiler infrastructure designed for compile-time, link-time,
@@ -106,35 +108,47 @@ languages. The compiler infrastructure includes mirror sets of programming
 tools as well as libraries with equivalent functionality.
 
 %package devel
-Summary:	Libraries and header files for LLVM
-Requires:	%{name}%{?_isa} = %{version}-%{release}
+Summary:  Libraries and header files for LLVM
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 # The installed LLVM cmake files will add -ledit to the linker flags for any
 # app that requires the libLLVMLineEditor, so we need to make sure
 # libedit-devel is available.
-Requires:	libedit-devel
-Requires(post):	%{_sbindir}/alternatives
-Requires(postun):	%{_sbindir}/alternatives
+Requires: libedit-devel
+# The installed cmake files reference binaries from llvm-test and llvm-static.
+# We tried in the past to split the cmake exports for these binaries out into
+# separate files, so that llvm-devel would not need to Require these packages,
+# but this caused bugs (rhbz#1773678) and forced us to carry two non-upstream
+# patches.
+Requires: llvm-static%{?_isa} = %{version}-%{release}
+Requires: llvm-test%{?_isa} = %{version}-%{release}
+
+
+Requires(post): %{_sbindir}/alternatives
+Requires(postun): %{_sbindir}/alternatives
+
+Provides: llvm-devel(major) = %{maj_ver}
 
 %description devel
 This package contains library and header files needed to develop new native
 programs that use the LLVM infrastructure.
 
 %package doc
-Summary:	Documentation for LLVM
-BuildArch:	noarch
-Requires:	%{name} = %{version}-%{release}
+Summary:  Documentation for LLVM
+BuildArch:  noarch
+Requires: %{name} = %{version}-%{release}
 
 %description doc
 Documentation for the LLVM compiler infrastructure.
 
 %package libs
-Summary:	LLVM shared libraries
+Summary:  LLVM shared libraries
 
 %description libs
 Shared libraries for the LLVM compiler infrastructure.
 
 %package static
-Summary:	LLVM static libraries
+Summary:  LLVM static libraries
 
 %description static
 Static libraries for the LLVM compiler infrastructure.
@@ -142,16 +156,16 @@ Static libraries for the LLVM compiler infrastructure.
 %if !0%{?compat_build}
 
 %package test
-Summary:	LLVM regression tests
-Requires:	%{name}%{?_isa} = %{version}-%{release}
-Requires:	python3-lit
+Summary:  LLVM regression tests
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: python3-lit
 # The regression tests need gold.
-Requires:	binutils
+Requires: binutils
 # This is for llvm-config
-Requires:	%{name}-devel%{?_isa} = %{version}-%{release}
+Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 # Bugpoint tests require gcc
-Requires:	gcc
-Requires:	findutils
+Requires: gcc
+Requires: findutils
 
 %description test
 LLVM regression tests.
@@ -168,14 +182,23 @@ LLVM's modified googletest sources.
 %autosetup -n llvm-project-%{commit}/llvm -p1
 
 pathfix.py -i %{__python3} -pn \
-	test/BugPoint/compile-custom.ll.py \
-	tools/opt-viewer/*.py
+  test/BugPoint/compile-custom.ll.py \
+  tools/opt-viewer/*.py
 
 sed -i 's~@TOOLS_DIR@~%{_bindir}~' %{SOURCE1}
 
 %build
-mkdir -p _build
-cd _build
+cd ..
+
+# Disable LTO on s390x, this causes some test failures:
+# LLVM-Unit :: Target/AArch64/./AArch64Tests/InstSizes.Authenticated
+# LLVM-Unit :: Target/AArch64/./AArch64Tests/InstSizes.PATCHPOINT
+# LLVM-Unit :: Target/AArch64/./AArch64Tests/InstSizes.STACKMAP
+# LLVM-Unit :: Target/AArch64/./AArch64Tests/InstSizes.TLSDESC_CALLSEQ
+# On X86_64, LTO builds of TableGen crash.  This can be reproduced by:
+# %%cmake_build --target include/llvm/IR/IntrinsicsAArch64.h
+# Because of these failures, lto is disabled for now.
+%global _lto_cflags %{nil}
 
 %ifarch s390 %{arm} %ix86
 # Decrease debuginfo verbosity to reduce memory consumption during final library linking
@@ -183,79 +206,81 @@ cd _build
 %endif
 
 # force off shared libs as cmake macros turns it on.
-%cmake .. -G Ninja \
- 	-DCMAKE_RULE_MESSAGES:BOOL=OFF \
-	-DBUILD_SHARED_LIBS:BOOL=OFF \
-	-DLLVM_PARALLEL_LINK_JOBS=1 \
-	-DCMAKE_BUILD_TYPE=Release \
-	-DCMAKE_SKIP_RPATH:BOOL=ON \
-	-DCMAKE_INSTALL_RPATH:BOOL=OFF \
+%cmake -G Ninja \
+  -DCMAKE_RULE_MESSAGES:BOOL=OFF \
+  -DBUILD_SHARED_LIBS:BOOL=OFF \
+  -DLLVM_PARALLEL_LINK_JOBS=1 \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_SKIP_RPATH:BOOL=ON \
 %ifarch s390 %{arm} %ix86
-	-DCMAKE_C_FLAGS_RELWITHDEBINFO="%{optflags} -DNDEBUG" \
-	-DCMAKE_CXX_FLAGS_RELWITHDEBINFO="%{optflags} -DNDEBUG" \
+  -DCMAKE_C_FLAGS_RELWITHDEBINFO="%{optflags} -DNDEBUG" \
+  -DCMAKE_CXX_FLAGS_RELWITHDEBINFO="%{optflags} -DNDEBUG" \
 %endif
-%if !0%{?compat_build}
+%if %{without compat_build}
 %if 0%{?__isa_bits} == 64
-	-DLLVM_LIBDIR_SUFFIX=64 \
+  -DLLVM_LIBDIR_SUFFIX=64 \
 %else
-	-DLLVM_LIBDIR_SUFFIX= \
+  -DLLVM_LIBDIR_SUFFIX= \
 %endif
 %endif
-	\
-	-DLLVM_TARGETS_TO_BUILD="%{llvm_targets}" \
-	-DLLVM_ENABLE_LIBCXX:BOOL=OFF \
-	-DLLVM_ENABLE_ZLIB:BOOL=ON \
-	-DLLVM_ENABLE_FFI:BOOL=ON \
-	-DLLVM_ENABLE_RTTI:BOOL=ON \
+  \
+  -DLLVM_TARGETS_TO_BUILD="%{llvm_targets}" \
+  -DLLVM_ENABLE_LIBCXX:BOOL=OFF \
+  -DLLVM_ENABLE_ZLIB:BOOL=ON \
+  -DLLVM_ENABLE_FFI:BOOL=ON \
+  -DLLVM_ENABLE_RTTI:BOOL=ON \
 %if %{with gold}
-	-DLLVM_BINUTILS_INCDIR=%{_includedir} \
+  -DLLVM_BINUTILS_INCDIR=%{_includedir} \
 %endif
-	\
-	-DLLVM_BUILD_RUNTIME:BOOL=ON \
-	\
-	-DLLVM_INCLUDE_TOOLS:BOOL=ON \
-	-DLLVM_BUILD_TOOLS:BOOL=ON \
-	\
-	-DLLVM_INCLUDE_TESTS:BOOL=ON \
-	-DLLVM_BUILD_TESTS:BOOL=ON \
-	\
-	-DLLVM_INCLUDE_EXAMPLES:BOOL=ON \
-	-DLLVM_BUILD_EXAMPLES:BOOL=OFF \
-	\
-	-DLLVM_INCLUDE_UTILS:BOOL=ON \
-%if 0%{?compat_build}
-	-DLLVM_INSTALL_UTILS:BOOL=OFF \
+  \
+  -DLLVM_BUILD_RUNTIME:BOOL=ON \
+  \
+  -DLLVM_INCLUDE_TOOLS:BOOL=ON \
+  -DLLVM_BUILD_TOOLS:BOOL=ON \
+  \
+  -DLLVM_INCLUDE_TESTS:BOOL=ON \
+  -DLLVM_BUILD_TESTS:BOOL=ON \
+  \
+  -DLLVM_INCLUDE_EXAMPLES:BOOL=ON \
+  -DLLVM_BUILD_EXAMPLES:BOOL=OFF \
+  \
+  -DLLVM_INCLUDE_UTILS:BOOL=ON \
+%if %{with compat_build}
+  -DLLVM_INSTALL_UTILS:BOOL=OFF \
 %else
-	-DLLVM_INSTALL_UTILS:BOOL=ON \
-	-DLLVM_UTILS_INSTALL_DIR:PATH=%{build_llvm_bindir} \
-	-DLLVM_TOOLS_INSTALL_DIR:PATH=bin \
+  -DLLVM_INSTALL_UTILS:BOOL=ON \
+  -DLLVM_UTILS_INSTALL_DIR:PATH=%{build_llvm_bindir} \
+  -DLLVM_TOOLS_INSTALL_DIR:PATH=bin \
 %endif
-	\
-	-DLLVM_INCLUDE_DOCS:BOOL=ON \
-	-DLLVM_BUILD_DOCS:BOOL=ON \
-	-DLLVM_ENABLE_SPHINX:BOOL=ON \
-	-DLLVM_ENABLE_DOXYGEN:BOOL=OFF \
-	\
-	-DLLVM_BUILD_LLVM_DYLIB:BOOL=ON \
-	-DLLVM_DYLIB_EXPORT_ALL:BOOL=ON \
-	-DLLVM_LINK_LLVM_DYLIB:BOOL=ON \
-	-DLLVM_BUILD_EXTERNAL_COMPILER_RT:BOOL=ON \
-	-DLLVM_INSTALL_TOOLCHAIN_ONLY:BOOL=OFF \
-	\
-	-DSPHINX_WARNINGS_AS_ERRORS=OFF \
-	-DCMAKE_INSTALL_PREFIX=%{build_install_prefix} \
-	-DLLVM_INSTALL_SPHINX_HTML_DIR=%{build_pkgdocdir}/html \
-	-DSPHINX_EXECUTABLE=%{_bindir}/sphinx-build-3
+  \
+  -DLLVM_INCLUDE_DOCS:BOOL=ON \
+  -DLLVM_BUILD_DOCS:BOOL=ON \
+  -DLLVM_ENABLE_SPHINX:BOOL=ON \
+  -DLLVM_ENABLE_DOXYGEN:BOOL=OFF \
+  \
+%if %{without compat_build}
+  -DLLVM_VERSION_SUFFIX='' \
+%endif
+  -DLLVM_BUILD_LLVM_DYLIB:BOOL=ON \
+  -DLLVM_DYLIB_EXPORT_ALL:BOOL=ON \
+  -DLLVM_LINK_LLVM_DYLIB:BOOL=ON \
+  -DLLVM_BUILD_EXTERNAL_COMPILER_RT:BOOL=ON \
+  -DLLVM_INSTALL_TOOLCHAIN_ONLY:BOOL=OFF \
+  \
+  -DSPHINX_WARNINGS_AS_ERRORS=OFF \
+  -DCMAKE_INSTALL_PREFIX=%{build_install_prefix} \
+  -DLLVM_INSTALL_SPHINX_HTML_DIR=%{build_pkgdocdir}/html \
+  -DSPHINX_EXECUTABLE=%{_bindir}/sphinx-build-3
 
 # Build libLLVM.so first.  This ensures that when libLLVM.so is linking, there
 # are no other compile jobs running.  This will help reduce OOM errors on the
 # builders without having to artificially limit the number of concurrent jobs.
 
-%ninja_build LLVM
-%ninja_build
+%cmake_build --target LLVM
+%cmake_build
 
 %install
-ninja -C _build -v install
+%cmake_install
 
 
 %if !0%{?compat_build}
@@ -271,7 +296,7 @@ mv %{buildroot}%{_mandir}/man1/tblgen.1 %{buildroot}%{_mandir}/man1/llvm-tblgen.
 
 for f in %{test_binaries}
 do
-    install -m 0755 ./_build/bin/$f %{build_llvm_bindir}
+    install -m 0755 %{_vpath_builddir}/bin/$f %{build_llvm_bindir}
 done
 
 
@@ -279,9 +304,9 @@ done
 
 # Install libraries needed for unittests
 %if 0%{?__isa_bits} == 64
-%global build_libdir _build/lib64
+%global build_libdir %{_vpath_builddir}/lib64
 %else
-%global build_libdir _build/lib
+%global build_libdir %{_vpath_builddir}/lib
 %endif
 
 install %{build_libdir}/libLLVMTestingSupport.a %{buildroot}%{_libdir}
@@ -296,12 +321,12 @@ install -d %{install_srcdir}/utils/
 cp -R utils/unittest %{install_srcdir}/utils/
 
 # Generate lit config files.
-cat _build/test/lit.site.cfg.py >> %{lit_cfg}
+head -n -1 %{_vpath_builddir}/test/lit.site.cfg.py >> %{lit_cfg}
 
 # Unit tests write output to this directory, so it can't be in /usr.
 sed -i 's~\(config.llvm_obj_root = \)"[^"]\+"~\1"."~' %{lit_cfg}
 
-cat _build/test/Unit/lit.site.cfg.py >> %{lit_unit_cfg}
+head -n -1 %{_vpath_builddir}/test/Unit/lit.site.cfg.py >> %{lit_unit_cfg}
 sed -i -e s~`pwd`/_build~%{_prefix}~g -e s~`pwd`~.~g %{lit_cfg} %{lit_cfg} %{lit_unit_cfg}
 
 # obj_root needs to be set to the directory containing the unit test binaries.
@@ -317,7 +342,7 @@ tar -czf %{install_srcdir}/test.tar.gz test/
 
 # Install the unit test binaries
 mkdir -p %{build_llvm_libdir}
-cp -R _build/unittests %{build_llvm_libdir}/
+cp -R %{_vpath_builddir}/unittests %{build_llvm_libdir}/
 rm -rf `find %{build_llvm_libdir} -iname 'cmake*'`
 
 # Workaround missing ${_IMPORT_PREFIX}
@@ -364,11 +389,18 @@ rm -Rf %{build_install_prefix}/share/opt-viewer
 
 
 %check
-#ninja check-all -C _build || :
+# TODO: Fix test failures on arm
+# FIXME: use %%cmake_build instead of %%__ninja
+#LD_LIBRARY_PATH=%{buildroot}/%{_libdir}  %{__ninja} check-all -C %{_vpath_builddir} || \
+%ifarch %{arm}
+  :
+%else
+  false
+%endif
 
 %ldconfig_scriptlets libs
 
-%if !0%{?compat_build}
+%if %{without compat_build}
 
 %post devel
 %{_sbindir}/update-alternatives --install %{_bindir}/llvm-config llvm-config %{_bindir}/llvm-config-%{__isa_bits} %{__isa_bits}
@@ -381,7 +413,7 @@ fi
 %endif
 
 %files
-%if !0%{?compat_build}
+%if %{without compat_build}
 %exclude %{_bindir}/llvm-config-%{__isa_bits}
 %exclude %{_bindir}/not
 %exclude %{_bindir}/count
@@ -402,7 +434,7 @@ fi
 
 %files libs
 %{pkg_libdir}/libLLVM-%{maj_ver}*.so
-%if !0%{?compat_build}
+%if %{without compat_build}
 %if %{with gold}
 %{_libdir}/LLVMgold.so
 %endif
@@ -419,7 +451,7 @@ fi
 %{pkg_libdir}/libRemarks.so*
 
 %files devel
-%if !0%{?compat_build}
+%if %{without compat_build}
 %{_bindir}/llvm-config-%{__isa_bits}
 %{_mandir}/man1/llvm-config*
 %{_includedir}/llvm
@@ -444,7 +476,7 @@ fi
 %doc %{_pkgdocdir}/html
 
 %files static
-%if !0%{?compat_build}
+%if %{without compat_build}
 %{_libdir}/*.a
 %exclude %{_libdir}/libLLVMTestingSupport.a
 %{_libdir}/cmake/llvm/*.cmake
@@ -452,7 +484,7 @@ fi
 %{_libdir}/%{name}/lib/*.a
 %endif
 
-%if !0%{?compat_build}
+%if %{without compat_build}
 
 %files test
 %{_libexecdir}/tests/llvm/

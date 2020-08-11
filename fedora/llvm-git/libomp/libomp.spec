@@ -7,8 +7,8 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 2a11d5dcc97a454bfd6db0771709cd554a5ccfac
-%global commit_date 20200809
+%define commit 8144a7d8fc00c1ed779cb2dfabd826eedb19f296
+%global commit_date 20200811
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 %global gitrel .%{commit_date}.git%{shortcommit}
@@ -34,6 +34,7 @@ Source2: lit.fedora.cfg.py
 Patch0: 0001-CMake-Make-LIBOMP_HEADERS_INSTALL_PATH-a-cache-varia.patch
 
 BuildRequires: cmake
+BuildRequires: ninja-build
 BuildRequires: elfutils-libelf-devel
 BuildRequires: perl
 BuildRequires: perl-Data-Dumper
@@ -75,10 +76,8 @@ curl -Lo %{_sourcedir}/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{com
 %autosetup -n llvm-project-%{commit}/openmp -p1
 
 %build
-mkdir -p _build
-cd _build
 
-%cmake .. \
+%cmake -GNinja \
   -DLIBOMP_INSTALL_ALIASES=OFF \
   -DLIBOMP_HEADERS_INSTALL_PATH:PATH=%{_libdir}/clang/%{version}/include \
 %if 0%{?__isa_bits} == 64
@@ -87,11 +86,11 @@ cd _build
   -DOPENMP_LIBDIR_SUFFIX= \
 %endif
 
-%make_build
+%cmake_build
 
 
 %install
-%make_install -C _build
+%cmake_install
 
 # Test package setup
 %global libomp_srcdir %{_datadir}/libomp/src/
@@ -105,7 +104,7 @@ cp -R runtime/src  %{buildroot}%{libomp_srcdir}/runtime
 
 # Generate lit config files.  Strip off the last line that initiates the
 # test run, so we can customize the configuration.
-head -n -1 _build/runtime/test/lit.site.cfg >> %{buildroot}%{lit_cfg}
+head -n -1 %{_vpath_builddir}/runtime/test/lit.site.cfg >> %{buildroot}%{lit_cfg}
 
 # Install custom fedora config file
 cp %{SOURCE2} %{buildroot}%{lit_fedora_cfg}
@@ -144,6 +143,9 @@ rm -rf %{buildroot}%{_libdir}/libarcher_static.a
 %{_libexecdir}/tests/libomp/
 
 %changelog
+* Mon Jul 20 2020 sguelton@redhat.com
+- Use modern cmake macro
+
 * Mon Mar 23 2020 Mihai Vultur <xanto@egaming.ro>
 - Modified the spec by tstellar.
 - Implemented some version autodetection to reduce maintenance work.

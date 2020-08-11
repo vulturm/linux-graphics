@@ -31,11 +31,11 @@ Patch0:		0001-CMake-Check-for-gtest-headers-even-if-lit.py-is-not-.patch
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  cmake
+BuildRequires:  ninja-build
 BuildRequires:  llvm-devel = %{version}
 BuildRequires:  llvm-test = %{version}
 BuildRequires:  ncurses-devel
 BuildRequires:  zlib-devel
-BuildRequires:  chrpath
 
 # For make check:
 BuildRequires:  python3-rpm-macros
@@ -68,12 +68,10 @@ Shared libraries for LLD.
 
 %build
 
-mkdir %{_target_platform}
-cd %{_target_platform}
-
-%cmake .. \
+%cmake -GNinja \
 	-DLLVM_LINK_LLVM_DYLIB:BOOL=ON \
 	-DLLVM_DYLIB_COMPONENTS="all" \
+  -DCMAKE_SKIP_RPATH:BOOL=ON \
 	-DPYTHON_EXECUTABLE=%{__python3} \
 	-DLLVM_INCLUDE_TESTS=ON \
 	-DLLVM_MAIN_SRC_DIR=%{_datadir}/llvm/src \
@@ -86,15 +84,10 @@ cd %{_target_platform}
 	-DLLVM_LIBDIR_SUFFIX=
 %endif
 
-%make_build
+%cmake_build
 
 %install
-cd %{_target_platform}
-%make_install
-
-# Remove rpath
-chrpath --delete %{buildroot}%{_bindir}/*
-chrpath --delete %{buildroot}%{_libdir}/*.so*
+%cmake_install
 
 %check
 # armv7lhl tests disabled because of arm issue, see https://koji.fedoraproject.org/koji/taskinfo?taskID=33660162
@@ -118,6 +111,11 @@ chrpath --delete %{buildroot}%{_libdir}/*.so*
 %{_libdir}/liblld*.so.*
 
 %changelog
+* Mon Jul 20 2020 sguelton@redhat.com
+- Use generic cmake macros
+- Use Ninja as build system
+- Remove chrpath dependency
+
 * Sat Nov 02 2019 Mihai Vultur <xanto@egaming.ro>
 - Now that they have migrated to github, change to official source url.
 

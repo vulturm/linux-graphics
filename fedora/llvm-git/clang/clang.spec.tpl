@@ -108,7 +108,7 @@ BuildRequires:	python3-devel
 
 # Needed for %%multilib_fix_c_header
 BuildRequires:	multilib-rpm-config
-BuildRequires: chrpath
+BuildRequires:  gnupg2
 
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 
@@ -232,9 +232,6 @@ sed -i 's/\@FEDORA_LLVM_LIB_SUFFIX\@/64/g' test/lit.cfg.py
 sed -i 's/\@FEDORA_LLVM_LIB_SUFFIX\@//g' test/lit.cfg.py
 %endif
 
-mkdir -p _build
-cd _build
-
 %ifarch s390 s390x %{arm} %ix86
 # Decrease debuginfo verbosity to reduce memory consumption during final library linking
 %global optflags %(echo %{optflags} | sed 's/-g /-g1 /')
@@ -281,9 +278,11 @@ LDFLAGS="%{__global_ldflags} -ldl"
 	-DCLANG_BUILD_EXAMPLES:BOOL=OFF \
 	-DCLANG_REPOSITORY_STRING="%{?fedora:Fedora}%{?rhel:Red Hat} %{version}-%{release}"
 
-ninja -j 1
+%cmake_build
+
 
 %install
+%cmake_install
 DESTDIR=%{buildroot} ninja install -C _build
 
 %if 0%{?compat_build}
@@ -342,7 +341,7 @@ chmod u-x %{buildroot}%{_mandir}/man1/scan-build.1*
 #%if !0%{?compat_build}
 # requires lit.py from LLVM utilities
 # FIXME: Fix failing ARM tests, s390x i686 and ppc64le tests
-#LD_LIBRARY_PATH=%{buildroot}%{_libdir} ninja check-all -C _build || \
+#LD_LIBRARY_PATH=%{buildroot}/%{_libdir} %cmake_build --target check-all || \
 #%ifarch s390x i686 ppc64le %{arm}
 #:
 #%else
@@ -420,6 +419,9 @@ chmod u-x %{buildroot}%{_mandir}/man1/scan-build.1*
 
 %endif
 %changelog
+* Mon Jul 20 2020 sguelton@redhat.com
+- Update cmake macro usage
+
 * Sat Nov 02 2019 Mihai Vultur <xanto@egaming.ro>
 - Now that they have migrated to github, change to official source url.
 
