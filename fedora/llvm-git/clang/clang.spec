@@ -6,10 +6,10 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 59fc86779038b19cf85f87b51052d468286788f2
+%define commit 8889faaed0b7c8545b67b040c380b983264ebc67
 
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200911
+%global commit_date 20200913
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %global _default_patch_fuzz 2
@@ -18,15 +18,15 @@
 %global clang_tools_binaries \
 	%{_bindir}/clangd \
 	%{_bindir}/clang-* \
+	%{_bindir}/diagtool \
+	%{_bindir}/hmaptool \
 	%{_bindir}/pp-trace
 
 
 %global clang_binaries \
 	%{_bindir}/clang \
 	%{_bindir}/clang+* \
-	%{_bindir}/clang-* \
-	%{_bindir}/diagtool \
-	%{_bindir}/hmaptool
+	%{_bindir}/clang-*
 
 
 %if 0%{?compat_build}
@@ -54,10 +54,15 @@
 
 %global build_install_prefix %{buildroot}%{install_prefix}
 
+%ifarch ppc64le
+# Too many threads on ppc64 systems causes OOM errors.
+%global _smp_mflags -j8
+%endif
+
 %global clang_srcdir llvm-project-%{commit}/clang
 %global clang_tools_srcdir llvm-project-%{commit}/clang-tools-extra
 
-Name:		%{pkg_name}
+Name:		%pkg_name
 Version:	%{maj_ver}.%{min_ver}.%{patch_ver}
 Release:	0.1%{?gitrel}%{?dist}
 Summary:	A C language family front-end for LLVM
@@ -108,7 +113,20 @@ BuildRequires:	python3-devel
 
 # Needed for %%multilib_fix_c_header
 BuildRequires:	multilib-rpm-config
-BuildRequires:  gnupg2
+
+# scan-build uses these perl modules so they need to be installed in order
+# to run the tests.
+BuildRequires: perl(Digest::MD5)
+BuildRequires: perl(File::Copy)
+BuildRequires: perl(File::Find)
+BuildRequires: perl(File::Path)
+BuildRequires: perl(File::Temp)
+BuildRequires: perl(FindBin)
+BuildRequires: perl(Hash::Util)
+BuildRequires: perl(lib)
+BuildRequires: perl(Term::ANSIColor)
+BuildRequires: perl(Text::ParseWords)
+BuildRequires: perl(Sys::Hostname)
 
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 
@@ -118,9 +136,10 @@ Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 Requires:	libstdc++-devel
 Requires:	gcc-c++
 
-Requires:	emacs-filesystem
-
 Provides:	clang(major) = %{maj_ver}
+
+Conflicts:  compiler-rt < %{version}
+Conflicts:  compiler-rt > %{version}
 
 %description
 clang: noun
@@ -135,6 +154,9 @@ as libraries and designed to be loosely-coupled and extensible.
 %package libs
 Summary: Runtime library for clang
 Recommends: compiler-rt%{?_isa} = %{version}
+# libomp-devel is required, so clang can find the omp.h header when compiling
+# with -fopenmp.
+Recommends: libomp-devel%{_isa} = %{version}
 Recommends: libomp%{_isa} = %{version}
 
 %description libs
@@ -146,6 +168,7 @@ Summary: Development header files for clang
 Requires: %{name}%{?_isa} = %{version}-%{release}
 # The clang CMake files reference tools from clang-tools-extra.
 Requires: %{name}-tools-extra%{?_isa} = %{version}-%{release}
+Requires: %{name}-libs = %{version}-%{release}
 %endif
 
 %description devel
@@ -177,7 +200,7 @@ A set of extra tools built using Clang's tooling API.
 # just want clang.
 %package -n git-clang-format
 Summary:	Integration of clang-format for git
-Requires:	%{name}%{?_isa} = %{version}-%{release}
+Requires: %{name}-tools-extra = %{version}-%{release}
 Requires:	git
 Requires:	python3
 
@@ -200,7 +223,6 @@ Requires:      python3
 %if 0%{?compat_build}
 
 %autosetup -D -n %{clang_srcdir} -p1
-
 %else
 
 %setup -D -q -n %{clang_tools_srcdir}
@@ -226,64 +248,78 @@ pathfix.py -i %{__python3} -pn \
 
 %build
 
+# We run the builders out of memory on armv7 and i686 when LTO is enabled
+%ifarch %{arm} i686
+%define _lto_cflags %{nil}
+%endif
+
 %if 0%{?__isa_bits} == 64
 sed -i 's/\@FEDORA_LLVM_LIB_SUFFIX\@/64/g' test/lit.cfg.py
 %else
 sed -i 's/\@FEDORA_LLVM_LIB_SUFFIX\@//g' test/lit.cfg.py
 %endif
 
-%ifarch s390 s390x %{arm} %ix86
+%ifarch s390 s390x %{arm} %ix86 ppc64le
 # Decrease debuginfo verbosity to reduce memory consumption during final library linking
 %global optflags %(echo %{optflags} | sed 's/-g /-g1 /')
 %endif
 
 LDFLAGS="%{__global_ldflags} -ldl"
-
-%cmake .. -G Ninja \
-  -DCMAKE_RULE_MESSAGES:BOOL=OFF \
-	-DLLVM_PARALLEL_LINK_JOBS=1 \
-	-DLLVM_LINK_LLVM_DYLIB:BOOL=ON \
-	-DCMAKE_BUILD_TYPE=Release \
-	-DPYTHON_EXECUTABLE=%{__python3} \
-	-DCMAKE_SKIP_RPATH:BOOL=ON \
-	-DCMAKE_INSTALL_RPATH:BOOL=OFF \
+# -DCMAKE_INSTALL_RPATH=";" is a workaround for llvm manually setting the
+# rpath of libraries and binaries.  llvm will skip the manual setting
+# if CAMKE_INSTALL_RPATH is set to a value, but cmake interprets this value
+# as nothing, so it sets the rpath to "" when installing.
+%cmake -B "%{_vpath_builddir}" \
+  -G Ninja \
+  -DLLVM_PARALLEL_LINK_JOBS=1 \
+  -DLLVM_LINK_LLVM_DYLIB:BOOL=ON \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DPYTHON_EXECUTABLE=%{__python3} \
+  -DCMAKE_INSTALL_RPATH:BOOL=";" \
+%ifarch s390 s390x %{arm} %ix86 ppc64le
+  -DCMAKE_C_FLAGS_RELWITHDEBINFO="%{optflags} -DNDEBUG" \
+  -DCMAKE_CXX_FLAGS_RELWITHDEBINFO="%{optflags} -DNDEBUG" \
+%endif
 %if 0%{?compat_build}
-	-DLLVM_CONFIG:FILEPATH=%{_bindir}/llvm-config-%{maj_ver}.%{min_ver}-%{__isa_bits} \
-	-DCMAKE_INSTALL_PREFIX=%{install_prefix} \
-	-DCLANG_INCLUDE_TESTS:BOOL=OFF \
+  -DLLVM_CONFIG:FILEPATH=%{_bindir}/llvm-config-%{maj_ver}.%{min_ver}-%{__isa_bits} \
+  -DCMAKE_INSTALL_PREFIX=%{install_prefix} \
+  -DCLANG_INCLUDE_TESTS:BOOL=OFF \
 %else
-	-DCLANG_INCLUDE_TESTS:BOOL=OFF \
-	-DLLVM_EXTERNAL_LIT=%{_bindir}/lit \
-	-DLLVM_MAIN_SRC_DIR=%{_datadir}/llvm/src \
+  -DCLANG_INCLUDE_TESTS:BOOL=ON \
+  -DLLVM_EXTERNAL_LIT=%{_bindir}/lit \
+  -DLLVM_MAIN_SRC_DIR=%{_datadir}/llvm/src \
 %if 0%{?__isa_bits} == 64
-	-DLLVM_LIBDIR_SUFFIX=64 \
+  -DLLVM_LIBDIR_SUFFIX=64 \
 %else
-	-DLLVM_LIBDIR_SUFFIX= \
+  -DLLVM_LIBDIR_SUFFIX= \
 %endif
 %endif
-	\
-	-DLLVM_TABLEGEN_EXE:FILEPATH=%{_bindir}/llvm-tblgen \
-	-DCLANG_ENABLE_ARCMT:BOOL=ON \
-	-DCLANG_ENABLE_STATIC_ANALYZER:BOOL=ON \
-	-DCLANG_INCLUDE_DOCS:BOOL=ON \
-	-DCLANG_PLUGIN_SUPPORT:BOOL=ON \
-	-DENABLE_LINKER_BUILD_ID:BOOL=ON \
-	-DLLVM_ENABLE_EH=ON \
-	-DLLVM_ENABLE_RTTI=ON \
-	-DLLVM_BUILD_DOCS=ON \
-	-DLLVM_ENABLE_SPHINX=ON \
-	-DSPHINX_WARNINGS_AS_ERRORS=OFF \
-        -DLLVM_USE_LINKER=gold \
-	\
-	-DCLANG_BUILD_EXAMPLES:BOOL=OFF \
-	-DCLANG_REPOSITORY_STRING="%{?fedora:Fedora}%{?rhel:Red Hat} %{version}-%{release}"
+  \
+%if !0%{compat_build}
+  -DLLVM_TABLEGEN_EXE:FILEPATH=%{_bindir}/llvm-tblgen \
+%else
+  -DLLVM_TABLEGEN_EXE:FILEPATH=%{_bindir}/llvm-tblgen-%{maj_ver}.%{min_ver} \
+%endif
+  -DCLANG_ENABLE_ARCMT:BOOL=ON \
+  -DCLANG_ENABLE_STATIC_ANALYZER:BOOL=ON \
+  -DCLANG_INCLUDE_DOCS:BOOL=ON \
+  -DCLANG_PLUGIN_SUPPORT:BOOL=ON \
+  -DENABLE_LINKER_BUILD_ID:BOOL=ON \
+  -DLLVM_ENABLE_EH=ON \
+  -DLLVM_ENABLE_RTTI=ON \
+  -DLLVM_BUILD_DOCS=ON \
+  -DLLVM_ENABLE_SPHINX=ON \
+  -DCLANG_LINK_CLANG_DYLIB=ON \
+  -DSPHINX_WARNINGS_AS_ERRORS=OFF \
+  \
+  -DCLANG_BUILD_EXAMPLES:BOOL=OFF \
+  -DBUILD_SHARED_LIBS=OFF \
+  -DCLANG_REPOSITORY_STRING="%{?fedora:Fedora}%{?rhel:Red Hat} %{version}-%{release}"
 
-%cmake_build
-
+%ninja_build -C "%{_vpath_builddir}"
 
 %install
-%cmake_install
-DESTDIR=%{buildroot} ninja install -C _build
+%ninja_install -C "%{_vpath_builddir}"
 
 %if 0%{?compat_build}
 
@@ -335,34 +371,41 @@ ln -s clang++ %{buildroot}%{_bindir}/clang++-%{maj_ver}
 # Fix permission
 chmod u-x %{buildroot}%{_mandir}/man1/scan-build.1*
 
+# create a link to clang's resource directory that is "constant" across minor
+# version bumps
+# this is required for packages like ccls that hardcode the link to clang's
+# resource directory to not require rebuilds on minor version bumps
+# Fix for bugs like rhbz#1807574
+pushd %{buildroot}%{_libdir}/clang/
+ln -s %{version} %{maj_ver}
+popd
+
 %endif
 
-%check
-#%if !0%{?compat_build}
-# requires lit.py from LLVM utilities
-# FIXME: Fix failing ARM tests, s390x i686 and ppc64le tests
-#LD_LIBRARY_PATH=%{buildroot}/%{_libdir} %cmake_build --target check-all || \
-#%ifarch s390x i686 ppc64le %{arm}
-#:
-#%else
-#false
-#%endif
+# Remove clang-tidy headers.  We don't ship the libraries for these.
+rm -Rvf %{buildroot}%{_includedir}/clang-tidy/
 
-#%endif
+%check
+%if !0%{?compat_build}
+# requires lit.py from LLVM utilities
+# FIXME: Fix failing ARM tests
+LD_LIBRARY_PATH=%{buildroot}/%{_libdir} %cmake_build --target check-all || \
+%ifarch %{arm}
+:
+%else
+false
+%endif
+%endif
 
 
 %if !0%{?compat_build}
 %files
+%license LICENSE.TXT
 %{clang_binaries}
-%{_bindir}/c-index-test
 %{_mandir}/man1/clang.1.gz
 %{_mandir}/man1/clang++.1.gz
 %{_mandir}/man1/clang-%{maj_ver}.1.gz
 %{_mandir}/man1/clang++-%{maj_ver}.1.gz
-%{_mandir}/man1/diagtool.1.gz
-%{_emacs_sitestartdir}/clang-format.el
-%{_datadir}/clang/*.*
-%{_includedir}/clang-tidy/*
 %endif
 
 %files libs
@@ -400,10 +443,15 @@ chmod u-x %{buildroot}%{_mandir}/man1/scan-build.1*
 
 %files tools-extra
 %{clang_tools_binaries}
+%{_bindir}/c-index-test
 %{_bindir}/find-all-symbols
 %{_bindir}/modularize
+%{_mandir}/man1/diagtool.1.gz
+%{_emacs_sitestartdir}/clang-format.el
 %{_emacs_sitestartdir}/clang-rename.el
 %{_emacs_sitestartdir}/clang-include-fixer.el
+%{_datadir}/clang/clang-format.py*
+%{_datadir}/clang/clang-format-diff.py*
 %{_datadir}/clang/clang-include-fixer.py*
 %{_datadir}/clang/clang-tidy-diff.py*
 %{_datadir}/clang/run-clang-tidy.py*
