@@ -198,7 +198,7 @@ pathfix.py -i %{__python3} -pn \
   -G Ninja \
   -DBUILD_SHARED_LIBS:BOOL=OFF \
   -DLLVM_PARALLEL_LINK_JOBS=1 \
-  -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+  -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_SKIP_RPATH:BOOL=ON \
 %ifarch s390 %{arm} %ix86
   -DCMAKE_C_FLAGS_RELWITHDEBINFO="%{optflags} -DNDEBUG" \
