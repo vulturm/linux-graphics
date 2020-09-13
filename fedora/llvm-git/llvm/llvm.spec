@@ -194,7 +194,8 @@ pathfix.py -i %{__python3} -pn \
 %endif
 
 # force off shared libs as cmake macros turns it on.
-%cmake  -G Ninja \
+%cmake -B "%{_vpath_builddir}" \
+  -G Ninja \
   -DBUILD_SHARED_LIBS:BOOL=OFF \
   -DLLVM_PARALLEL_LINK_JOBS=1 \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo \
@@ -263,12 +264,12 @@ pathfix.py -i %{__python3} -pn \
 # Build libLLVM.so first.  This ensures that when libLLVM.so is linking, there
 # are no other compile jobs running.  This will help reduce OOM errors on the
 # builders without having to artificially limit the number of concurrent jobs.
-%cmake_build --target LLVM
-%cmake_build
+%ninja_build -C "%{_vpath_builddir}" LLVM
+%ninja_build -C "%{_vpath_builddir}"
+
 
 %install
-%cmake_install
-
+%ninja_install -C "%{_vpath_builddir}"
 
 %if %{without compat_build}
 mkdir -p %{buildroot}/%{_bindir}
