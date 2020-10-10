@@ -279,10 +279,10 @@ cd _build
 	-DCLANG_BUILD_EXAMPLES:BOOL=OFF \
 	-DCLANG_REPOSITORY_STRING="%{?fedora:Fedora}%{?rhel:Red Hat} %{version}-%{release}"
 
-ninja -j 1
+%ninja_build
 
 %install
-DESTDIR=%{buildroot} ninja install -C _build
+%ninja_install -C _build
 
 %if 0%{?compat_build}
 
