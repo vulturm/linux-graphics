@@ -388,16 +388,17 @@ popd
 rm -Rvf %{buildroot}%{_includedir}/clang-tidy/
 
 %check
-%if !0%{?compat_build}
+#%if !0%{?compat_build}
 # requires lit.py from LLVM utilities
 # FIXME: Fix failing ARM tests
-LD_LIBRARY_PATH=%{buildroot}/%{_libdir} %cmake_build --target check-all || \
-%ifarch %{arm}
-:
-%else
-false
-%endif
-%endif
+#LD_LIBRARY_PATH=%{buildroot}/%{_libdir} cmake_build --target check-all || \
+#%ifarch %{arm}
+#:
+#%else
+#false
+#%endif
+#
+#%endif
 
 
 %if !0%{?compat_build}
