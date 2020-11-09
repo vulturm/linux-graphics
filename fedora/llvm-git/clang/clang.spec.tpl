@@ -74,7 +74,7 @@ Source0:  %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 Patch4:		0002-gtest-reorg.patch
 Patch10:	0001-Workaround-GCC-9-bug-when-handling-bitfields.patch
 Patch11:	0001-ToolChain-Add-lgcc_s-to-the-linker-flags-when-using-.patch
-
+Patch12:	0003-clang-tools-extra-dir.patch
 
 BuildRequires:	gcc
 BuildRequires:	gcc-c++
@@ -238,6 +238,8 @@ pathfix.py -i %{__python3} -pn \
 %patch11 -p1 -b .libcxx-fix
 
 mv ../clang-tools-extra tools/extra
+
+%patch12 -p0
 
 pathfix.py -i %{__python3} -pn \
 	tools/clang-format/*.py \
