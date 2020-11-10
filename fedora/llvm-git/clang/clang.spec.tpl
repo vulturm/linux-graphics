@@ -287,7 +287,7 @@ LDFLAGS="%{__global_ldflags} -ldl"
   -DCMAKE_INSTALL_PREFIX=%{install_prefix} \
   -DCLANG_INCLUDE_TESTS:BOOL=OFF \
 %else
-  -DCLANG_INCLUDE_TESTS:BOOL=ON \
+  -DCLANG_INCLUDE_TESTS:BOOL=OFF \
   -DLLVM_EXTERNAL_LIT=%{_bindir}/lit \
   -DLLVM_MAIN_SRC_DIR=%{_datadir}/llvm/src \
 %if 0%{?__isa_bits} == 64
