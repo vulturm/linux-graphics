@@ -73,8 +73,10 @@ Source0:  %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 
 Patch4:		0002-gtest-reorg.patch
 Patch10:	0001-Workaround-GCC-9-bug-when-handling-bitfields.patch
+# Not Upstream
 Patch11:	0001-ToolChain-Add-lgcc_s-to-the-linker-flags-when-using-.patch
-Patch12:	0003-clang-tools-extra-dir.patch
+Patch15:	0001-clang-Don-t-install-static-libraries.patch
+Patch20:	0003-clang-tools-extra-dir.patch
 
 BuildRequires:	gcc
 BuildRequires:	gcc-c++
@@ -236,10 +238,11 @@ pathfix.py -i %{__python3} -pn \
 %patch4 -p1 -b .gtest
 %patch10 -p1 -b .bitfields
 %patch11 -p1 -b .libcxx-fix
+%patch15 -p2 -b .no-install-static
 
 mv ../clang-tools-extra tools/extra
 
-%patch12 -p0
+%patch20 -p0
 
 pathfix.py -i %{__python3} -pn \
 	tools/clang-format/*.py \
@@ -357,6 +360,9 @@ rm -vf %{buildroot}%{_datadir}/clang/clang-format-sublime.py*
 
 # TODO: Package html docs
 rm -Rvf %{buildroot}%{_pkgdocdir}
+rm -Rvf %{buildroot}%{_docdir}/clang/html
+rm -Rvf %{buildroot}%{_datadir}/clang/clang-doc-default-stylesheet.css
+rm -Rvf %{buildroot}%{_datadir}/clang/index.js
 
 # TODO: What are the Fedora guidelines for packaging bash autocomplete files?
 rm -vf %{buildroot}%{_datadir}/clang/bash-autocomplete.sh
