@@ -381,7 +381,7 @@ export CXXFLAGS="$CXXFLAGS -std=c++14 -falign-functions=32 -fno-semantic-interpo
 export LDFLAGS="$LDFLAG0S -flto=8 "
 
 %meson -Dcpp_std=gnu++14 \
-  -D platforms=x11,wayland,drm,surfaceless \
+  -D platforms=x11,wayland \
   -D dri-drivers=%{?dri_drivers} \
 %if 0%{?with_hardware}
   -D gallium-drivers=swrast,virgl,r300,nouveau%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi,r600}%{?with_iris:,iris}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_zink:,zink} \
@@ -646,7 +646,11 @@ popd
 %endif
 
 %changelog
-* Tue Apr 20 2020 Mihai Vultur <xanto@egaming.ro>
+* Mon Nov 23 2020 Mihai Vultur <xanto@egaming.ro>
+- meson: drop deprecated EGL platform build options.
+- Consequence of MR: https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/5844
+
+* Mon Apr 20 2020 Mihai Vultur <xanto@egaming.ro>
 - Enable vulkan-device-select-layer.
 
 * Sun Feb 09 2020 Mihai Vultur <xanto@egaming.ro>
