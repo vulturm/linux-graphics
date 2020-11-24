@@ -1542,7 +1542,8 @@ pathfix.py -i "%{__python3} %{py3_shbang_opts}" -p -n \
 	tools/perf/scripts/python/stat-cpi.py \
 	tools/perf/scripts/python/sched-migration.py \
 	Documentation \
-	scripts/clang-tools/gen_compile_commands.py
+	scripts/clang-tools/gen_compile_commands.py \
+  scripts/clang-tools/run-clang-tools.py
 
 # only deal with configs if we are going to build for the arch
 %ifnarch %nobuildarches
