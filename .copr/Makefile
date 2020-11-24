@@ -10,9 +10,7 @@ clone_branch := drm-next
 
 
 srpm:
-	# Pin rpkg and python-rpkg versions. Newer versions are causing
-	# the following issue: https://pagure.io/copr/copr/issue/1517
-	dnf -y install git make rpkg-2.7 python3-rpkg-1.60
+	dnf -y install git make rpkg
 	git clone --single-branch --branch $(clone_branch) --depth=1 $(clone_repo) $(clone_branch)
 	git_commit=`git ls-remote $(clone_repo) $(clone_branch) | cut -c1-7`
 	commit_date=`date +"%Y%m%d"`
