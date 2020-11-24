@@ -3,11 +3,11 @@
 %global _default_patch_fuzz 2
 
 %global build_repo https://github.com/vulturm/mesa
-%define version_string 20.2.0
+%define version_string 21.0.0
 
-%define commit 4032d50568aa91a6c06e1dd76bc7caf52fc2ae01
+%define commit 7f223a2329a7d392b8860f488b3797012cdd37fe
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200907.00
+%global commit_date 20201124.21
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
