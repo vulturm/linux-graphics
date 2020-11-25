@@ -8,7 +8,7 @@
 
 %define commit f09456361c4c753f686b8f155f5c8de3f1feebb9
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20201125.22
+%global commit_date 20201125.23
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -392,30 +392,30 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -D vulkan-drivers=%{?vulkan_drivers} \
   -D dri3=enabled \
   -D egl=enabled \
-  -D gallium-extra-hud=%{?with_gallium_extra_hud:enabled}%{!?with_gallium_extra_hud:disabled} \
-  -D gallium-nine=%{?with_nine:enabled}%{!?with_nine:disabled} \
+  -D gallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
+  -D gallium-nine=%{?with_nine:true}%{!?with_nine:false} \
   -D gallium-omx=%{?with_omx:bellagio}%{!?with_omx:disabled} \
-  -D gallium-va=%{?with_vaapi:enabled}%{!?with_vaapi:disabled} \
+  -D gallium-va=%{?with_vaapi:true}%{!?with_vaapi:false} \
   -D gallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
-  -D gallium-xa=enabled \
-  -D gallium-xvmc=disabled \
+  -D gallium-xa=true \
+  -D gallium-xvmc=false \
   -D gbm=enabled \
   -D gles1=disabled \
   -D gles2=enabled \
-  -D glvnd=enabled \
+  -D glvnd=true \
   -D glx=dri \
-  -D libunwind=enabled \
-  -D llvm=enabled \
-  -Dshared-llvm=enabled \
-  -Dvalgrind=%{?with_valgrind:enabled}%{!?with_valgrind:disabled} \
-  -Dbuild-tests=disabled \
-  -Dselinux=enabled \
-  -D lmsensors=enabled \
+  -D libunwind=true \
+  -D llvm=true \
+  -Dshared-llvm=true \
+  -Dvalgrind=%{?with_valgrind:true}%{!?with_valgrind:false} \
+  -Dbuild-tests=false \
+  -Dselinux=true \
+  -D lmsensors=true \
   -D osmesa=gallium \
   -D shared-glapi=enabled \
   -D gallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
-  -D vulkan-overlay-layer=%{?with_vulkan_overlay:enabled}%{!?with_vulkan_overlay:disabled} \
-  -D vulkan-device-select-layer=%{?with_vulkan_device_select:enabled}%{!?with_vulkan_device_select:disabled} \
+  -D vulkan-overlay-layer=%{?with_vulkan_overlay:true}%{!?with_vulkan_overlay:false} \
+  -D vulkan-device-select-layer=%{?with_vulkan_device_select:true}%{!?with_vulkan_device_select:false} \
   -D tools=[]
   %{nil}
 %meson_build
