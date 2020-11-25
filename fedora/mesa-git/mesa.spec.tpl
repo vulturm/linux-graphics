@@ -390,18 +390,18 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -D gallium-drivers=swrast,virgl \
 %endif
   -D vulkan-drivers=%{?vulkan_drivers} \
-  -D dri3=true \
-  -D egl=true \
+  -D dri3=enabled \
+  -D egl=enabled \
   -D gallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
   -D gallium-nine=%{?with_nine:true}%{!?with_nine:false} \
   -D gallium-omx=%{?with_omx:bellagio}%{!?with_omx:disabled} \
   -D gallium-va=%{?with_vaapi:true}%{!?with_vaapi:false} \
-  -D gallium-vdpau=%{?with_vdpau:true}%{!?with_vdpau:false} \
+  -D gallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
   -D gallium-xa=true \
   -D gallium-xvmc=false \
-  -D gbm=true \
-  -D gles1=false \
-  -D gles2=true \
+  -D gbm=enabled \
+  -D gles1=disabled \
+  -D gles2=enabled \
   -D glvnd=true \
   -D glx=dri \
   -D libunwind=true \
@@ -412,7 +412,7 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -Dselinux=true \
   -D lmsensors=true \
   -D osmesa=gallium \
-  -D shared-glapi=true \
+  -D shared-glapi=enabled \
   -D gallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
   -D vulkan-overlay-layer=%{?with_vulkan_overlay:true}%{!?with_vulkan_overlay:false} \
   -D vulkan-device-select-layer=%{?with_vulkan_device_select:true}%{!?with_vulkan_device_select:false} \
