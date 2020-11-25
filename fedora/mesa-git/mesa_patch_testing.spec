@@ -1,13 +1,14 @@
 %define package_name mesa
 %global build_branch master
 %global _default_patch_fuzz 2
+%global __meson_auto_features disabled
 
 %global build_repo https://github.com/vulturm/mesa
 %define version_string 21.0.0
 
 %define commit 2b35580d0dd76607aa5ae332491b3ecdd0304173
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20201124.21
+%global commit_date 20201125.22
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -646,6 +647,10 @@ popd
 %endif
 
 %changelog
+* Wed Nov 25 2020 Mihai Vultur <xanto@egaming.ro>
+- meson: __meson_auto_features default to disabled
+- Issue: https://gitlab.freedesktop.org/mesa/mesa/-/issues/3873
+
 * Mon Nov 23 2020 Mihai Vultur <xanto@egaming.ro>
 - meson: drop deprecated EGL platform build options.
 - Consequence of MR: https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/5844
