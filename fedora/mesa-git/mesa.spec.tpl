@@ -397,8 +397,8 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -D gallium-omx=%{?with_omx:bellagio}%{!?with_omx:disabled} \
   -D gallium-va=%{?with_vaapi:true}%{!?with_vaapi:false} \
   -D gallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
-  -D gallium-xa=true \
-  -D gallium-xvmc=false \
+  -D gallium-xa=enabled \
+  -D gallium-xvmc=disabled \
   -D gbm=enabled \
   -D gles1=disabled \
   -D gles2=enabled \
@@ -411,7 +411,7 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -Dbuild-tests=false \
   -Dselinux=true \
   -D lmsensors=true \
-  -D osmesa=gallium \
+  -D osmesa=true \
   -D shared-glapi=enabled \
   -D gallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
   -D vulkan-overlay-layer=%{?with_vulkan_overlay:true}%{!?with_vulkan_overlay:false} \
@@ -647,6 +647,9 @@ popd
 %endif
 
 %changelog
+* Fri Dec 11 2020 Mihai Vultur <xanto@egaming.ro>
+- Set osmesa=true since upstream commit ee802372180a2b4460cc7abb53438e45c6b6f1e4 
+
 * Wed Nov 25 2020 Mihai Vultur <xanto@egaming.ro>
 - meson: __meson_auto_features default to disabled
 - Issue: https://gitlab.freedesktop.org/mesa/mesa/-/issues/3873
