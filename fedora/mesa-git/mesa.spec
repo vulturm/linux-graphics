@@ -411,7 +411,7 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -Dbuild-tests=false \
   -Dselinux=true \
   -D lmsensors=true \
-  -D osmesa=gallium \
+  -D osmesa=true \
   -D shared-glapi=enabled \
   -D gallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
   -D vulkan-overlay-layer=%{?with_vulkan_overlay:true}%{!?with_vulkan_overlay:false} \
