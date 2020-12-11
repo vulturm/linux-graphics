@@ -8,7 +8,7 @@
 
 %define commit 7f223a2329a7d392b8860f488b3797012cdd37fe
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20201125.22
+%global commit_date 20201211.17
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -390,18 +390,18 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -D gallium-drivers=swrast,virgl \
 %endif
   -D vulkan-drivers=%{?vulkan_drivers} \
-  -D dri3=true \
-  -D egl=true \
+  -D dri3=enabled \
+  -D egl=enabled \
   -D gallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
   -D gallium-nine=%{?with_nine:true}%{!?with_nine:false} \
   -D gallium-omx=%{?with_omx:bellagio}%{!?with_omx:disabled} \
   -D gallium-va=%{?with_vaapi:true}%{!?with_vaapi:false} \
-  -D gallium-vdpau=%{?with_vdpau:true}%{!?with_vdpau:false} \
-  -D gallium-xa=true \
-  -D gallium-xvmc=false \
-  -D gbm=true \
-  -D gles1=false \
-  -D gles2=true \
+  -D gallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
+  -D gallium-xa=enabled \
+  -D gallium-xvmc=disabled \
+  -D gbm=enabled \
+  -D gles1=disabled \
+  -D gles2=enabled \
   -D glvnd=true \
   -D glx=dri \
   -D libunwind=true \
@@ -411,8 +411,8 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -Dbuild-tests=false \
   -Dselinux=true \
   -D lmsensors=true \
-  -D osmesa=gallium \
-  -D shared-glapi=true \
+  -D osmesa=true \
+  -D shared-glapi=enabled \
   -D gallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
   -D vulkan-overlay-layer=%{?with_vulkan_overlay:true}%{!?with_vulkan_overlay:false} \
   -D vulkan-device-select-layer=%{?with_vulkan_device_select:true}%{!?with_vulkan_device_select:false} \
@@ -647,6 +647,9 @@ popd
 %endif
 
 %changelog
+* Fri Dec 11 2020 Mihai Vultur <xanto@egaming.ro>
+- Set osmesa=true since upstream commit ee802372180a2b4460cc7abb53438e45c6b6f1e4 
+
 * Wed Nov 25 2020 Mihai Vultur <xanto@egaming.ro>
 - meson: __meson_auto_features default to disabled
 - Issue: https://gitlab.freedesktop.org/mesa/mesa/-/issues/3873
