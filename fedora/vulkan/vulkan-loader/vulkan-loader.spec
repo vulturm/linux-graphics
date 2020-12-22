@@ -12,8 +12,7 @@ Summary:        Vulkan ICD desktop loader
 
 License:        ASL 2.0
 URL:            %{build_repo}
-# Source0:        %url/archive/v%{version}.tar.gz#/Vulkan-Loader-%{version}.tar.gz
-Source0:        https://github.com/xantares/Vulkan-Loader/archive/suffix2.tar.gz#/Vulkan-Loader-suffix2.tar.gz
+Source0:        %url/archive/v%{version}.tar.gz#/Vulkan-Loader-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -60,8 +59,7 @@ developing applications that use %{name}.
 
 
 %prep
-# autosetup -n Vulkan-Loader-{version}
-%autosetup -n Vulkan-Loader-suffix2
+%autosetup -n Vulkan-Loader-%{version}
 
 
 %build
