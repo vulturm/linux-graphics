@@ -80,16 +80,18 @@ curl -Lo %{_sourcedir}/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{com
 %autosetup -p0 -n llvm-project-%{commit}/%{name}
 
 %build
-export CFLAGS="%{build_cflags} -nogpulib -D__extern_always_inline=inline"
-mkdir -p _build
-cd _build
-%{__cmake} .. -DCMAKE_INSTALL_INCLUDEDIR:PATH=%{_includedir} -DCMAKE_INSTALL_DATADIR:PATH=%{_libdir}
-%make_build
+export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
+%set_build_flags
+#./configure.py --prefix=%{_prefix} --libexecdir=%{_libdir}/%{shortname}/ --pkgconfigdir=%{_libdir}/pkgconfig/
+%cmake  -B "%{_vpath_builddir}" \
+  -G Ninja \
+  -DCMAKE_INSTALL_INCLUDEDIR:PATH=%{_includedir} \
+  -DCMAKE_INSTALL_DATADIR:PATH=%{_libdir}
+
+%ninja_build -C "%{_vpath_builddir}"
 
 %install
-cd _build
-%make_install
-
+%ninja_install -C "%{_vpath_builddir}"
 
 %files
 %license LICENSE.TXT
