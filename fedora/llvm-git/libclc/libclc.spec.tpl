@@ -36,6 +36,8 @@ BuildRequires:  llvm-devel >= 3.9
 BuildRequires:  python
 BuildRequires:  zlib-devel
 BuildRequires:  cmake
+BuildRequires:  ninja-build
+BuildRequires:  spirv-llvm-translator-tools
 
 %description
 libclc is an open source, BSD licensed implementation of the library
