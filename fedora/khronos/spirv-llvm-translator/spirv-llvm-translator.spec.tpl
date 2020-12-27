@@ -50,7 +50,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 This package contains the standalone llvm to spirv tool.
 
 %prep
-%autosetup -n %{name}-%{commit}
+%autosetup -n SPIRV-LLVM-Translator-%{commit}
 
 %build
 %cmake -B "%{_vpath_builddir}" \
