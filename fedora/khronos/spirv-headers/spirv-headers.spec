@@ -5,11 +5,11 @@
 %global version_file https://raw.githubusercontent.com/KhronosGroup/SPIRV-Headers/{}/CMakeLists.txt
 %global version_tag_regex reg_beg ([0-9.]+[0-9]) reg_end
 
-%define version_string 1.5.3
+%define version_string 1.5.4
 
-%define commit 3fdabd0da2932c276b25b9b4a988ba134eba1aa6
+%define commit f027d53ded7e230e008d37c8b47ede7cd308e19d
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200811
+%global commit_date 20201227
 %global gitrel .%{commit_date}.%{shortcommit}
 
 

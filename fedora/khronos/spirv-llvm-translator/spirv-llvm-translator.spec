@@ -10,7 +10,7 @@
 %define commit f57e6c9b425e58e366c2bcdbc78fa463250c6639
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global commit_date 20201227
-%global gitrel .%{commit_date}.%{shortcommit}
+%global gitrel .%{commit_date}.git%{shortcommit}
 
 
 Name:           %{package_name}
@@ -20,7 +20,7 @@ Summary:        LLVM to SPIRV Translator
 
 License:        NCSA
 URL:            %{build_repo}
-Source0:        %{build_repo}/archive/%{commit}.tar.gz
+Source0:        %{build_repo}/archive/%{commit}.tar.gz#/SPIRV-LLVM-Translator-%{commit}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -50,7 +50,9 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 This package contains the standalone llvm to spirv tool.
 
 %prep
-%autosetup -n %{name}-%{commit}
+#force downloading the project, seems that copr dist-cache is poisoned with bogus archive
+curl -Lo %{_sourcedir}/SPIRV-LLVM-Translator-%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz#/SPIRV-LLVM-Translator-%{commit}.tar.gz
+%autosetup -n SPIRV-LLVM-Translator-%{commit}
 
 %build
 %cmake -B "%{_vpath_builddir}" \
