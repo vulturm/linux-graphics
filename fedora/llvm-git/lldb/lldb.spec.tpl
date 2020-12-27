@@ -23,19 +23,22 @@ License:	NCSA
 URL:      https://llvm.org
 Source0:  %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 
-
-BuildRequires:	cmake
-BuildRequires:	llvm-devel = %{version}
-BuildRequires:	llvm-test = %{version}
-BuildRequires:	clang-devel = %{version}
-BuildRequires:	ncurses-devel
-BuildRequires:	swig
-BuildRequires:	llvm-static = %{version}
-BuildRequires:	libffi-devel
-BuildRequires:	zlib-devel
-BuildRequires:	libxml2-devel
-BuildRequires:	libedit-devel
-BuildRequires:	python2-lit
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  cmake
+BuildRequires:  ninja-build
+BuildRequires:  llvm-devel = %{version}
+BuildRequires:  llvm-test = %{version}
+BuildRequires:  clang-devel = %{version}
+BuildRequires:  ncurses-devel
+BuildRequires:  swig
+BuildRequires:  llvm-static = %{version}
+BuildRequires:  libffi-devel
+BuildRequires:  zlib-devel
+BuildRequires:  libxml2-devel
+BuildRequires:  libedit-devel
+BuildRequires:  python3-lit
+BuildRequires:  multilib-rpm-config
 
 Requires:	python2-lldb
 
@@ -84,7 +87,8 @@ LDFLAGS="%{__global_ldflags} -lpthread -ldl"
 CFLAGS="%{optflags} -Wno-error=format-security"
 CXXFLAGS="%{optflags} -Wno-error=format-security"
 
-%cmake .. \
+%cmake  -B "%{_vpath_builddir}" \
+  -GNinja \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 	-DLLVM_LINK_LLVM_DYLIB:BOOL=ON \
 	-DLLVM_CONFIG:FILEPATH=/usr/bin/llvm-config-%{__isa_bits} \
@@ -105,11 +109,12 @@ CXXFLAGS="%{optflags} -Wno-error=format-security"
 	-DLLVM_LIT_ARGS="-sv \
 	--path %{_libdir}/llvm" \
 
-make %{?_smp_mflags}
+%ninja_build -C "%{_vpath_builddir}"
 
 %install
-cd _build
-make install DESTDIR=%{buildroot}
+%ninja_install -C "%{_vpath_builddir}"
+
+%multilib_fix_c_header --file %{_includedir}/lldb/Host/Config.h
 
 # remove static libraries
 rm -fv %{buildroot}%{_libdir}/*.a
