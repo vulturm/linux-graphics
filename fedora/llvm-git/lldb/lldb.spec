@@ -7,8 +7,8 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit e334c52addc591b95bb0c125e8e289abbf3b67af
-%global commit_date 20201225
+%define commit d3f1f7b6bca585b76d40422e8076d59113e3bb80
+%global commit_date 20201227
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 %global gitrel .%{commit_date}.git%{shortcommit}
@@ -77,32 +77,37 @@ sed -i -e "s~import sys~import sys\nsys.path.insert\(1, '%{python2_sitearch}/lld
 
 %build
 
+mkdir -p _build
+cd _build
+
+# Python version detection is broken
+
+LDFLAGS="%{__global_ldflags} -lpthread -ldl"
+
 CFLAGS="%{optflags} -Wno-error=format-security"
 CXXFLAGS="%{optflags} -Wno-error=format-security"
 
 %cmake  -B "%{_vpath_builddir}" \
   -GNinja \
-  -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-  -DCMAKE_SKIP_RPATH:BOOL=ON \
-  -DLLVM_LINK_LLVM_DYLIB:BOOL=ON \
-  -DLLVM_CONFIG:FILEPATH=/usr/bin/llvm-config-%{__isa_bits} \
-  \
-  -DLLDB_DISABLE_CURSES:BOOL=OFF \
-  -DLLDB_DISABLE_LIBEDIT:BOOL=OFF \
-  -DLLDB_DISABLE_PYTHON:BOOL=OFF \
+	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+	-DLLVM_LINK_LLVM_DYLIB:BOOL=ON \
+	-DLLVM_CONFIG:FILEPATH=/usr/bin/llvm-config-%{__isa_bits} \
+	\
+	-DLLDB_DISABLE_CURSES:BOOL=OFF \
+	-DLLDB_DISABLE_LIBEDIT:BOOL=OFF \
+	-DLLDB_DISABLE_PYTHON:BOOL=OFF \
 %if 0%{?__isa_bits} == 64
-  -DLLVM_LIBDIR_SUFFIX=64 \
+	-DLLVM_LIBDIR_SUFFIX=64 \
 %else
-  -DLLVM_LIBDIR_SUFFIX= \
+	-DLLVM_LIBDIR_SUFFIX= \
 %endif
-  \
-  -DPYTHON_EXECUTABLE:STRING=%{__python3} \
-  -DPYTHON_VERSION_MAJOR:STRING=$(%{__python3} -c "import sys; print(sys.version_info.major)") \
-  -DPYTHON_VERSION_MINOR:STRING=$(%{__python3} -c "import sys; print(sys.version_info.minor)") \
-  -DLLVM_EXTERNAL_LIT=%{_bindir}/lit \
-  -DCLANG_LINK_CLANG_DYLIB=ON \
-  -DLLVM_LIT_ARGS="-sv \
-  --path %{_libdir}/llvm" \
+	\
+	-DPYTHON_EXECUTABLE:STRING=%{__python2} \
+	-DPYTHON_VERSION_MAJOR:STRING=$(%{__python2} -c "import sys; print(sys.version_info.major)") \
+	-DPYTHON_VERSION_MINOR:STRING=$(%{__python2} -c "import sys; print(sys.version_info.minor)") \
+	-DLLVM_EXTERNAL_LIT=%{_bindir}/lit \
+	-DLLVM_LIT_ARGS="-sv \
+	--path %{_libdir}/llvm" \
 
 %ninja_build -C "%{_vpath_builddir}"
 
@@ -116,15 +121,14 @@ rm -fv %{buildroot}%{_libdir}/*.a
 
 # python: fix binary libraries location
 liblldb=$(basename $(readlink -e %{buildroot}%{_libdir}/liblldb.so))
-ln -vsf "../../../${liblldb}" %{buildroot}%{python3_sitearch}/lldb/_lldb.so
-%py_byte_compile %{__python3} %{buildroot}%{python3_sitearch}/lldb
+ln -vsf "../../../${liblldb}" %{buildroot}%{python2_sitearch}/lldb/_lldb.so
+#mv -v %{buildroot}%{python2_sitearch}/readline.so %{buildroot}%{python2_sitearch}/lldb/readline.so
+%py_byte_compile %{__python2} %{buildroot}%{python2_sitearch}/lldb
 
 # remove bundled six.py
-rm -f %{buildroot}%{python3_sitearch}/six.*
+rm -f %{buildroot}%{python2_sitearch}/six.*
 
 %ldconfig_scriptlets
-
-%check
 
 %files
 %{_bindir}/lldb*
