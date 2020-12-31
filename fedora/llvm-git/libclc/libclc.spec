@@ -5,9 +5,9 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit df7ddeea668af7b25ee01f282fd8e6b388155103
+%define commit d974ac0224dec34b95fb1be8c61bd8b524698bcd
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20201229
+%global commit_date 20201231
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %define _unpackaged_files_terminate_build 0
