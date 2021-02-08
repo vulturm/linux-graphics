@@ -10,9 +10,9 @@
 %define version_string 2020.7
 %undefine __cmake_in_source_build
 
-%define commit d61a7d110d93c244222364d67099bd3bbba1c307
+%define commit f0c96f40c79d03e42688aae48642a4759a5e376f
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20210201
+%global commit_date 20210208
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
