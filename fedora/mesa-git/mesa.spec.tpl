@@ -66,8 +66,6 @@
 %endif
 
 %global with_vulkan_overlay 1
-%global with_vulkan_device_select 1
-
 
 %global dri_drivers %{?base_drivers}%{?platform_drivers}
 
@@ -414,8 +412,7 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -D osmesa=true \
   -D shared-glapi=enabled \
   -D gallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
-  -D vulkan-overlay-layer=%{?with_vulkan_overlay:true}%{!?with_vulkan_overlay:false} \
-  -D vulkan-device-select-layer=%{?with_vulkan_device_select:true}%{!?with_vulkan_device_select:false} \
+  -D vulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
   -D tools=[]
   %{nil}
 %meson_build
@@ -634,10 +631,8 @@ popd
 %{_libdir}/libVkLayer_MESA_overlay.so
 %{_datadir}/vulkan/explicit_layer.d/VkLayer_MESA_overlay.json
 %endif
-%if 0%{?with_vulkan_device_select}
 %{_libdir}/libVkLayer_MESA_device_select.so
 %{_datadir}/vulkan/implicit_layer.d/VkLayer_MESA_device_select.json
-%endif
 
 %files vulkan-devel
 %if 0%{?with_hardware}
@@ -647,6 +642,9 @@ popd
 %endif
 
 %changelog
+* Fri Mar 26 2021 Mihai Vultur <xanto@egaming.ro>
+- Set vulkan-layers=device-select,overlay since upstream commit 54fe5b04
+
 * Fri Dec 11 2020 Mihai Vultur <xanto@egaming.ro>
 - Set osmesa=true since upstream commit ee802372180a2b4460cc7abb53438e45c6b6f1e4 
 

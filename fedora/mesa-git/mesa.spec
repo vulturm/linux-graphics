@@ -6,9 +6,9 @@
 %global build_repo https://github.com/mesa3d/mesa
 %define version_string 21.1.0
 
-%define commit a3ee818b790920fa4b74823cd207d3b5ff340798
+%define commit ce9896727424621eb641fb48610a70af37960d3c
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20210326.15
+%global commit_date 20210326.18
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -66,8 +66,6 @@
 %endif
 
 %global with_vulkan_overlay 1
-%global with_vulkan_device_select 1
-
 
 %global dri_drivers %{?base_drivers}%{?platform_drivers}
 
@@ -414,8 +412,7 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -D osmesa=true \
   -D shared-glapi=enabled \
   -D gallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
-  -D vulkan-overlay-layer=%{?with_vulkan_overlay:true}%{!?with_vulkan_overlay:false} \
-  -D vulkan-device-select-layer=%{?with_vulkan_device_select:true}%{!?with_vulkan_device_select:false} \
+  -D vulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
   -D tools=[]
   %{nil}
 %meson_build
@@ -647,6 +644,9 @@ popd
 %endif
 
 %changelog
+* Fri Mar 26 2021 Mihai Vultur <xanto@egaming.ro>
+- Set vulkan-layers=device-select,overlay since upstream commit 54fe5b04
+
 * Fri Dec 11 2020 Mihai Vultur <xanto@egaming.ro>
 - Set osmesa=true since upstream commit ee802372180a2b4460cc7abb53438e45c6b6f1e4 
 
