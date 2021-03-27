@@ -6,9 +6,9 @@
 %global build_repo https://github.com/mesa3d/mesa
 %define version_string 21.1.0
 
-%define commit ce9896727424621eb641fb48610a70af37960d3c
+%define commit b30792730341c3bd20b3dd548a3b47c664834a1e
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20210326.18
+%global commit_date 20210327.13
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -631,10 +631,8 @@ popd
 %{_libdir}/libVkLayer_MESA_overlay.so
 %{_datadir}/vulkan/explicit_layer.d/VkLayer_MESA_overlay.json
 %endif
-%if 0%{?with_vulkan_device_select}
 %{_libdir}/libVkLayer_MESA_device_select.so
 %{_datadir}/vulkan/implicit_layer.d/VkLayer_MESA_device_select.json
-%endif
 
 %files vulkan-devel
 %if 0%{?with_hardware}
