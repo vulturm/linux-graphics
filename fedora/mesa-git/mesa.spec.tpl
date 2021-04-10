@@ -352,14 +352,6 @@ Requires:       vulkan%{_isa}
 %description vulkan-drivers
 The drivers with support for the Vulkan API.
 
-%package vulkan-devel
-Summary:        Mesa Vulkan development files
-Requires:       %{name}-vulkan-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:       vulkan-devel
-
-%description vulkan-devel
-Headers for development with the Vulkan API.
-
 %prep
 %setup -q -c
 %autosetup -n mesa-%{commit} -p1
@@ -634,14 +626,11 @@ popd
 %{_libdir}/libVkLayer_MESA_device_select.so
 %{_datadir}/vulkan/implicit_layer.d/VkLayer_MESA_device_select.json
 
-%files vulkan-devel
-%if 0%{?with_hardware}
-%ifarch %{ix86} x86_64
-%{_includedir}/vulkan/*.h
-%endif
-%endif
-
 %changelog
+* Sun Apr 11 2021 Mihai Vultur <xanto@egaming.ro>
+- Don't generate a separate vulkan-devel package anymore
+- TODO: Find upstream commit that introduced this change in behavior.
+
 * Fri Mar 26 2021 Mihai Vultur <xanto@egaming.ro>
 - Set vulkan-layers=device-select,overlay since upstream commit 54fe5b04
 

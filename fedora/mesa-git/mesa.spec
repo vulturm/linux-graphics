@@ -6,9 +6,9 @@
 %global build_repo https://github.com/mesa3d/mesa
 %define version_string 21.1.0
 
-%define commit 44ed8378bf69fc3762e114eb3b1985daa6566e28
+%define commit 492c8f1709d3f67e1d77fcc4e69e83d656349e2a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20210410.20
+%global commit_date 20210411.00
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -352,14 +352,6 @@ Requires:       vulkan%{_isa}
 %description vulkan-drivers
 The drivers with support for the Vulkan API.
 
-%package vulkan-devel
-Summary:        Mesa Vulkan development files
-Requires:       %{name}-vulkan-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:       vulkan-devel
-
-%description vulkan-devel
-Headers for development with the Vulkan API.
-
 %prep
 %setup -q -c
 %autosetup -n mesa-%{commit} -p1
@@ -633,13 +625,6 @@ popd
 %endif
 %{_libdir}/libVkLayer_MESA_device_select.so
 %{_datadir}/vulkan/implicit_layer.d/VkLayer_MESA_device_select.json
-
-%files vulkan-devel
-%if 0%{?with_hardware}
-%ifarch %{ix86} x86_64
-%{_includedir}/vulkan/*.h
-%endif
-%endif
 
 %changelog
 * Fri Mar 26 2021 Mihai Vultur <xanto@egaming.ro>
