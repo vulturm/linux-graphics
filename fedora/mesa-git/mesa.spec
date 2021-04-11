@@ -6,9 +6,9 @@
 %global build_repo https://github.com/mesa3d/mesa
 %define version_string 21.1.0
 
-%define commit 492c8f1709d3f67e1d77fcc4e69e83d656349e2a
+%define commit ba8737bb8602421fde25b3c9435394b4b0ff5b1b
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20210411.00
+%global commit_date 20210411.10
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -627,6 +627,10 @@ popd
 %{_datadir}/vulkan/implicit_layer.d/VkLayer_MESA_device_select.json
 
 %changelog
+* Sun Apr 11 2021 Mihai Vultur <xanto@egaming.ro>
+- Don't generate a separate vulkan-devel package anymore
+- TODO: Find upstream commit that introduced this change in behavior.
+
 * Fri Mar 26 2021 Mihai Vultur <xanto@egaming.ro>
 - Set vulkan-layers=device-select,overlay since upstream commit 54fe5b04
 
