@@ -72,6 +72,7 @@ BuildRequires:  meson >= 0.43
 BuildRequires:  gcc
 BuildRequires:  libatomic_ops-devel
 BuildRequires:  kernel-headers
+BuildRequires:  python3-docutils
 %if %{with intel}
 BuildRequires:  pkgconfig(pciaccess) >= 0.10
 %endif
