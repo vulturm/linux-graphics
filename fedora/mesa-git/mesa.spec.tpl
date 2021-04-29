@@ -629,7 +629,11 @@ popd
 %changelog
 * Sun Apr 11 2021 Mihai Vultur <xanto@egaming.ro>
 - Don't generate a separate vulkan-devel package anymore
-- TODO: Find upstream commit that introduced this change in behavior.
+- Since upstream commit:
+-    commit 5e6db1916860ec217eac60903e0a9d10189d1c53
+-    Author: Chad Versace <chad@kiwitree.net>
+-    Message:
+-       anv: Remove vkCreateDmaBufINTEL (v4)
 
 * Fri Mar 26 2021 Mihai Vultur <xanto@egaming.ro>
 - Set vulkan-layers=device-select,overlay since upstream commit 54fe5b04
