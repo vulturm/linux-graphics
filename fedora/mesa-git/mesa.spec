@@ -6,9 +6,9 @@
 %global build_repo https://github.com/mesa3d/mesa
 %define version_string 21.2.0
 
-%define commit ede0b3c643279f4126fb10552a2f1d00be27f16d
+%define commit 96ec6b3d8fa828bd4bc58cd2183797953caaa405
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20210429.20
+%global commit_date 20210430.00
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -629,7 +629,11 @@ popd
 %changelog
 * Sun Apr 11 2021 Mihai Vultur <xanto@egaming.ro>
 - Don't generate a separate vulkan-devel package anymore
-- TODO: Find upstream commit that introduced this change in behavior.
+- Since upstream commit:
+-    commit 5e6db1916860ec217eac60903e0a9d10189d1c53
+-    Author: Chad Versace <chad@kiwitree.net>
+-    Message:
+-       anv: Remove vkCreateDmaBufINTEL (v4)
 
 * Fri Mar 26 2021 Mihai Vultur <xanto@egaming.ro>
 - Set vulkan-layers=device-select,overlay since upstream commit 54fe5b04
