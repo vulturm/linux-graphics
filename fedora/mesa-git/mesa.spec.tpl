@@ -531,6 +531,7 @@ popd
 %{_libdir}/dri/radeonsi_dri.so
 %endif
 %ifarch %{ix86} x86_64
+%{_libdir}/dri/i830_dri.so
 %{_libdir}/dri/i915_dri.so
 %{_libdir}/dri/i965_dri.so
 %endif
@@ -627,6 +628,10 @@ popd
 %{_datadir}/vulkan/implicit_layer.d/VkLayer_MESA_device_select.json
 
 %changelog
+* Wed May 05 2021 Mihai Vultur <xanto@egaming.ro>
+- After https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/10554
+- also consider i830_dri.so
+
 * Sun Apr 11 2021 Mihai Vultur <xanto@egaming.ro>
 - Don't generate a separate vulkan-devel package anymore
 - Since upstream commit:
