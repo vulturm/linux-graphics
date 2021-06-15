@@ -352,6 +352,14 @@ Requires:       vulkan%{_isa}
 %description vulkan-drivers
 The drivers with support for the Vulkan API.
 
+%package vulkan-devel
+Summary:        Mesa Vulkan development files
+Requires:       %{name}-vulkan-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       vulkan-devel
+
+%description vulkan-devel
+Headers for development with the Vulkan API.
+
 %prep
 %setup -q -c
 %autosetup -n mesa-%{commit} -p1
@@ -627,6 +635,7 @@ popd
 %{_libdir}/libVkLayer_MESA_device_select.so
 %{_datadir}/vulkan/implicit_layer.d/VkLayer_MESA_device_select.json
 
+<<<<<<< HEAD
 %changelog
 * Wed May 05 2021 Mihai Vultur <xanto@egaming.ro>
 - After https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/10554
@@ -639,7 +648,16 @@ popd
 -    Author: Chad Versace <chad@kiwitree.net>
 -    Message:
 -       anv: Remove vkCreateDmaBufINTEL (v4)
+=======
+%files vulkan-devel
+%if 0%{?with_hardware}
+%ifarch %{ix86} x86_64
+%{_includedir}/vulkan/*.h
+%endif
+%endif
+>>>>>>> parent of 2f620be... [mesa] Don't generate a separate vulkan-devel package anymore.
 
+%changelog
 * Fri Mar 26 2021 Mihai Vultur <xanto@egaming.ro>
 - Set vulkan-layers=device-select,overlay since upstream commit 54fe5b04
 

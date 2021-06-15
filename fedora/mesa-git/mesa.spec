@@ -6,9 +6,15 @@
 %global build_repo https://github.com/mesa3d/mesa
 %define version_string 21.2.0
 
+<<<<<<< HEAD
 %define commit 49c01da5899fb6fe0b01161d3d0585e6ebb6b184
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global commit_date 20210615.20
+=======
+%define commit 44ed8378bf69fc3762e114eb3b1985daa6566e28
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
+%global commit_date 20210410.20
+>>>>>>> parent of 2f620be... [mesa] Don't generate a separate vulkan-devel package anymore.
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -352,6 +358,14 @@ Requires:       vulkan%{_isa}
 %description vulkan-drivers
 The drivers with support for the Vulkan API.
 
+%package vulkan-devel
+Summary:        Mesa Vulkan development files
+Requires:       %{name}-vulkan-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       vulkan-devel
+
+%description vulkan-devel
+Headers for development with the Vulkan API.
+
 %prep
 %setup -q -c
 %autosetup -n mesa-%{commit} -p1
@@ -626,6 +640,13 @@ popd
 %endif
 %{_libdir}/libVkLayer_MESA_device_select.so
 %{_datadir}/vulkan/implicit_layer.d/VkLayer_MESA_device_select.json
+
+%files vulkan-devel
+%if 0%{?with_hardware}
+%ifarch %{ix86} x86_64
+%{_includedir}/vulkan/*.h
+%endif
+%endif
 
 %changelog
 * Wed May 05 2021 Mihai Vultur <xanto@egaming.ro>
