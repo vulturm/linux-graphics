@@ -635,8 +635,15 @@ popd
 %{_libdir}/libVkLayer_MESA_device_select.so
 %{_datadir}/vulkan/implicit_layer.d/VkLayer_MESA_device_select.json
 
-<<<<<<< HEAD
+%files vulkan-devel
+
+
 %changelog
+* Tue Jun 15 2021 Mihai Vultur <xanto@egaming.ro>
+- Partially revert the modifications done in Apr 11:
+- Regenerate vulkan-devel package but with no files
+- This provides a lean upgrade path
+
 * Wed May 05 2021 Mihai Vultur <xanto@egaming.ro>
 - After https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/10554
 - also consider i830_dri.so
@@ -648,16 +655,7 @@ popd
 -    Author: Chad Versace <chad@kiwitree.net>
 -    Message:
 -       anv: Remove vkCreateDmaBufINTEL (v4)
-=======
-%files vulkan-devel
-%if 0%{?with_hardware}
-%ifarch %{ix86} x86_64
-%{_includedir}/vulkan/*.h
-%endif
-%endif
->>>>>>> parent of 2f620be... [mesa] Don't generate a separate vulkan-devel package anymore.
 
-%changelog
 * Fri Mar 26 2021 Mihai Vultur <xanto@egaming.ro>
 - Set vulkan-layers=device-select,overlay since upstream commit 54fe5b04
 
