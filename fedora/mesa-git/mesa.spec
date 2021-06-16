@@ -6,15 +6,9 @@
 %global build_repo https://github.com/mesa3d/mesa
 %define version_string 21.2.0
 
-<<<<<<< HEAD
-%define commit 49c01da5899fb6fe0b01161d3d0585e6ebb6b184
+%define commit 541af28cb28810a041c5c363b4210d65a2fbdc4f
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20210615.20
-=======
-%define commit 44ed8378bf69fc3762e114eb3b1985daa6566e28
-%global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20210410.20
->>>>>>> parent of 2f620be... [mesa] Don't generate a separate vulkan-devel package anymore.
+%global commit_date 20210616.15
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -642,13 +636,14 @@ popd
 %{_datadir}/vulkan/implicit_layer.d/VkLayer_MESA_device_select.json
 
 %files vulkan-devel
-%if 0%{?with_hardware}
-%ifarch %{ix86} x86_64
-%{_includedir}/vulkan/*.h
-%endif
-%endif
+
 
 %changelog
+* Tue Jun 15 2021 Mihai Vultur <xanto@egaming.ro>
+- Partially revert the modifications done in Apr 11:
+- Regenerate vulkan-devel package but with no files
+- This provides a lean upgrade path
+
 * Wed May 05 2021 Mihai Vultur <xanto@egaming.ro>
 - After https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/10554
 - also consider i830_dri.so
