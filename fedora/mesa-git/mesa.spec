@@ -4,11 +4,11 @@
 %global __meson_auto_features disabled
 
 %global build_repo https://github.com/mesa3d/mesa
-%define version_string 21.2.0
+%define version_string 21.3.0
 
-%define commit 71aab9607dc6d979d29c9bb2ab1c2af32de5fd8b
+%define commit 6689c3917e876bf1719b5808e2c0832ee4d50aed
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20210714.20
+%global commit_date 20210715.00
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
