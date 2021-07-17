@@ -38,11 +38,15 @@ Vulkan Header files and API registry
 %license LICENSE.txt
 %doc README.md
 %{_includedir}/vulkan/
+%{_includedir}/vk_video/
 %dir %{_datadir}/vulkan/
 %{_datadir}/vulkan/registry/
 
 
 %changelog
+* Sat Jul 17 2021 Mihai Vultur <xanto@egaming.ro>
+- Include vk_video folder
+
 * Tue Jul 16 2019 Mihai Vultur <xanto@egaming.ro>
 - Implement some version autodetection to reduce maintenance work.
 
