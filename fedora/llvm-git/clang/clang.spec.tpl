@@ -235,21 +235,23 @@ pathfix.py -i %{__python3} -pn \
   clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py
 
 %setup -D -T -q -n %{clang_srcdir}
+%autopatch -m200 -p2
 
-%patch4 -p1 -b .gtest
-%patch10 -p1 -b .bitfields
-%patch11 -p1 -b .libcxx-fix
-%patch15 -p2 -b .no-install-static
+#%patch4 -p1 -b .gtest
+#%patch10 -p1 -b .bitfields
+#%patch11 -p1 -b .libcxx-fix
+#%patch15 -p2 -b .no-install-static
 
 mv ../clang-tools-extra tools/extra
 
-%patch20 -p0
+# %patch20 -p0
 
 pathfix.py -i %{__python3} -pn \
-	tools/clang-format/*.py \
-	tools/clang-format/git-clang-format \
-	utils/hmaptool/hmaptool \
-	tools/scan-view/bin/scan-view
+  tools/clang-format/*.py \
+  tools/clang-format/git-clang-format \
+  utils/hmaptool/hmaptool \
+  tools/scan-view/bin/scan-view \
+  tools/scan-build-py/bin/*
 %endif
 
 %build
