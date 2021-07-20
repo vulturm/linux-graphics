@@ -6,10 +6,10 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 42e6cfc81d05304574f98e3b05296d53613493ff
+%define commit 1453f048cf9275ac329b5beb243c3c0986144143
 
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20210719
+%global commit_date 20210720
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %global _default_patch_fuzz 2
@@ -71,12 +71,13 @@ License:	NCSA
 URL:      https://llvm.org
 Source0:  %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 
-Patch4:		0002-gtest-reorg.patch
-Patch10:	0001-Workaround-GCC-9-bug-when-handling-bitfields.patch
-# Not Upstream
-Patch11:	0001-ToolChain-Add-lgcc_s-to-the-linker-flags-when-using-.patch
-Patch15:	0001-clang-Don-t-install-static-libraries.patch
-Patch20:	0003-clang-tools-extra-dir.patch
+
+# Patches for clang
+Patch0:     0001-PATCH-clang-Reorganize-gtest-integration.patch
+Patch1:     0002-PATCH-clang-Make-funwind-tables-the-default-on-all-a.patch
+Patch2:     0003-PATCH-clang-Don-t-install-static-libraries.patch
+Patch3:     0004-PATCH-clang-Prefer-gcc-toolchains-with-libgcc_s.so-w.patch
+
 
 BuildRequires:	gcc
 BuildRequires:	gcc-c++
@@ -476,6 +477,9 @@ rm -Rvf %{buildroot}%{_includedir}/clang-tidy/
 
 %endif
 %changelog
+* Tue Jul 20 2021 Mihai Vultur <xanto@egaming.ro>
+- Update patches from upstream.
+
 * Mon Jul 20 2020 sguelton@redhat.com
 - Update cmake macro usage
 
