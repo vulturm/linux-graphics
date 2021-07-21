@@ -6,10 +6,10 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit e04c05e8230e383493774cb3636587d3c0b5f288
+%define commit 326a5a2658d81db46a78b184fe42e522ef170f32
 
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20210720
+%global commit_date 20210721
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %global _default_patch_fuzz 2
@@ -246,7 +246,6 @@ mv ../clang-tools-extra tools/extra
 
 # %patch20 -p0
 
-  
 pathfix.py -i %{__python3} -pn \
   tools/clang-format/*.py \
   tools/clang-format/git-clang-format \
