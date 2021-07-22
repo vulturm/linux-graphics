@@ -250,6 +250,10 @@ pathfix.py -i %{__python3} -pn \
   tools/clang-format/*.py \
   tools/clang-format/git-clang-format \
   utils/hmaptool/hmaptool \
+  tools/scan-build-py/libexec/intercept-cc \
+  tools/scan-build-py/libexec/intercept-c++ \
+  tools/scan-build-py/libexec/analyze-cc \
+  tools/scan-build-py/libexec/analyze-c++ \
   tools/scan-view/bin/scan-view \
   tools/scan-build-py/bin/*
 %endif
