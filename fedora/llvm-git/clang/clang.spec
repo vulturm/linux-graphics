@@ -6,10 +6,10 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 326a5a2658d81db46a78b184fe42e522ef170f32
+%define commit 078003482e90ff5c7ba047a3d3152f0b0c392b31
 
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20210721
+%global commit_date 20210722
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %global _default_patch_fuzz 2
@@ -250,6 +250,10 @@ pathfix.py -i %{__python3} -pn \
   tools/clang-format/*.py \
   tools/clang-format/git-clang-format \
   utils/hmaptool/hmaptool \
+  tools/scan-build-py/libexec/intercept-cc \
+  tools/scan-build-py/libexec/intercept-c++ \
+  tools/scan-build-py/libexec/analyze-cc \
+  tools/scan-build-py/libexec/analyze-c++ \
   tools/scan-view/bin/scan-view \
   tools/scan-build-py/bin/*
 %endif
