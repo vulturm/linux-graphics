@@ -5,11 +5,11 @@
 %global version_file https://raw.githubusercontent.com/KhronosGroup/SPIRV-LLVM-Translator/{}/CMakeLists.txt
 %global version_string_regex reg_beg set \(BASE_LLVM_VERSION ([0-9.]+)\) reg_end
 
-%define version_string 13.0.0
+%define version_string 14.0.0
 
-%define commit 062788212ce7544b896afbce9dd210c4fea5c0ea
+%define commit 31ed43e80a72372ddfb43dab37d3daa3b70f2559
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20210803
+%global commit_date 20210805
 %global gitrel .%{commit_date}.git%{shortcommit}
 
 
