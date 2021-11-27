@@ -4,11 +4,11 @@
 %global __meson_auto_features disabled
 
 %global build_repo https://github.com/vulturm/mesa
-%define version_string 21.2.0
+%define version_string 8
 
 %define commit 0cec71d7ce0a793b35aca7c142f511417c3fd57a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20211122.08
+%global commit_date 20211127.23
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
