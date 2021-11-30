@@ -1,6 +1,6 @@
 %global build_repo https://gitlab.freedesktop.org/mesa/drm/
 
-%global build_branch master
+%global build_branch main
 
 %define build_shortcommit %(git ls-remote %{build_repo} | grep "refs/heads/%{build_branch}" | cut -c1-8)
 %define numeric_ver %(curl -s %{build_repo}/raw/master/meson.build | grep -m 1 -oP "(?<=version : ')([0-9.]+)")
