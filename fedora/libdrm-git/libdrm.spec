@@ -229,7 +229,7 @@ cp %{SOURCE1} %{buildroot}%{_docdir}/libdrm
 %{_libdir}/pkgconfig/libdrm_intel.pc
 %endif
 %if %{with radeon}
-%{_includedir}/libdrm/radeon_*.h
+%{_includedir}/libdrm/radeon_{bo,cs,surface}*.h
 %{_includedir}/libdrm/r600_pci_ids.h
 %{_libdir}/libdrm_radeon.so
 %{_libdir}/pkgconfig/libdrm_radeon.pc
@@ -285,9 +285,16 @@ cp %{SOURCE1} %{buildroot}%{_docdir}/libdrm
 
 %if %{with install_test_programs}
 %files -n drm-utils
+%if %{with amdgpu}
+%{_bindir}/amdgpu_stress
+%endif
 %{_bindir}/drmdevice
+%if %{with etnaviv}
 %exclude %{_bindir}/etnaviv_*
+%endif
+%if %{with exynos}
 %exclude %{_bindir}/exynos_*
+%endif
 %{_bindir}/kms-steal-crtc
 %{_bindir}/kms-universal-planes
 %if %{with libkms}
