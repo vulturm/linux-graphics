@@ -24,11 +24,9 @@
 %global with_nine 1
 %global with_omx 1
 %global with_opencl 1
-%global base_drivers nouveau,r100,r200
 %endif
 
 %ifarch %{ix86} x86_64
-%global platform_drivers ,i915,i965
 %global with_vmware 1
 %global with_xa     1
 %global with_zink   1
@@ -66,8 +64,6 @@
 %endif
 
 %global with_vulkan_overlay 1
-
-%global dri_drivers %{?base_drivers}%{?platform_drivers}
 
 %global sanitize 1
 
@@ -377,11 +373,10 @@ export CFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLA
 export FCFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export FFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export CXXFLAGS="$CXXFLAGS -std=c++14 -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
-export LDFLAGS="$LDFLAG0S -flto=8 "
+export LDFLAGS="$LDFLAGS -flto=8 "
 
 %meson -Dcpp_std=gnu++14 \
   -D platforms=x11,wayland \
-  -D dri-drivers=%{?dri_drivers} \
 %if 0%{?with_hardware}
   -D gallium-drivers=swrast,virgl,r300,nouveau%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi,r600}%{?with_iris:,iris}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_zink:,zink} \
 %else
@@ -453,7 +448,6 @@ popd
 %{_libdir}/libGLX_system.so.0*
 %files libGL-devel
 %{_includedir}/GL/*
-%{_libdir}/pkgconfig/dri.pc
 %{_libdir}/libglapi.so
 
 
@@ -530,18 +524,10 @@ popd
 %dir %{_datadir}/drirc.d
 %{_datadir}/drirc.d/00-mesa-defaults.conf
 %if 0%{?with_hardware}
-%{_libdir}/dri/radeon_dri.so
-%{_libdir}/dri/r200_dri.so
-%{_libdir}/dri/nouveau_vieux_dri.so
 %{_libdir}/dri/r300_dri.so
 %if 0%{?with_radeonsi}
 %{_libdir}/dri/r600_dri.so
 %{_libdir}/dri/radeonsi_dri.so
-%endif
-%ifarch %{ix86} x86_64
-%{_libdir}/dri/i830_dri.so
-%{_libdir}/dri/i915_dri.so
-%{_libdir}/dri/i965_dri.so
 %endif
 %if 0%{?with_vc4}
 %{_libdir}/dri/vc4_dri.so
