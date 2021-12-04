@@ -36,6 +36,8 @@ BuildRequires:  llvm-devel >= 3.9
 BuildRequires:  python
 BuildRequires:  zlib-devel
 BuildRequires:  cmake
+BuildRequires:  ninja-build
+BuildRequires:  spirv-llvm-translator-tools
 
 %description
 libclc is an open source, BSD licensed implementation of the library
@@ -79,21 +81,21 @@ curl -Lo %{_sourcedir}/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{com
 
 %build
 export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
-mkdir -p _build
-cd _build
-%cmake ..
-%make_build
+%set_build_flags
+#./configure.py --prefix=%{_prefix} --libexecdir=%{_libdir}/%{shortname}/ --pkgconfigdir=%{_libdir}/pkgconfig/
+%cmake  -B "%{_vpath_builddir}" \
+  -G Ninja \
+  -DCMAKE_INSTALL_INCLUDEDIR:PATH=%{_includedir} \
+  -DCMAKE_INSTALL_DATADIR:PATH=%{_libdir}
+
+%ninja_build -C "%{_vpath_builddir}"
 
 %install
-cd _build
-%make_install
-
+%ninja_install -C "%{_vpath_builddir}"
 
 %files
 %license LICENSE.TXT
 %doc README.TXT CREDITS.TXT
-%dir %{_libdir}/%{shortname}
-%{_libdir}/%{shortname}/*.bc
 %{_includedir}/%{shortname}
 
 %files devel

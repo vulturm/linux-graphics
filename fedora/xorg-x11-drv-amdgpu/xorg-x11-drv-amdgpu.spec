@@ -50,6 +50,9 @@ X.Org X11 AMDGPU driver
 %autosetup -n %{driver_name}-%{latest_tag}
 
 %build
+export CFLAGS="%{build_cflags} -fcommon"
+export CXXFLAGS="%{build_cxxflags} -fcommon"
+
 #autoreconf -fiv
 ./autogen.sh --disable-static --enable-glamor
 #%configure --disable-static --enable-glamor

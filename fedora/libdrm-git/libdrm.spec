@@ -1,9 +1,9 @@
 %global build_repo https://gitlab.freedesktop.org/mesa/drm/
 
-%global build_branch master
+%global build_branch main
 
 %define build_shortcommit %(git ls-remote %{build_repo} | grep "refs/heads/%{build_branch}" | cut -c1-8)
-%define numeric_ver %(curl -s %{build_repo}/raw/master/meson.build | grep -m 1 -oP "(?<=version : ')([0-9.]+)")
+%define numeric_ver %(curl -s %{build_repo}/raw/%{build_branch}/meson.build | grep -m 1 -oP "(?<=version : ')([0-9.]+)")
 %global build_timestamp %(date +"%Y%m%d")
 
 %global rel_build %{build_timestamp}.%{build_shortcommit}%{?dist}
@@ -72,6 +72,7 @@ BuildRequires:  meson >= 0.43
 BuildRequires:  gcc
 BuildRequires:  libatomic_ops-devel
 BuildRequires:  kernel-headers
+BuildRequires:  python3-docutils
 %if %{with intel}
 BuildRequires:  pkgconfig(pciaccess) >= 0.10
 %endif
@@ -95,7 +96,7 @@ BuildRequires:  chrpath
 # hardcode the 666 instead of 660 for device nodes
 Patch1001:      libdrm-make-dri-perms-okay.patch
 # remove backwards compat not needed on Fedora
-Patch1002:      libdrm-2.4.0-no-bc.patch
+# Patch1002:      libdrm-2.4.0-no-bc.patch
 
 %description
 Direct Rendering Manager runtime library
@@ -228,7 +229,7 @@ cp %{SOURCE1} %{buildroot}%{_docdir}/libdrm
 %{_libdir}/pkgconfig/libdrm_intel.pc
 %endif
 %if %{with radeon}
-%{_includedir}/libdrm/radeon_*.h
+%{_includedir}/libdrm/radeon_{bo,cs,surface}*.h
 %{_includedir}/libdrm/r600_pci_ids.h
 %{_libdir}/libdrm_radeon.so
 %{_libdir}/pkgconfig/libdrm_radeon.pc
@@ -284,9 +285,16 @@ cp %{SOURCE1} %{buildroot}%{_docdir}/libdrm
 
 %if %{with install_test_programs}
 %files -n drm-utils
+%if %{with amdgpu}
+%{_bindir}/amdgpu_stress
+%endif
 %{_bindir}/drmdevice
+%if %{with etnaviv}
 %exclude %{_bindir}/etnaviv_*
+%endif
+%if %{with exynos}
 %exclude %{_bindir}/exynos_*
+%endif
 %{_bindir}/kms-steal-crtc
 %{_bindir}/kms-universal-planes
 %if %{with libkms}
@@ -299,6 +307,9 @@ cp %{SOURCE1} %{buildroot}%{_docdir}/libdrm
 %endif
 
 %changelog
+* Sun Jun 07 2020 Mihai Vultur <xanto@egaming.ro>
+- Remove no_bc patch. Makes our life easier from a patch maintenance standpoint.
+
 * Tue Jul 09 2019 Mihai Vultur <xanto@egaming.ro> - git
 - Update to git version
 

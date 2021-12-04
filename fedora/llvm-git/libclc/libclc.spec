@@ -1,13 +1,13 @@
 %global build_branch master
 %global build_repo https://github.com/llvm/llvm-project
 
-%global maj_ver 11
+%global maj_ver 14
 %global min_ver 0
 %global patch_ver 0
 
-%define commit af450eabb925a8735434282d4cab6280911c229a
+%define commit 6318001209932f075fd6f12439ec9e0327e9af05
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200229
+%global commit_date 20211203
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %define _unpackaged_files_terminate_build 0
@@ -36,6 +36,8 @@ BuildRequires:  llvm-devel >= 3.9
 BuildRequires:  python
 BuildRequires:  zlib-devel
 BuildRequires:  cmake
+BuildRequires:  ninja-build
+BuildRequires:  spirv-llvm-translator-tools
 
 %description
 libclc is an open source, BSD licensed implementation of the library
@@ -79,21 +81,21 @@ curl -Lo %{_sourcedir}/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{com
 
 %build
 export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
-mkdir -p _build
-cd _build
-%cmake ..
-%make_build
+%set_build_flags
+#./configure.py --prefix=%{_prefix} --libexecdir=%{_libdir}/%{shortname}/ --pkgconfigdir=%{_libdir}/pkgconfig/
+%cmake  -B "%{_vpath_builddir}" \
+  -G Ninja \
+  -DCMAKE_INSTALL_INCLUDEDIR:PATH=%{_includedir} \
+  -DCMAKE_INSTALL_DATADIR:PATH=%{_libdir}
+
+%ninja_build -C "%{_vpath_builddir}"
 
 %install
-cd _build
-%make_install
-
+%ninja_install -C "%{_vpath_builddir}"
 
 %files
 %license LICENSE.TXT
 %doc README.TXT CREDITS.TXT
-%dir %{_libdir}/%{shortname}
-%{_libdir}/%{shortname}/*.bc
 %{_includedir}/%{shortname}
 
 %files devel

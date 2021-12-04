@@ -1,0 +1,13 @@
+# additional rpminspect configuration for this branch
+
+---
+emptyrpm:
+    expected_empty:
+        - kernel
+        - kernel-debug
+        - kernel-debug-devel-matched
+        - kernel-devel-matched
+        - kernel-lpae
+        - kernel-zfcpdump
+        - kernel-zfcpdump-devel-matched
+        - kernel-zfcpdump-modules

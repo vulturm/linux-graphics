@@ -1,12 +1,14 @@
 %define package_name mesa
 %global build_branch master
+%global _default_patch_fuzz 2
+%global __meson_auto_features disabled
 
 %global build_repo https://github.com/mesa3d/mesa
-%define version_string 20.1.0
+%define version_string 22.0.0
 
-%define commit 02f3af2ad1eb1732d0bfb781de5e781bf83b400d
+%define commit 8665910a632e7fbc7ac3cd1c6c683c24cda8404e
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200229.13
+%global commit_date 20211204.05
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -85,7 +87,6 @@ Source0:        %{build_repo}/archive/%{commit}.tar.gz#/mesa-%{commit}.tar.gz
 Source1:        Mesa-MLAA-License-Clarification-Email.txt
 
 Patch3:         0003-evergreen-big-endian.patch
-Patch4:         0001-Link-with-libclang-cpp.patch
 
 
 # Disable rgb10 configs by default:
@@ -379,7 +380,7 @@ export CXXFLAGS="$CXXFLAGS -std=c++14 -falign-functions=32 -fno-semantic-interpo
 export LDFLAGS="$LDFLAG0S -flto=8 "
 
 %meson -Dcpp_std=gnu++14 \
-  -D platforms=x11,wayland,drm,surfaceless \
+  -D platforms=x11,wayland \
   -D dri-drivers=%{?dri_drivers} \
 %if 0%{?with_hardware}
   -D gallium-drivers=swrast,virgl,r300,nouveau%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi,r600}%{?with_iris:,iris}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_zink:,zink} \
@@ -387,18 +388,18 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -D gallium-drivers=swrast,virgl \
 %endif
   -D vulkan-drivers=%{?vulkan_drivers} \
-  -D dri3=true \
-  -D egl=true \
+  -D dri3=enabled \
+  -D egl=enabled \
   -D gallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
   -D gallium-nine=%{?with_nine:true}%{!?with_nine:false} \
   -D gallium-omx=%{?with_omx:bellagio}%{!?with_omx:disabled} \
   -D gallium-va=%{?with_vaapi:true}%{!?with_vaapi:false} \
-  -D gallium-vdpau=%{?with_vdpau:true}%{!?with_vdpau:false} \
-  -D gallium-xa=true \
-  -D gallium-xvmc=false \
-  -D gbm=true \
-  -D gles1=false \
-  -D gles2=true \
+  -D gallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
+  -D gallium-xa=enabled \
+  -D gallium-xvmc=disabled \
+  -D gbm=enabled \
+  -D gles1=disabled \
+  -D gles2=enabled \
   -D glvnd=true \
   -D glx=dri \
   -D libunwind=true \
@@ -408,10 +409,10 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -Dbuild-tests=false \
   -Dselinux=true \
   -D lmsensors=true \
-  -D osmesa=gallium \
-  -D shared-glapi=true \
+  -D osmesa=true \
+  -D shared-glapi=enabled \
   -D gallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
-  -D vulkan-overlay-layer=%{?with_vulkan_overlay:true}%{!?with_vulkan_overlay:false} \
+  -D vulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
   -D tools=[]
   %{nil}
 %meson_build
@@ -538,6 +539,7 @@ popd
 %{_libdir}/dri/radeonsi_dri.so
 %endif
 %ifarch %{ix86} x86_64
+%{_libdir}/dri/i830_dri.so
 %{_libdir}/dri/i915_dri.so
 %{_libdir}/dri/i965_dri.so
 %endif
@@ -630,15 +632,47 @@ popd
 %{_libdir}/libVkLayer_MESA_overlay.so
 %{_datadir}/vulkan/explicit_layer.d/VkLayer_MESA_overlay.json
 %endif
+%{_libdir}/libVkLayer_MESA_device_select.so
+%{_datadir}/vulkan/implicit_layer.d/VkLayer_MESA_device_select.json
 
 %files vulkan-devel
-%if 0%{?with_hardware}
-%ifarch %{ix86} x86_64
-%{_includedir}/vulkan/*.h
-%endif
-%endif
+
 
 %changelog
+* Tue Jun 15 2021 Mihai Vultur <xanto@egaming.ro>
+- Partially revert the modifications done in Apr 11:
+- Regenerate vulkan-devel package but with no files
+- This provides a lean upgrade path
+
+* Wed May 05 2021 Mihai Vultur <xanto@egaming.ro>
+- After https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/10554
+- also consider i830_dri.so
+
+* Sun Apr 11 2021 Mihai Vultur <xanto@egaming.ro>
+- Don't generate a separate vulkan-devel package anymore
+- Since upstream commit:
+-    commit 5e6db1916860ec217eac60903e0a9d10189d1c53
+-    Author: Chad Versace <chad@kiwitree.net>
+-    Message:
+-       anv: Remove vkCreateDmaBufINTEL (v4)
+
+* Fri Mar 26 2021 Mihai Vultur <xanto@egaming.ro>
+- Set vulkan-layers=device-select,overlay since upstream commit 54fe5b04
+
+* Fri Dec 11 2020 Mihai Vultur <xanto@egaming.ro>
+- Set osmesa=true since upstream commit ee802372180a2b4460cc7abb53438e45c6b6f1e4 
+
+* Wed Nov 25 2020 Mihai Vultur <xanto@egaming.ro>
+- meson: __meson_auto_features default to disabled
+- Issue: https://gitlab.freedesktop.org/mesa/mesa/-/issues/3873
+
+* Mon Nov 23 2020 Mihai Vultur <xanto@egaming.ro>
+- meson: drop deprecated EGL platform build options.
+- Consequence of MR: https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/5844
+
+* Mon Apr 20 2020 Mihai Vultur <xanto@egaming.ro>
+- Enable vulkan-device-select-layer.
+
 * Sun Feb 09 2020 Mihai Vultur <xanto@egaming.ro>
 - Enable zink.
 

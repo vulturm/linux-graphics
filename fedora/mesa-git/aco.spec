@@ -1,12 +1,14 @@
 %define package_name mesa
 %global build_branch master
+%global _default_patch_fuzz 2
+%global __meson_auto_features disabled
 
 %global build_repo https://github.com/daniel-schuermann/mesa
-%define version_string 20.0.0
+%define version_string 20.1.1
 
-%define commit 7a965bd4c38e8368de9e06605a4b13c18c251826
+%define commit 951983c483a6e6f1a71e9d4a8301a27d64da2de4
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200226.10
+%global commit_date 20210223.05
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -64,6 +66,8 @@
 %endif
 
 %global with_vulkan_overlay 1
+%global with_vulkan_device_select 1
+
 
 %global dri_drivers %{?base_drivers}%{?platform_drivers}
 
@@ -85,7 +89,6 @@ Source0:        %{build_repo}/archive/%{commit}.tar.gz#/mesa-%{commit}.tar.gz
 Source1:        Mesa-MLAA-License-Clarification-Email.txt
 
 Patch3:         0003-evergreen-big-endian.patch
-Patch4:         0001-Link-with-libclang-cpp.patch
 
 
 # Disable rgb10 configs by default:
@@ -379,7 +382,7 @@ export CXXFLAGS="$CXXFLAGS -std=c++14 -falign-functions=32 -fno-semantic-interpo
 export LDFLAGS="$LDFLAG0S -flto=8 "
 
 %meson -Dcpp_std=gnu++14 \
-  -D platforms=x11,wayland,drm,surfaceless \
+  -D platforms=x11,wayland \
   -D dri-drivers=%{?dri_drivers} \
 %if 0%{?with_hardware}
   -D gallium-drivers=swrast,virgl,r300,nouveau%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi,r600}%{?with_iris:,iris}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_zink:,zink} \
@@ -387,18 +390,18 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -D gallium-drivers=swrast,virgl \
 %endif
   -D vulkan-drivers=%{?vulkan_drivers} \
-  -D dri3=true \
-  -D egl=true \
+  -D dri3=enabled \
+  -D egl=enabled \
   -D gallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
   -D gallium-nine=%{?with_nine:true}%{!?with_nine:false} \
   -D gallium-omx=%{?with_omx:bellagio}%{!?with_omx:disabled} \
   -D gallium-va=%{?with_vaapi:true}%{!?with_vaapi:false} \
-  -D gallium-vdpau=%{?with_vdpau:true}%{!?with_vdpau:false} \
-  -D gallium-xa=true \
-  -D gallium-xvmc=false \
-  -D gbm=true \
-  -D gles1=false \
-  -D gles2=true \
+  -D gallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
+  -D gallium-xa=enabled \
+  -D gallium-xvmc=disabled \
+  -D gbm=enabled \
+  -D gles1=disabled \
+  -D gles2=enabled \
   -D glvnd=true \
   -D glx=dri \
   -D libunwind=true \
@@ -408,10 +411,11 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -Dbuild-tests=false \
   -Dselinux=true \
   -D lmsensors=true \
-  -D osmesa=gallium \
-  -D shared-glapi=true \
+  -D osmesa=true \
+  -D shared-glapi=enabled \
   -D gallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
   -D vulkan-overlay-layer=%{?with_vulkan_overlay:true}%{!?with_vulkan_overlay:false} \
+  -D vulkan-device-select-layer=%{?with_vulkan_device_select:true}%{!?with_vulkan_device_select:false} \
   -D tools=[]
   %{nil}
 %meson_build
@@ -630,6 +634,10 @@ popd
 %{_libdir}/libVkLayer_MESA_overlay.so
 %{_datadir}/vulkan/explicit_layer.d/VkLayer_MESA_overlay.json
 %endif
+%if 0%{?with_vulkan_device_select}
+%{_libdir}/libVkLayer_MESA_device_select.so
+%{_datadir}/vulkan/implicit_layer.d/VkLayer_MESA_device_select.json
+%endif
 
 %files vulkan-devel
 %if 0%{?with_hardware}
@@ -639,6 +647,20 @@ popd
 %endif
 
 %changelog
+* Fri Dec 11 2020 Mihai Vultur <xanto@egaming.ro>
+- Set osmesa=true since upstream commit ee802372180a2b4460cc7abb53438e45c6b6f1e4 
+
+* Wed Nov 25 2020 Mihai Vultur <xanto@egaming.ro>
+- meson: __meson_auto_features default to disabled
+- Issue: https://gitlab.freedesktop.org/mesa/mesa/-/issues/3873
+
+* Mon Nov 23 2020 Mihai Vultur <xanto@egaming.ro>
+- meson: drop deprecated EGL platform build options.
+- Consequence of MR: https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/5844
+
+* Mon Apr 20 2020 Mihai Vultur <xanto@egaming.ro>
+- Enable vulkan-device-select-layer.
+
 * Sun Feb 09 2020 Mihai Vultur <xanto@egaming.ro>
 - Enable zink.
 

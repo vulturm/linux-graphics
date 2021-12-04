@@ -5,7 +5,7 @@
 .SHELLFLAGS := -xc
 
 
-clone_repo := git://people.freedesktop.org/~agd5f/linux
+clone_repo := https://gitlab.freedesktop.org/agd5f/linux.git
 clone_branch := drm-next
 
 

@@ -1,0 +1,132 @@
+From d8af49687765744efaae7ba0f0c4c0fcd58a0e31 Mon Sep 17 00:00:00 2001
+From: serge-sans-paille <sguelton@redhat.com>
+Date: Wed, 23 Sep 2020 12:47:30 +0000
+Subject: [PATCH 4/6] [PATCH][clang] Prefer gcc toolchains with libgcc_s.so
+ when not static linking libgcc
+
+Fedora ships cross-compilers on all platforms, so a user could end up
+with a gcc x86_64 cross-compiler installed on an x86_64 system. clang
+maintains a list of supported triples for each target and when all
+else is equal will prefer toolchains with triples that appear earlier
+in the list.
+
+The cross-compiler triple on Fedora is x86_64-linux-gnu and this comes
+before the Fedora system compiler's triple: x86_64-redhat-linux in
+the triples list, so the cross compiler is always preferred. This
+is a problem, because the cross compiler is missing libraries, like
+libgcc_s.so, that clang expects to be there so linker invocations
+will fail.
+
+This patch fixes this by checking for the existence of libgcc_s.so
+when it is required and taking that into account when selecting a
+toolchain.
+---
+ clang/lib/Driver/ToolChains/Gnu.cpp                      | 16 ++++++++++++++--
+ clang/lib/Driver/ToolChains/Gnu.h                        |  4 +++-
+ .../usr/lib/gcc/x86_64-linux-gnu/7/crtbegin.o            |  0
+ .../usr/lib/gcc/x86_64-redhat-linux/7/crtbegin.o         |  0
+ .../usr/lib/gcc/x86_64-redhat-linux/7/libgcc_s.so        |  0
+ clang/test/Driver/linux-ld.c                             | 12 ++++++++++++
+ 6 files changed, 29 insertions(+), 3 deletions(-)
+ create mode 100644 clang/test/Driver/Inputs/fedora_28_tree/usr/lib/gcc/x86_64-linux-gnu/7/crtbegin.o
+ create mode 100644 clang/test/Driver/Inputs/fedora_28_tree/usr/lib/gcc/x86_64-redhat-linux/7/crtbegin.o
+ create mode 100644 clang/test/Driver/Inputs/fedora_28_tree/usr/lib/gcc/x86_64-redhat-linux/7/libgcc_s.so
+
+diff --git a/clang/lib/Driver/ToolChains/Gnu.cpp b/clang/lib/Driver/ToolChains/Gnu.cpp
+index 5deeb10..5d51517 100644
+--- a/clang/lib/Driver/ToolChains/Gnu.cpp
++++ b/clang/lib/Driver/ToolChains/Gnu.cpp
+@@ -2539,6 +2539,8 @@ void Generic_GCC::GCCInstallationDetector::ScanLibDirForGCCTriple(
+        (TargetArch == llvm::Triple::x86 &&
+         TargetTriple.getOS() != llvm::Triple::Solaris)}};
+ 
++  bool NeedLibgccShared = !Args.hasArg(options::OPT_static_libgcc) &&
++                          !Args.hasArg(options::OPT_static);
+   for (auto &Suffix : Suffixes) {
+     if (!Suffix.Active)
+       continue;
+@@ -2556,8 +2558,17 @@ void Generic_GCC::GCCInstallationDetector::ScanLibDirForGCCTriple(
+           continue; // Saw this path before; no need to look at it again.
+       if (CandidateVersion.isOlderThan(4, 1, 1))
+         continue;
+-      if (CandidateVersion <= Version)
+-        continue;
++
++      bool CandidateHasLibGccShared = false;
++      if (CandidateVersion <= Version) {
++        if (NeedLibgccShared && !HasLibGccShared) {
++          CandidateHasLibGccShared =
++                D.getVFS().exists(LI->path() + "/libgcc_s.so");
++
++        }
++        if (HasLibGccShared || !CandidateHasLibGccShared)
++          continue;
++      }
+ 
+       if (!ScanGCCForMultilibs(TargetTriple, Args, LI->path(),
+                                NeedsBiarchSuffix))
+@@ -2571,6 +2582,7 @@ void Generic_GCC::GCCInstallationDetector::ScanLibDirForGCCTriple(
+       GCCInstallPath = (LibDir + "/" + LibSuffix + "/" + VersionText).str();
+       GCCParentLibPath = (GCCInstallPath + "/../" + Suffix.ReversePath).str();
+       IsValid = true;
++      HasLibGccShared = CandidateHasLibGccShared;
+     }
+   }
+ }
+diff --git a/clang/lib/Driver/ToolChains/Gnu.h b/clang/lib/Driver/ToolChains/Gnu.h
+index 90d3baf..9d0cea2 100644
+--- a/clang/lib/Driver/ToolChains/Gnu.h
++++ b/clang/lib/Driver/ToolChains/Gnu.h
+@@ -190,6 +190,7 @@ public:
+   /// Driver, and has logic for fuzzing that where appropriate.
+   class GCCInstallationDetector {
+     bool IsValid;
++    bool HasLibGccShared;
+     llvm::Triple GCCTriple;
+     const Driver &D;
+ 
+@@ -216,7 +217,8 @@ public:
+     const std::string GentooConfigDir = "/etc/env.d/gcc";
+ 
+   public:
+-    explicit GCCInstallationDetector(const Driver &D) : IsValid(false), D(D) {}
++    explicit GCCInstallationDetector(const Driver &D)
++        : IsValid(false), HasLibGccShared(false), D(D) {}
+     void init(const llvm::Triple &TargetTriple, const llvm::opt::ArgList &Args,
+               ArrayRef<std::string> ExtraTripleAliases = None);
+ 
+diff --git a/clang/test/Driver/Inputs/fedora_28_tree/usr/lib/gcc/x86_64-linux-gnu/7/crtbegin.o b/clang/test/Driver/Inputs/fedora_28_tree/usr/lib/gcc/x86_64-linux-gnu/7/crtbegin.o
+new file mode 100644
+index 0000000..e69de29
+diff --git a/clang/test/Driver/Inputs/fedora_28_tree/usr/lib/gcc/x86_64-redhat-linux/7/crtbegin.o b/clang/test/Driver/Inputs/fedora_28_tree/usr/lib/gcc/x86_64-redhat-linux/7/crtbegin.o
+new file mode 100644
+index 0000000..e69de29
+diff --git a/clang/test/Driver/Inputs/fedora_28_tree/usr/lib/gcc/x86_64-redhat-linux/7/libgcc_s.so b/clang/test/Driver/Inputs/fedora_28_tree/usr/lib/gcc/x86_64-redhat-linux/7/libgcc_s.so
+new file mode 100644
+index 0000000..e69de29
+diff --git a/clang/test/Driver/linux-ld.c b/clang/test/Driver/linux-ld.c
+index 24d3c78..071bb9b 100644
+--- a/clang/test/Driver/linux-ld.c
++++ b/clang/test/Driver/linux-ld.c
+@@ -784,6 +784,18 @@
+ // CHECK-FEDORA-31-RISCV64: "{{.*}}/usr/lib/gcc/riscv64-redhat-linux/9{{/|\\\\}}crtend.o"
+ // CHECK-FEDORA-31-RISCV64: "{{.*}}/usr/lib/gcc/riscv64-redhat-linux/9{{/|\\\\}}crtn.o"
+ //
++// Check that clang does not select the cross compiler by default on Fedora 28.
++//
++// RUN: %clang -no-canonical-prefixes %s -### -o %t.o 2>&1 \
++// RUN:     --target=x86_64-unknown-linux-gnu \
++// RUN:     --gcc-toolchain="" \
++// RUN:     --sysroot=%S/Inputs/fedora_28_tree \
++// RUN:   | FileCheck --check-prefix=CHECK-FEDORA-28-X86_64 %s
++//
++// CHECK-FEDORA-28-X86_64: "{{.*}}ld{{(.exe)?}}" "--sysroot=[[SYSROOT:[^"]+]]"
++// CHECK-FEDORA-28-X86_64: "[[SYSROOT]]/usr/lib/gcc/x86_64-redhat-linux/7/crtbegin.o"
++// CHECK-FEDORA-28-X86_64: "-L[[SYSROOT]]/usr/lib/gcc/x86_64-redhat-linux/7"
++//
+ // RUN: %clang -no-canonical-prefixes %s -### -o %t.o 2>&1 \
+ // RUN:     --target=arm-unknown-linux-gnueabi -rtlib=platform \
+ // RUN:     --gcc-toolchain="" \
+-- 
+1.8.3.1
+

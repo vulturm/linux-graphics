@@ -3,9 +3,9 @@
 %global build_repo https://github.com/FeralInteractive/gamemode
 %define version_string 1.6
 
-%define commit 883d7c15ff316e91bfecfad523fbd7a443e768fc
+%define commit 510a0a6ae255e622e13c14d3a3268d690dd155d3
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200227
+%global commit_date 20200719
 %global gitrel .%{commit_date}.git%{shortcommit}
 
 Name:		  %{package_name}
@@ -17,6 +17,8 @@ URL:		  %{build_repo}
 Source0:  https://github.com/FeralInteractive/gamemode/archive/%{commit}.tar.gz#/%{package_name}-%{commit}.tar.gz
 
 BuildRequires: gcc
+BuildRequires: inih-devel
+BuildRequires: cmake
 BuildRequires: asciidoc
 BuildRequires: meson
 BuildRequires: pkgconfig(dbus-1)
@@ -44,6 +46,7 @@ Files for development with %{name}.
 %prep
 #force downloading the project, seems that copr dist-cache is poisoned with bogus archive
 git clone --recursive %{build_repo} %{_builddir}/%{package_name}-%{commit}
+
 %autosetup -p1 -D -T -n %{package_name}-%{commit}
 
 %build

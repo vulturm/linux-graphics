@@ -3,12 +3,12 @@
 
 %global build_repo https://github.com/llvm/llvm-project
 
-%global maj_ver 11
+%global maj_ver 14
 %global min_ver 0
 %global patch_ver 0
 
-%define commit af450eabb925a8735434282d4cab6280911c229a
-%global commit_date 20200229
+%define commit 6318001209932f075fd6f12439ec9e0327e9af05
+%global commit_date 20211203
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 %global gitrel .%{commit_date}.git%{shortcommit}
@@ -23,19 +23,22 @@ License:	NCSA
 URL:      https://llvm.org
 Source0:  %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 
-
-BuildRequires:	cmake
-BuildRequires:	llvm-devel = %{version}
-BuildRequires:	llvm-test = %{version}
-BuildRequires:	clang-devel = %{version}
-BuildRequires:	ncurses-devel
-BuildRequires:	swig
-BuildRequires:	llvm-static = %{version}
-BuildRequires:	libffi-devel
-BuildRequires:	zlib-devel
-BuildRequires:	libxml2-devel
-BuildRequires:	libedit-devel
-BuildRequires:	python2-lit
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  cmake
+BuildRequires:  ninja-build
+BuildRequires:  llvm-devel = %{version}
+BuildRequires:  llvm-test = %{version}
+BuildRequires:  clang-devel = %{version}
+BuildRequires:  ncurses-devel
+BuildRequires:  swig
+BuildRequires:  llvm-static = %{version}
+BuildRequires:  libffi-devel
+BuildRequires:  zlib-devel
+BuildRequires:  libxml2-devel
+BuildRequires:  libedit-devel
+BuildRequires:  python3-lit
+BuildRequires:  multilib-rpm-config
 
 Requires:	python2-lldb
 
@@ -63,7 +66,7 @@ The package contains the LLDB Python module.
 
 %prep
 #force downloading the project, seems that copr dist-cache is poisoned with bogus archive
-curl -Lo /builddir/build/SOURCES/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
+curl -Lo %{_sourcedir}/llvm-project-%{commit}.tar.gz %{build_repo}/archive/%{commit}.tar.gz#/llvm-project-%{commit}.tar.gz
 
 %setup -q -n llvm-project-%{commit}/%{name}
 
@@ -84,7 +87,8 @@ LDFLAGS="%{__global_ldflags} -lpthread -ldl"
 CFLAGS="%{optflags} -Wno-error=format-security"
 CXXFLAGS="%{optflags} -Wno-error=format-security"
 
-%cmake .. \
+%cmake  -B "%{_vpath_builddir}" \
+  -GNinja \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 	-DLLVM_LINK_LLVM_DYLIB:BOOL=ON \
 	-DLLVM_CONFIG:FILEPATH=/usr/bin/llvm-config-%{__isa_bits} \
@@ -105,11 +109,12 @@ CXXFLAGS="%{optflags} -Wno-error=format-security"
 	-DLLVM_LIT_ARGS="-sv \
 	--path %{_libdir}/llvm" \
 
-make %{?_smp_mflags}
+%ninja_build -C "%{_vpath_builddir}"
 
 %install
-cd _build
-make install DESTDIR=%{buildroot}
+%ninja_install -C "%{_vpath_builddir}"
+
+%multilib_fix_c_header --file %{_includedir}/lldb/Host/Config.h
 
 # remove static libraries
 rm -fv %{buildroot}%{_libdir}/*.a

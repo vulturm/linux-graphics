@@ -3,13 +3,13 @@
 
 %global build_repo https://github.com/llvm/llvm-project
 
-%global maj_ver 11
+%global maj_ver 14
 %global min_ver 0
 %global patch_ver 0
 
-%define commit af450eabb925a8735434282d4cab6280911c229a
+%define commit 6318001209932f075fd6f12439ec9e0327e9af05
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200229
+%global commit_date 20211203
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %define _unpackaged_files_terminate_build 0
@@ -37,6 +37,7 @@ Patch0:		0001-PATCH-std-thread-copy.patch
 BuildRequires:	gcc
 BuildRequires:	gcc-c++
 BuildRequires:	cmake
+BuildRequires:  ninja-build
 BuildRequires:	python3
 # We need python3-devel for pathfix.py.
 BuildRequires:	python3-devel
@@ -58,54 +59,66 @@ pathfix.py -i "%{__python3} %{py3_shbang_opts}" -p -n \
   lib/hwasan/scripts/hwasan_symbolize
 
 %build
-mkdir -p _build
-cd _build
-%cmake .. \
-	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
-	-DLLVM_CONFIG_PATH:FILEPATH=%{_bindir}/llvm-config-%{__isa_bits} \
-	\
+%cmake  -B "%{_vpath_builddir}" \
+  -GNinja \
+  -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+  -DLLVM_CONFIG_PATH:FILEPATH=%{_bindir}/llvm-config-%{__isa_bits} \
+  \
 %if 0%{?__isa_bits} == 64
-	-DLLVM_LIBDIR_SUFFIX=64 \
+  -DLLVM_LIBDIR_SUFFIX=64 \
 %else
-	-DLLVM_LIBDIR_SUFFIX= \
+  -DLLVM_LIBDIR_SUFFIX= \
 %endif
-	-DCOMPILER_RT_INCLUDE_TESTS:BOOL=OFF # could be on?
+  -DCOMPILER_RT_INCLUDE_TESTS:BOOL=OFF # could be on?
 
-make %{?_smp_mflags}
+%ninja_build -C "%{_vpath_builddir}"
 
 %install
-cd _build
-make install DESTDIR=%{buildroot}
 
-mkdir -p %{buildroot}%{_libdir}/clang/%{version}/lib
+%ninja_install -C "%{_vpath_builddir}"
 
-%ifarch aarch64
-%global aarch64_blacklists hwasan_blacklist.txt
-%endif
-
-for file in %{aarch64_blacklists} asan_blacklist.txt msan_blacklist.txt dfsan_blacklist.txt cfi_blacklist.txt dfsan_abilist.txt hwasan_blacklist.txt; do
-	mv -v %{buildroot}%{_datadir}/${file} %{buildroot}%{_libdir}/clang/%{version}/ || :
-done
+# move blacklist/abilist files to where clang expect them
+mkdir -p %{buildroot}%{_libdir}/clang/%{version}/share
+mv -v %{buildroot}%{_datadir}/*list.txt  %{buildroot}%{_libdir}/clang/%{version}/share/
 
 # move sanitizer libs to better place
 %global libclang_rt_installdir lib/linux
-mv -v %{buildroot}%{_prefix}/%{libclang_rt_installdir}/libclang_rt* %{buildroot}%{_libdir}/clang/%{version}/lib
+mkdir -p %{buildroot}%{_libdir}/clang/%{version}/lib
+mv -v %{buildroot}%{_prefix}/%{libclang_rt_installdir}/*clang_rt* %{buildroot}%{_libdir}/clang/%{version}/lib
 mkdir -p %{buildroot}%{_libdir}/clang/%{version}/lib/linux/
 pushd %{buildroot}%{_libdir}/clang/%{version}/lib
-for i in *.a *.syms *.so; do
-	ln -s ../$i linux/$i
+for i in *.a *.so
+do
+  ln -s ../$i linux/$i
 done
-pathfix.py -i "%{__python3} %{py3_shbang_opts}" -p -n .
 
+# multilib support: also create symlink from lib to lib64, fixes rhbz#1678240
+# the symlinks will be dangling if the 32 bits version is not installed, but that should be fine
+%ifarch x86_64
+
+mkdir -p %{buildroot}/%{_exec_prefix}/lib/clang/%{version}/lib/linux
+for i in *.a *.so
+do
+  target=`echo "$i" | sed -e 's/x86_64/i386/'`
+  ln -s ../../../../../lib/clang/%{version}/lib/$target ../../../../%{_lib}/clang/%{version}/lib/linux/
+done
+ 
+%endif
+ 
+popd
 
 %check
 #make check-all -C _build
 
 %files
+%license LICENSE.TXT
 %{_includedir}/*
 %{_libdir}/clang/%{version}
 
 %changelog
+* Mon Jul 20 2020 sguelton@redhat.com
+- Use modern cmake macros
+
 * Sat Jan 18 2020 Mihai Vultur <xanto@egaming.ro>
 - Fix ambigous python shebang.
 

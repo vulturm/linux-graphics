@@ -17,6 +17,8 @@ URL:		  %{build_repo}
 Source0:  https://github.com/FeralInteractive/gamemode/archive/%{commit}.tar.gz#/%{package_name}-%{commit}.tar.gz
 
 BuildRequires: gcc
+BuildRequires: inih-devel
+BuildRequires: cmake
 BuildRequires: asciidoc
 BuildRequires: meson
 BuildRequires: pkgconfig(dbus-1)
@@ -44,6 +46,7 @@ Files for development with %{name}.
 %prep
 #force downloading the project, seems that copr dist-cache is poisoned with bogus archive
 git clone --recursive %{build_repo} %{_builddir}/%{package_name}-%{commit}
+
 %autosetup -p1 -D -T -n %{package_name}-%{commit}
 
 %build
