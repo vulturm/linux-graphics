@@ -448,6 +448,7 @@ popd
 %{_libdir}/libGLX_system.so.0*
 %files libGL-devel
 %{_includedir}/GL/*
+%{_libdir}/pkgconfig/dri.pc
 %{_libdir}/libglapi.so
 
 
