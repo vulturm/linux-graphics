@@ -154,7 +154,7 @@ BuildRequires:  pkgconfig(libva) >= 0.38.0
 BuildRequires:  pkgconfig(libomxil-bellagio)
 %endif
 BuildRequires:  pkgconfig(libelf)
-BuildRequires:  pkgconfig(libglvnd) >= 0.2.0
+BuildRequires:  pkgconfig(libglvnd) >= 1.3.2
 BuildRequires:  llvm-devel >= 7.0.0
 %if 0%{?with_opencl}
 BuildRequires:  clang-devel
@@ -192,7 +192,7 @@ Obsoletes:      mesa-dri-filesystem < %{?epoch:%{epoch}:}%{version}-%{release}
 %package libGL
 Summary:        Mesa libGL runtime libraries
 Requires:       %{name}-libglapi%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:       libglvnd-glx%{?_isa} >= 1:1.0.1-0.6.99
+Requires:       libglvnd-glx%{?_isa} >= 1:1.3.2
 
 %description libGL
 %{summary}.
@@ -200,7 +200,7 @@ Requires:       libglvnd-glx%{?_isa} >= 1:1.0.1-0.6.99
 %package libGL-devel
 Summary:        Mesa libGL development package
 Requires:       %{name}-libGL%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:       libglvnd-devel%{?_isa}
+Requires:       libglvnd-devel%{?_isa} >= 1:1.3.2
 Provides:       libGL-devel
 Provides:       libGL-devel%{?_isa}
 
@@ -209,7 +209,7 @@ Provides:       libGL-devel%{?_isa}
 
 %package libEGL
 Summary:        Mesa libEGL runtime libraries
-Requires:       libglvnd-egl%{?_isa}
+Requires:       libglvnd-egl%{?_isa} >= 1:1.3.2
 Obsoletes:      egl-icd < %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description libEGL
@@ -218,7 +218,7 @@ Obsoletes:      egl-icd < %{?epoch:%{epoch}:}%{version}-%{release}
 %package libEGL-devel
 Summary:        Mesa libEGL development package
 Requires:       %{name}-libEGL%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:       libglvnd-devel%{?_isa}
+Requires:       libglvnd-devel%{?_isa} >= 1:1.3.2
 Requires:       %{name}-khr-devel%{?_isa}
 Provides:       libEGL-devel
 Provides:       libEGL-devel%{?_isa}
