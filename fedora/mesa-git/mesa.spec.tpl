@@ -5,6 +5,7 @@
 
 %global build_repo BUILD_REPO
 %define version_string VERSION_STRING
+%global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
 %define commit COMMIT
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
@@ -381,7 +382,9 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
 
 %meson -Dcpp_std=gnu++14 \
   -D platforms=x11,wayland \
+%if 0%{?version_major} && 0%{?version_major} < 22
   -D dri-drivers=%{?dri_drivers} \
+%endif
 %if 0%{?with_hardware}
   -D gallium-drivers=swrast,virgl,r300,nouveau%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi,r600}%{?with_iris:,iris}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_zink:,zink} \
 %else
@@ -530,18 +533,22 @@ popd
 %dir %{_datadir}/drirc.d
 %{_datadir}/drirc.d/00-mesa-defaults.conf
 %if 0%{?with_hardware}
-%{_libdir}/dri/radeon_dri.so
-%{_libdir}/dri/r200_dri.so
-%{_libdir}/dri/nouveau_vieux_dri.so
+ %if 0%{?version_major} && 0%{?version_major} < 22
+  %{_libdir}/dri/radeon_dri.so
+  %{_libdir}/dri/r200_dri.so
+  %{_libdir}/dri/nouveau_vieux_dri.so
+ %endif
 %{_libdir}/dri/r300_dri.so
 %if 0%{?with_radeonsi}
 %{_libdir}/dri/r600_dri.so
 %{_libdir}/dri/radeonsi_dri.so
 %endif
 %ifarch %{ix86} x86_64
-%{_libdir}/dri/i830_dri.so
-%{_libdir}/dri/i915_dri.so
-%{_libdir}/dri/i965_dri.so
+ %if 0%{?version_major} && 0%{?version_major} < 22
+  %{_libdir}/dri/i830_dri.so
+  %{_libdir}/dri/i915_dri.so
+  %{_libdir}/dri/i965_dri.so
+ %endif
 %endif
 %if 0%{?with_vc4}
 %{_libdir}/dri/vc4_dri.so
