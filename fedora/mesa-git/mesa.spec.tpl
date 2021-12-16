@@ -30,6 +30,8 @@
 
 %ifarch %{ix86} x86_64
 %global platform_drivers ,i915,i965
+%global with_crocus 1
+%global with_iris   1
 %global with_vmware 1
 %global with_xa     1
 %global with_zink   1
@@ -41,17 +43,24 @@
 %endif
 
 %ifarch %{arm} aarch64
-%global with_etnaviv   1
+%if !0%{?rhel}
+ %global with_etnaviv   1
+ %global with_lima      1
+ %global with_vc4       1
+ %global with_v3d       1
+%endif
 %global with_freedreno 1
 %global with_kmsro     1
-%global with_lima      1
 %global with_panfrost  1
 %global with_tegra     1
-%global with_vc4       1
 %global with_xa        1
 %endif
 
 %ifnarch %{arm} s390x
+%if !0%{?rhel}
+ %global with_r300 1
+ %global with_r600 1
+%endif
 %global with_radeonsi 1
 %global with_iris     1
 %endif
@@ -68,7 +77,9 @@
 
 %global with_vulkan_overlay 1
 
-%global dri_drivers %{?base_drivers}%{?platform_drivers}
+%if !0%{?rhel}
+  %global dri_drivers %{?base_drivers}%{?platform_drivers}
+%endif
 
 %global sanitize 1
 
@@ -386,7 +397,7 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -D dri-drivers=%{?dri_drivers} \
 %endif
 %if 0%{?with_hardware}
-  -D gallium-drivers=swrast,virgl,r300,nouveau%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi,r600}%{?with_iris:,iris}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_zink:,zink} \
+  -D gallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_zink:,zink} \
 %else
   -D gallium-drivers=swrast,virgl \
 %endif
@@ -396,7 +407,7 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -D gallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
   -D gallium-nine=%{?with_nine:true}%{!?with_nine:false} \
   -D gallium-omx=%{?with_omx:bellagio}%{!?with_omx:disabled} \
-  -D gallium-va=%{?with_vaapi:true}%{!?with_vaapi:false} \
+  -D gallium-va=%{?with_vaapi:enabled}%{!?with_vaapi:disabled} \
   -D gallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
   -D gallium-xa=enabled \
   -D gallium-xvmc=disabled \
@@ -405,13 +416,13 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -D gles2=enabled \
   -D glvnd=true \
   -D glx=dri \
-  -D libunwind=true \
-  -D llvm=true \
-  -Dshared-llvm=true \
-  -Dvalgrind=%{?with_valgrind:true}%{!?with_valgrind:false} \
+  -D libunwind=enabled \
+  -D llvm=enabled \
+  -Dshared-llvm=enabled \
+  -Dvalgrind=%{?with_valgrind:enabled}%{!?with_valgrind:disabled} \
   -Dbuild-tests=false \
   -Dselinux=true \
-  -D lmsensors=true \
+  -D lmsensors=enabled \
   -D osmesa=true \
   -D shared-glapi=enabled \
   -D gallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
@@ -579,6 +590,7 @@ popd
 %{_libdir}/dri/r600_drv_video.so
 %{_libdir}/dri/radeonsi_drv_video.so
 %endif
+%{_libdir}/dri/crocus_dri.so
 %if 0%{?with_iris}
 %{_libdir}/dri/iris_dri.so
 %endif
@@ -646,6 +658,9 @@ popd
 
 
 %changelog
+* Thu Dec 16 2021 Mihai Vultur <mihaivultur7@gmail.com>
+- Adjustments after dri-drivers deprecation in mesa 22
+
 * Tue Jun 15 2021 Mihai Vultur <xanto@egaming.ro>
 - Partially revert the modifications done in Apr 11:
 - Regenerate vulkan-devel package but with no files
