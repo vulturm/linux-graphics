@@ -7,9 +7,9 @@
 %define version_string 22.0.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 15a375b4c8668814eed39810518dc7e2f8efef6e
+%define commit 3077d968568213bfe2990ddc4ada2763d9701418
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20211213.20
+%global commit_date 20211217.23
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -659,7 +659,7 @@ popd
 
 %changelog
 * Thu Dec 16 2021 Mihai Vultur <mihaivultur7@gmail.com>
-- Adjustements after dri-drivers deprecation in mesa 22
+- Adjustments after dri-drivers deprecation in mesa 22
 
 * Tue Jun 15 2021 Mihai Vultur <xanto@egaming.ro>
 - Partially revert the modifications done in Apr 11:
