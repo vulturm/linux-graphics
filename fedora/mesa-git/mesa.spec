@@ -7,9 +7,9 @@
 %define version_string 22.0.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 0fc93928f19aa0ad4eb81dab2ddb97a1d602685e
+%define commit 074bde9989dfcc9e7ad5999564d3c32cbd7a8d93
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20220111.00
+%global commit_date 20220111.05
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
