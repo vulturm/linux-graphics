@@ -4,12 +4,12 @@
 %global __meson_auto_features disabled
 
 %global build_repo https://github.com/mesa3d/mesa
-%define version_string 22.0.0
+%define version_string 22.1.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit dbcdededb230083e97bca5e84e53f88ccfa6f160
+%define commit 04f6e91de0ed421988c1e070d90bcf354cb3f65b
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20220203.00
+%global commit_date 20220203.05
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
