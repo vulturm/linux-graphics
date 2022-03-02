@@ -9,7 +9,7 @@
 
 %define commit a02dd17cb36efe9bc2ff2d675357988ded914a02
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20220302.05
+%global commit_date 20220302.10
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -543,6 +543,7 @@ popd
 %files dri-drivers
 %dir %{_datadir}/drirc.d
 %{_datadir}/drirc.d/00-mesa-defaults.conf
+%{_datadir}/drirc.d/00-radv-defaults.conf
 %if 0%{?with_hardware}
  %if 0%{?version_major} && 0%{?version_major} < 22
   %{_libdir}/dri/radeon_dri.so
@@ -658,6 +659,9 @@ popd
 
 
 %changelog
+* Wed Mar 02 2022 Mihai Vultur <mihaivultur7@gmail.com>
+- Also include 00-radv-defaults.conf in the list of bundled files.
+
 * Thu Dec 16 2021 Mihai Vultur <mihaivultur7@gmail.com>
 - Adjustments after dri-drivers deprecation in mesa 22
 
