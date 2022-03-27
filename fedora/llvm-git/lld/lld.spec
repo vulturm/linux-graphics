@@ -7,8 +7,8 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 89525cbf283f1ffeca1e007a06b29917a9eadc53
-%global commit_date 20220325
+%define commit af9bdcfc46ef73179797ebd406ab413cd047a8c7
+%global commit_date 20220327
 
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
