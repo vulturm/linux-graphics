@@ -402,6 +402,7 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -D gallium-drivers=swrast,virgl \
 %endif
   -D vulkan-drivers=%{?vulkan_drivers} \
+  -D video-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec \
   -D dri3=enabled \
   -D egl=enabled \
   -D gallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
