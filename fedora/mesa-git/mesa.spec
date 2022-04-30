@@ -389,7 +389,7 @@ export CFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLA
 export FCFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export FFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export CXXFLAGS="$CXXFLAGS -std=c++14 -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
-export LDFLAGS="$LDFLAG0S -flto=8 "
+export LDFLAGS="$LDFLAGS -flto=8 "
 
 %meson -Dcpp_std=gnu++14 \
   -D platforms=x11,wayland \
