@@ -7,9 +7,9 @@
 %define version_string 22.2.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 529f316d8790e84b9f1b441f4b2e4272c0b2cd0e
+%define commit 53a94fbdd57acbbe2bc745901cbfeca968e25273
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20220502.15
+%global commit_date 20220502.20
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -389,7 +389,7 @@ export CFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLA
 export FCFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export FFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
 export CXXFLAGS="$CXXFLAGS -std=c++14 -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
-export LDFLAGS="$LDFLAGS -flto=8 "
+export LDFLAGS="$LDFLAG0S -flto=8 "
 
 %meson -Dcpp_std=gnu++14 \
   -D platforms=x11,wayland \
