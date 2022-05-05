@@ -402,6 +402,7 @@ export LDFLAGS="$LDFLAGS -flto=8 "
   -D gallium-drivers=swrast,virgl \
 %endif
   -D vulkan-drivers=%{?vulkan_drivers} \
+  -D video-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec \
   -D dri3=enabled \
   -D egl=enabled \
   -D gallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
@@ -659,6 +660,10 @@ popd
 
 
 %changelog
+* Sat Apr 30 2022 Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+- Reenabling all hw implementations of video codecs which was disabled by
+- MR https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/15258.
+
 * Wed Mar 02 2022 Mihai Vultur <mihaivultur7@gmail.com>
 - Also include 00-radv-defaults.conf in the list of bundled files.
 
