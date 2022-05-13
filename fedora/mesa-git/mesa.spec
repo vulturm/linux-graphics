@@ -7,9 +7,9 @@
 %define version_string 22.2.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit aa1c128b54b31580367d97107660c11cb94e0b98
+%define commit 7edb26966e9dbc184c1f6ea7d5d014537e6d1701
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20220513.15
+%global commit_date 20220513.19
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -378,18 +378,10 @@ Headers for development with the Vulkan API.
 cp %{SOURCE1} docs/
 
 %build
-
-## enable LTO
-export CFLAGS="%{build_cflags}"
-export CXXFLAGS="%{build_cxxflags}"
-export LDFLAGS="%{build_ldflags}"
-
-LTO_FLAGS="-fcommon -g0 -ffat-lto-objects -flto-odr-type-merging"
-export CFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
-export FCFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
-export FFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
-export CXXFLAGS="$CXXFLAGS -std=c++14 -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
-export LDFLAGS="$LDFLAGS -flto=8 "
+# We've gotten a report that enabling LTO for mesa breaks some games. See
+# https://bugzilla.redhat.com/show_bug.cgi?id=1862771 for details.
+# Disable LTO for now
+%define _lto_cflags %{nil}
 
 %meson -Dcpp_std=gnu++14 \
   -D platforms=x11,wayland \
