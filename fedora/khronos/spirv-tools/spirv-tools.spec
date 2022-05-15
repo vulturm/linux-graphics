@@ -10,9 +10,9 @@
 %define version_string 2022.3
 %undefine __cmake_in_source_build
 
-%define commit ffc8f2d45566329bb9e21170f9e2a34ed8a65e0a
+%define commit 98340ec500e92a534dc8384d5c45d2f488e40f6a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20220508
+%global commit_date 20220515
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
