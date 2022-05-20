@@ -9,7 +9,7 @@
 
 %define commit 0cec71d7ce0a793b35aca7c142f511417c3fd57a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20220224.18
+%global commit_date 20220520.11
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -378,18 +378,10 @@ Headers for development with the Vulkan API.
 cp %{SOURCE1} docs/
 
 %build
-
-## enable LTO
-export CFLAGS="%{build_cflags}"
-export CXXFLAGS="%{build_cxxflags}"
-export LDFLAGS="%{build_ldflags}"
-
-LTO_FLAGS="-fcommon -g0 -ffat-lto-objects -flto-odr-type-merging"
-export CFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
-export FCFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
-export FFLAGS="$CFLAGS -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
-export CXXFLAGS="$CXXFLAGS -std=c++14 -falign-functions=32 -fno-semantic-interposition $LTO_FLAGS "
-export LDFLAGS="$LDFLAG0S -flto=8 "
+# We've gotten a report that enabling LTO for mesa breaks some games. See
+# https://bugzilla.redhat.com/show_bug.cgi?id=1862771 for details.
+# Disable LTO for now
+%define _lto_cflags %{nil}
 
 %meson -Dcpp_std=gnu++14 \
   -D platforms=x11,wayland \
@@ -402,6 +394,7 @@ export LDFLAGS="$LDFLAG0S -flto=8 "
   -D gallium-drivers=swrast,virgl \
 %endif
   -D vulkan-drivers=%{?vulkan_drivers} \
+  -D video-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec \
   -D dri3=enabled \
   -D egl=enabled \
   -D gallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
@@ -543,6 +536,7 @@ popd
 %files dri-drivers
 %dir %{_datadir}/drirc.d
 %{_datadir}/drirc.d/00-mesa-defaults.conf
+%{_datadir}/drirc.d/00-radv-defaults.conf
 %if 0%{?with_hardware}
  %if 0%{?version_major} && 0%{?version_major} < 22
   %{_libdir}/dri/radeon_dri.so
@@ -658,6 +652,13 @@ popd
 
 
 %changelog
+* Sat Apr 30 2022 Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+- Reenabling all hw implementations of video codecs which was disabled by
+- MR https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/15258.
+
+* Wed Mar 02 2022 Mihai Vultur <mihaivultur7@gmail.com>
+- Also include 00-radv-defaults.conf in the list of bundled files.
+
 * Thu Dec 16 2021 Mihai Vultur <mihaivultur7@gmail.com>
 - Adjustments after dri-drivers deprecation in mesa 22
 
