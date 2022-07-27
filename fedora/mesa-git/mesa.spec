@@ -7,9 +7,9 @@
 %define version_string 22.2.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit fc1eec0a275b7f1c4ed5a48536b84857d2ad1425
+%define commit 398a9be94b44ba1063c41e6aa6558a05d797d876
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20220727.00
+%global commit_date 20220727.05
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
