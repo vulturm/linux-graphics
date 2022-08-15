@@ -7,9 +7,9 @@
 %define version_string 22.3.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit ba518a31ac02f2dcd20ff6cc5398754a9e6708b0
+%define commit 2e9044766ebc5dcbfcb6a1060deb5a2993c48a60
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20220815.15
+%global commit_date 20220815.16
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -469,8 +469,7 @@ popd
 %{_libdir}/libEGL_mesa.so.0*
 %files libEGL-devel
 %dir %{_includedir}/EGL
-%{_includedir}/EGL/eglmesaext.h
-%{_includedir}/EGL/eglextchromium.h
+%{_includedir}/EGL/*.h
 
 %ldconfig_scriptlets libglapi
 %files libglapi
@@ -652,6 +651,10 @@ popd
 
 
 %changelog
+* Mon Aug 15 2022 Mihai Vultur <xanto@egaming.ro>
+- Adjust specfile after eglextchromium.h removal
+- MR https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/17815
+
 * Sat Apr 30 2022 Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
 - Reenabling all hw implementations of video codecs which was disabled by
 - MR https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/15258.
