@@ -575,10 +575,10 @@ popd
 %{_libdir}/dri/panfrost_dri.so
 %endif
 %{_libdir}/dri/nouveau_dri.so
+%{_libdir}/dri/nouveau_drv_video.so
 %if 0%{?with_vmware}
 %{_libdir}/dri/vmwgfx_dri.so
 %endif
-%{_libdir}/dri/nouveau_drv_video.so
 %if 0%{?with_radeonsi}
 %{_libdir}/dri/r600_drv_video.so
 %{_libdir}/dri/radeonsi_drv_video.so
@@ -613,6 +613,8 @@ popd
 %{_libdir}/dri/kms_swrast_dri.so
 %{_libdir}/dri/swrast_dri.so
 %{_libdir}/dri/virtio_gpu_dri.so
+%{_libdir}/dri/virtio_gpu_drv_video.so
+
 
 %if 0%{?with_hardware}
 %if 0%{?with_omx}
@@ -623,6 +625,7 @@ popd
 %files vdpau-drivers
 %{_libdir}/vdpau/libvdpau_nouveau.so.1*
 %{_libdir}/vdpau/libvdpau_r300.so.1*
+%{_libdir}/vdpau/libvdpau_virtio_gpu.so.1*
 %if 0%{?with_radeonsi}
 %{_libdir}/vdpau/libvdpau_r600.so.1*
 %{_libdir}/vdpau/libvdpau_radeonsi.so.1*
