@@ -469,8 +469,7 @@ popd
 %{_libdir}/libEGL_mesa.so.0*
 %files libEGL-devel
 %dir %{_includedir}/EGL
-%{_includedir}/EGL/eglmesaext.h
-%{_includedir}/EGL/eglextchromium.h
+%{_includedir}/EGL/*.h
 
 %ldconfig_scriptlets libglapi
 %files libglapi
@@ -652,6 +651,10 @@ popd
 
 
 %changelog
+* Mon Aug 15 2022 Mihai Vultur <xanto@egaming.ro>
+- Adjust specfile after eglextchromium.h removal
+- MR https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/17815
+
 * Sat Apr 30 2022 Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
 - Reenabling all hw implementations of video codecs which was disabled by
 - MR https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/15258.
