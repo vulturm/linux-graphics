@@ -5,11 +5,11 @@
 %global version_file https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/{}/.gitignore
 %global version_tag_regex reg_beg sdk-(.*) reg_end
 
-%define version_string 1.3.224.0
+%define version_string 1.3.224.1
 
-%define commit 40315fa5c065f05c969a04b459eba6da602f793a
+%define commit 67b79bcb00a5f56cb6403b4c2546bbca08da9818
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20220822
+%global commit_date 20220829
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
