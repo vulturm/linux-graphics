@@ -35,7 +35,7 @@
 %global with_vmware 1
 %global with_xa     1
 %global with_zink   1
-%global vulkan_drivers intel,amd
+%global vulkan_drivers intel,intel_hasvk,amd
 %else
 %ifnarch s390x
 %global vulkan_drivers amd
@@ -663,6 +663,8 @@ popd
 %ifarch %{ix86} x86_64
 %{_libdir}/libvulkan_intel.so
 %{_datadir}/vulkan/icd.d/intel_icd.*.json
+%{_libdir}/libvulkan_intel_hasvk.so
+%{_datadir}/vulkan/icd.d/intel_hasvk_icd.*.json
 %endif
 %{_libdir}/libvulkan_radeon.so
 %{_datadir}/vulkan/icd.d/radeon_icd.*.json
