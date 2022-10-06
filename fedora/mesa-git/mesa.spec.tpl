@@ -21,7 +21,7 @@
 %ifnarch s390x
 %global with_hardware 1
 %global with_vdpau 1
-%global with_vaapi 1
+%global with_va 1
 %global with_nine 1
 %global with_omx 1
 %global with_opencl 1
@@ -159,7 +159,7 @@ BuildRequires:  flex
 %if 0%{?with_vdpau}
 BuildRequires:  pkgconfig(vdpau) >= 1.1
 %endif
-%if 0%{?with_vaapi}
+%if 0%{?with_va}
 BuildRequires:  pkgconfig(libva) >= 0.38.0
 %endif
 %if 0%{?with_omx}
@@ -256,12 +256,12 @@ Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{rel
 %{summary}.
 %endif
 
-%if 0%{?with_vaapi}
-%package        vaapi-drivers
-Summary:        Mesa-based VAAPI drivers
+%if 0%{?with_va}
+%package        va-drivers
+Summary:        Mesa-based VA-API video acceleration drivers
 Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 
-%description vaapi-drivers
+%description va-drivers
 %{summary}.
 %endif
 
@@ -412,7 +412,7 @@ cp %{SOURCE1} docs/
   -D gallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
   -D gallium-nine=%{?with_nine:true}%{!?with_nine:false} \
   -D gallium-omx=%{?with_omx:bellagio}%{!?with_omx:disabled} \
-  -D gallium-va=%{?with_vaapi:enabled}%{!?with_vaapi:disabled} \
+  -D gallium-va=%{?with_va:enabled}%{!?with_va:disabled} \
   -D gallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
   -D gallium-xa=enabled \
   -D gbm=enabled \
@@ -632,8 +632,8 @@ popd
 %{_libdir}/bellagio/libomx_mesa.so
 %endif
 
-%if 0%{?with_vaapi}
-%files vaapi-drivers
+%if 0%{?with_va}
+%files va-drivers
 %{_libdir}/dri/nouveau_drv_video.so
 %if 0%{?with_r600}
 %{_libdir}/dri/r600_drv_video.so
