@@ -9,7 +9,7 @@
 
 %define commit df3fdbdeb50b7b240a7ec81a5ea08e3541d2a51c
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20221006.00
+%global commit_date 20221006.12
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -21,7 +21,7 @@
 %ifnarch s390x
 %global with_hardware 1
 %global with_vdpau 1
-%global with_vaapi 1
+%global with_va 1
 %global with_nine 1
 %global with_omx 1
 %global with_opencl 1
@@ -159,7 +159,7 @@ BuildRequires:  flex
 %if 0%{?with_vdpau}
 BuildRequires:  pkgconfig(vdpau) >= 1.1
 %endif
-%if 0%{?with_vaapi}
+%if 0%{?with_va}
 BuildRequires:  pkgconfig(libva) >= 0.38.0
 %endif
 %if 0%{?with_omx}
@@ -196,7 +196,6 @@ BuildRequires:  pkgconfig(vulkan)
 %package filesystem
 Summary:        Mesa driver filesystem
 Provides:       mesa-dri-filesystem = %{?epoch:%{epoch}:}%{version}-%{release}
-Obsoletes:      mesa-dri-filesystem < %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description filesystem
 %{summary}.
@@ -205,6 +204,7 @@ Obsoletes:      mesa-dri-filesystem < %{?epoch:%{epoch}:}%{version}-%{release}
 Summary:        Mesa libGL runtime libraries
 Requires:       %{name}-libglapi%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires:       libglvnd-glx%{?_isa} >= 1:1.3.2
+Recommends:     %{name}-dri-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description libGL
 %{summary}.
@@ -222,6 +222,7 @@ Provides:       libGL-devel%{?_isa}
 %package libEGL
 Summary:        Mesa libEGL runtime libraries
 Requires:       libglvnd-egl%{?_isa} >= 1:1.3.2
+Recommends:     %{name}-dri-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 Obsoletes:      egl-icd < %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description libEGL
@@ -254,6 +255,15 @@ Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{rel
 %{summary}.
 %endif
 
+%if 0%{?with_va}
+%package        va-drivers
+Summary:        Mesa-based VA-API video acceleration drivers
+Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+
+%description va-drivers
+%{summary}.
+%endif
+
 %if 0%{?with_vdpau}
 %package        vdpau-drivers
 Summary:        Mesa-based VDPAU drivers
@@ -283,6 +293,7 @@ Requires:       %{name}-libOSMesa%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{rele
 Summary:        Mesa gbm runtime library
 Provides:       libgbm
 Provides:       libgbm%{?_isa}
+Recommends:     %{name}-dri-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description libgbm
 %{summary}.
@@ -400,10 +411,9 @@ cp %{SOURCE1} docs/
   -D gallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
   -D gallium-nine=%{?with_nine:true}%{!?with_nine:false} \
   -D gallium-omx=%{?with_omx:bellagio}%{!?with_omx:disabled} \
-  -D gallium-va=%{?with_vaapi:enabled}%{!?with_vaapi:disabled} \
+  -D gallium-va=%{?with_va:enabled}%{!?with_va:disabled} \
   -D gallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
   -D gallium-xa=enabled \
-  -D gallium-xvmc=disabled \
   -D gbm=enabled \
   -D gles1=disabled \
   -D gles2=enabled \
@@ -542,9 +552,13 @@ popd
   %{_libdir}/dri/r200_dri.so
   %{_libdir}/dri/nouveau_vieux_dri.so
  %endif
+%if 0%{?with_r300}
 %{_libdir}/dri/r300_dri.so
+%endif
 %if 0%{?with_radeonsi}
+%if 0%{?with_r600}
 %{_libdir}/dri/r600_dri.so
+%endif
 %{_libdir}/dri/radeonsi_dri.so
 %endif
 %ifarch %{ix86} x86_64
@@ -575,13 +589,8 @@ popd
 %{_libdir}/dri/panfrost_dri.so
 %endif
 %{_libdir}/dri/nouveau_dri.so
-%{_libdir}/dri/nouveau_drv_video.so
 %if 0%{?with_vmware}
 %{_libdir}/dri/vmwgfx_dri.so
-%endif
-%if 0%{?with_radeonsi}
-%{_libdir}/dri/r600_drv_video.so
-%{_libdir}/dri/radeonsi_drv_video.so
 %endif
 %{_libdir}/dri/crocus_dri.so
 %if 0%{?with_iris}
@@ -621,13 +630,29 @@ popd
 %files omx-drivers
 %{_libdir}/bellagio/libomx_mesa.so
 %endif
+
+%if 0%{?with_va}
+%files va-drivers
+%{_libdir}/dri/nouveau_drv_video.so
+%if 0%{?with_r600}
+%{_libdir}/dri/r600_drv_video.so
+%endif
+%if 0%{?with_radeonsi}
+%{_libdir}/dri/radeonsi_drv_video.so
+%endif
+%endif
+
 %if 0%{?with_vdpau}
 %files vdpau-drivers
 %{_libdir}/vdpau/libvdpau_nouveau.so.1*
-%{_libdir}/vdpau/libvdpau_r300.so.1*
 %{_libdir}/vdpau/libvdpau_virtio_gpu.so.1*
-%if 0%{?with_radeonsi}
+%if 0%{?with_r300}
+%{_libdir}/vdpau/libvdpau_r300.so.1*
+%endif
+%if 0%{?with_r600}
 %{_libdir}/vdpau/libvdpau_r600.so.1*
+%endif
+%if 0%{?with_radeonsi}
 %{_libdir}/vdpau/libvdpau_radeonsi.so.1*
 %endif
 %endif
@@ -654,6 +679,13 @@ popd
 
 
 %changelog
+* Thu Oct 06 2022 Mihai Vultur <xanto@egaming.ro>
+- Carry over and adapt some patches from upstream:
+ 60b9e9d Rename mesa-vaapi-drivers to mesa-va-drivers
+ 07e1e0b mesa: split out vaapi drivers into separate package
+ 8a2edad Recommend mesa-dri-drivers from libGL, libEGL, and libgbm subpackages (rhbz#1900633)
+ 8d117d9 Remove old obsoletes
+
 * Mon Aug 15 2022 Mihai Vultur <xanto@egaming.ro>
 - Adjust specfile after eglextchromium.h removal
 - MR https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/17815
