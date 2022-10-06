@@ -256,6 +256,15 @@ Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{rel
 %{summary}.
 %endif
 
+%if 0%{?with_vaapi}
+%package        vaapi-drivers
+Summary:        Mesa-based VAAPI drivers
+Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+
+%description vaapi-drivers
+%{summary}.
+%endif
+
 %if 0%{?with_vdpau}
 %package        vdpau-drivers
 Summary:        Mesa-based VDPAU drivers
@@ -544,9 +553,13 @@ popd
   %{_libdir}/dri/r200_dri.so
   %{_libdir}/dri/nouveau_vieux_dri.so
  %endif
+%if 0%{?with_r300}
 %{_libdir}/dri/r300_dri.so
+%endif
 %if 0%{?with_radeonsi}
+%if 0%{?with_r600}
 %{_libdir}/dri/r600_dri.so
+%endif
 %{_libdir}/dri/radeonsi_dri.so
 %endif
 %ifarch %{ix86} x86_64
@@ -577,13 +590,8 @@ popd
 %{_libdir}/dri/panfrost_dri.so
 %endif
 %{_libdir}/dri/nouveau_dri.so
-%{_libdir}/dri/nouveau_drv_video.so
 %if 0%{?with_vmware}
 %{_libdir}/dri/vmwgfx_dri.so
-%endif
-%if 0%{?with_radeonsi}
-%{_libdir}/dri/r600_drv_video.so
-%{_libdir}/dri/radeonsi_drv_video.so
 %endif
 %{_libdir}/dri/crocus_dri.so
 %if 0%{?with_iris}
@@ -623,13 +631,29 @@ popd
 %files omx-drivers
 %{_libdir}/bellagio/libomx_mesa.so
 %endif
+
+%if 0%{?with_vaapi}
+%files vaapi-drivers
+%{_libdir}/dri/nouveau_drv_video.so
+%if 0%{?with_r600}
+%{_libdir}/dri/r600_drv_video.so
+%endif
+%if 0%{?with_radeonsi}
+%{_libdir}/dri/radeonsi_drv_video.so
+%endif
+%endif
+
 %if 0%{?with_vdpau}
 %files vdpau-drivers
 %{_libdir}/vdpau/libvdpau_nouveau.so.1*
-%{_libdir}/vdpau/libvdpau_r300.so.1*
 %{_libdir}/vdpau/libvdpau_virtio_gpu.so.1*
-%if 0%{?with_radeonsi}
+%if 0%{?with_r300}
+%{_libdir}/vdpau/libvdpau_r300.so.1*
+%endif
+%if 0%{?with_r600}
 %{_libdir}/vdpau/libvdpau_r600.so.1*
+%endif
+%if 0%{?with_radeonsi}
 %{_libdir}/vdpau/libvdpau_radeonsi.so.1*
 %endif
 %endif
