@@ -662,8 +662,8 @@ popd
 %if 0%{?with_hardware}
 %ifarch %{ix86} x86_64
 %{_libdir}/libvulkan_intel.so
-%{_datadir}/vulkan/icd.d/intel_icd.*.json
 %{_libdir}/libvulkan_intel_hasvk.so
+%{_datadir}/vulkan/icd.d/intel_icd.*.json
 %{_datadir}/vulkan/icd.d/intel_hasvk_icd.*.json
 %endif
 %{_libdir}/libvulkan_radeon.so
@@ -681,6 +681,11 @@ popd
 
 
 %changelog
+* Thu Oct 06 2022 Ibrahim Ansari <retrixe@users.noreply.github.com>
+- The Intel ANV Vulkan driver no longer supports Gen7/8 integrated graphics,
+  instead, the Vulkan support for these GPUs has been moved into a new "HASVK" driver.
+- Enable 'intel_hasvk'.
+
 * Thu Oct 06 2022 Mihai Vultur <xanto@egaming.ro>
 - Carry over and adapt some patches from upstream:
  60b9e9d Rename mesa-vaapi-drivers to mesa-va-drivers
