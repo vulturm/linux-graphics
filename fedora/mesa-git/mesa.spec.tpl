@@ -403,7 +403,6 @@ cp %{SOURCE1} docs/
   -D gallium-va=%{?with_vaapi:enabled}%{!?with_vaapi:disabled} \
   -D gallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
   -D gallium-xa=enabled \
-  -D gallium-xvmc=disabled \
   -D gbm=enabled \
   -D gles1=disabled \
   -D gles2=enabled \
