@@ -679,6 +679,13 @@ popd
 
 
 %changelog
+* Thu Oct 06 2022 Mihai Vultur <xanto@egaming.ro>
+- Carry over and adapt some patches from upstream:
+ 60b9e9d Rename mesa-vaapi-drivers to mesa-va-drivers
+ 07e1e0b mesa: split out vaapi drivers into separate package
+ 8a2edad Recommend mesa-dri-drivers from libGL, libEGL, and libgbm subpackages (rhbz#1900633)
+ 8d117d9 Remove old obsoletes
+
 * Mon Aug 15 2022 Mihai Vultur <xanto@egaming.ro>
 - Adjust specfile after eglextchromium.h removal
 - MR https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/17815
