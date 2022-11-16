@@ -394,8 +394,10 @@ cp %{SOURCE1} docs/
 # Disable LTO for now
 %define _lto_cflags %{nil}
 
-%meson -Dcpp_std=gnu++14 \
+%meson -Dcpp_std=gnu++17 \
   -D platforms=x11,wayland \
+  -D dri3=enabled \
+  -D osmesa=true \
 %if 0%{?version_major} && 0%{?version_major} < 22
   -D dri-drivers=%{?dri_drivers} \
 %endif
@@ -406,7 +408,6 @@ cp %{SOURCE1} docs/
 %endif
   -D vulkan-drivers=%{?vulkan_drivers} \
   -D video-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec \
-  -D dri3=enabled \
   -D egl=enabled \
   -D gallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
   -D gallium-nine=%{?with_nine:true}%{!?with_nine:false} \
@@ -426,7 +427,6 @@ cp %{SOURCE1} docs/
   -Dbuild-tests=false \
   -Dselinux=true \
   -D lmsensors=enabled \
-  -D osmesa=true \
   -D shared-glapi=enabled \
   -D gallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
   -D vulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
@@ -681,6 +681,9 @@ popd
 
 
 %changelog
+* Wed Nov 16 2022 Mihai Vultur <mihaivultur7@gmail.com>
+  Use '-Dcpp_std=gnu++17' to unbreak the build.
+
 * Thu Oct 06 2022 Ibrahim Ansari <retrixe@users.noreply.github.com>
 - The Intel ANV Vulkan driver no longer supports Gen7/8 integrated graphics,
   instead, the Vulkan support for these GPUs has been moved into a new "HASVK" driver.
