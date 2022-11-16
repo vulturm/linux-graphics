@@ -7,9 +7,9 @@
 %define version_string 23.0.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit fc193133d4ea553ed08758437159d6fbbe14dbf3
+%define commit 1b8e66e564e9923414c9fc5ef29663acda03905c
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20221116.10
+%global commit_date 20221116.12
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -394,43 +394,41 @@ cp %{SOURCE1} docs/
 # Disable LTO for now
 %define _lto_cflags %{nil}
 
-%meson -Dcpp_std=gnu++14 \
-  -D platforms=x11,wayland \
-%if 0%{?version_major} && 0%{?version_major} < 22
-  -D dri-drivers=%{?dri_drivers} \
-%endif
+%meson \
+  -Dplatforms=x11,wayland \
+  -Ddri3=enabled \
+  -Dosmesa=true \
 %if 0%{?with_hardware}
-  -D gallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_zink:,zink} \
+  -Dgallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_zink:,zink} \
 %else
-  -D gallium-drivers=swrast,virgl \
+  -Dgallium-drivers=swrast,virgl \
 %endif
-  -D vulkan-drivers=%{?vulkan_drivers} \
-  -D video-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec \
-  -D dri3=enabled \
-  -D egl=enabled \
-  -D gallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
-  -D gallium-nine=%{?with_nine:true}%{!?with_nine:false} \
-  -D gallium-omx=%{?with_omx:bellagio}%{!?with_omx:disabled} \
-  -D gallium-va=%{?with_va:enabled}%{!?with_va:disabled} \
-  -D gallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
-  -D gallium-xa=enabled \
-  -D gbm=enabled \
-  -D gles1=disabled \
-  -D gles2=enabled \
-  -D glvnd=true \
-  -D glx=dri \
-  -D libunwind=enabled \
-  -D llvm=enabled \
+  -Dgallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
+  -Dgallium-omx=%{?with_omx:bellagio}%{!?with_omx:disabled} \
+  -Dgallium-va=%{?with_va:enabled}%{!?with_va:disabled} \
+  -Dgallium-xa=%{?with_xa:enabled}%{!?with_xa:disabled} \
+  -Dgallium-nine=%{?with_nine:true}%{!?with_nine:false} \
+  -Dgallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
+  -Dvulkan-drivers=%{?vulkan_drivers} \
+  -Dvulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
+  -Dshared-glapi=enabled \
+  -Dgles1=disabled \
+  -Dgles2=enabled \
+  -Dopengl=true \
+  -Dgbm=enabled \
+  -Dglx=dri \
+  -Degl=enabled \
+  -Dglvnd=true \
+  -Dmicrosoft-clc=disabled \
+  -Dllvm=enabled \
   -Dshared-llvm=enabled \
   -Dvalgrind=%{?with_valgrind:enabled}%{!?with_valgrind:disabled} \
   -Dbuild-tests=false \
   -Dselinux=true \
-  -D lmsensors=enabled \
-  -D osmesa=true \
-  -D shared-glapi=enabled \
-  -D gallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
-  -D vulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
-  -D tools=[]
+  -Dvideo-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec \
+  -Dgallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
+  -Dlibunwind=enabled \
+  -Dlmsensors=enabled \
   %{nil}
 %meson_build
 
@@ -622,7 +620,6 @@ popd
 %{_libdir}/dri/kms_swrast_dri.so
 %{_libdir}/dri/swrast_dri.so
 %{_libdir}/dri/virtio_gpu_dri.so
-%{_libdir}/dri/virtio_gpu_drv_video.so
 
 
 %if 0%{?with_hardware}
@@ -633,6 +630,7 @@ popd
 
 %if 0%{?with_va}
 %files va-drivers
+%{_libdir}/dri/virtio_gpu_drv_video.so
 %{_libdir}/dri/nouveau_drv_video.so
 %if 0%{?with_r600}
 %{_libdir}/dri/r600_drv_video.so
@@ -681,6 +679,9 @@ popd
 
 
 %changelog
+* Wed Nov 16 2022 Mihai Vultur <mihaivultur7@gmail.com>
+  Use '-Dcpp_std=gnu++17' to unbreak the build.
+
 * Thu Oct 06 2022 Ibrahim Ansari <retrixe@users.noreply.github.com>
 - The Intel ANV Vulkan driver no longer supports Gen7/8 integrated graphics,
   instead, the Vulkan support for these GPUs has been moved into a new "HASVK" driver.
