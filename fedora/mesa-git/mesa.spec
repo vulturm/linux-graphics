@@ -7,9 +7,9 @@
 %define version_string 23.0.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 1b8e66e564e9923414c9fc5ef29663acda03905c
+%define commit b9be2773a1b9de8b2ded56f51b0cb759d7ced666
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20221116.12
+%global commit_date 20221116.13
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -449,7 +449,8 @@ ln -s %{_libdir}/libGLX_mesa.so.0 %{buildroot}%{_libdir}/libGLX_system.so.0
 
 # this keeps breaking, check it early.  note that the exit from eu-ftr is odd.
 pushd %{buildroot}%{_libdir}
-for i in libOSMesa*.so libGL.so ; do
+for i in libOSMesa*.so libGL*.so ; do
+    sleep 1
     eu-findtextrel $i && exit 1
 done
 popd
