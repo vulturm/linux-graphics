@@ -4,12 +4,12 @@
 %global __meson_auto_features disabled
 
 %global build_repo https://github.com/vulturm/mesa
-%define version_string 1
+%define version_string 21.2.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
 %define commit 0cec71d7ce0a793b35aca7c142f511417c3fd57a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20220926.07
+%global commit_date 20221121.14
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
@@ -21,7 +21,7 @@
 %ifnarch s390x
 %global with_hardware 1
 %global with_vdpau 1
-%global with_vaapi 1
+%global with_va 1
 %global with_nine 1
 %global with_omx 1
 %global with_opencl 1
@@ -35,7 +35,7 @@
 %global with_vmware 1
 %global with_xa     1
 %global with_zink   1
-%global vulkan_drivers intel,amd
+%global vulkan_drivers intel,intel_hasvk,amd
 %else
 %ifnarch s390x
 %global vulkan_drivers amd
@@ -159,7 +159,7 @@ BuildRequires:  flex
 %if 0%{?with_vdpau}
 BuildRequires:  pkgconfig(vdpau) >= 1.1
 %endif
-%if 0%{?with_vaapi}
+%if 0%{?with_va}
 BuildRequires:  pkgconfig(libva) >= 0.38.0
 %endif
 %if 0%{?with_omx}
@@ -196,7 +196,6 @@ BuildRequires:  pkgconfig(vulkan)
 %package filesystem
 Summary:        Mesa driver filesystem
 Provides:       mesa-dri-filesystem = %{?epoch:%{epoch}:}%{version}-%{release}
-Obsoletes:      mesa-dri-filesystem < %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description filesystem
 %{summary}.
@@ -205,6 +204,7 @@ Obsoletes:      mesa-dri-filesystem < %{?epoch:%{epoch}:}%{version}-%{release}
 Summary:        Mesa libGL runtime libraries
 Requires:       %{name}-libglapi%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires:       libglvnd-glx%{?_isa} >= 1:1.3.2
+Recommends:     %{name}-dri-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description libGL
 %{summary}.
@@ -222,6 +222,7 @@ Provides:       libGL-devel%{?_isa}
 %package libEGL
 Summary:        Mesa libEGL runtime libraries
 Requires:       libglvnd-egl%{?_isa} >= 1:1.3.2
+Recommends:     %{name}-dri-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 Obsoletes:      egl-icd < %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description libEGL
@@ -254,6 +255,15 @@ Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{rel
 %{summary}.
 %endif
 
+%if 0%{?with_va}
+%package        va-drivers
+Summary:        Mesa-based VA-API video acceleration drivers
+Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+
+%description va-drivers
+%{summary}.
+%endif
+
 %if 0%{?with_vdpau}
 %package        vdpau-drivers
 Summary:        Mesa-based VDPAU drivers
@@ -283,6 +293,7 @@ Requires:       %{name}-libOSMesa%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{rele
 Summary:        Mesa gbm runtime library
 Provides:       libgbm
 Provides:       libgbm%{?_isa}
+Recommends:     %{name}-dri-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description libgbm
 %{summary}.
@@ -383,44 +394,41 @@ cp %{SOURCE1} docs/
 # Disable LTO for now
 %define _lto_cflags %{nil}
 
-%meson -Dcpp_std=gnu++14 \
-  -D platforms=x11,wayland \
-%if 0%{?version_major} && 0%{?version_major} < 22
-  -D dri-drivers=%{?dri_drivers} \
-%endif
+%meson \
+  -Dplatforms=x11,wayland \
+  -Ddri3=enabled \
+  -Dosmesa=true \
 %if 0%{?with_hardware}
-  -D gallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_zink:,zink} \
+  -Dgallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_zink:,zink} \
 %else
-  -D gallium-drivers=swrast,virgl \
+  -Dgallium-drivers=swrast,virgl \
 %endif
-  -D vulkan-drivers=%{?vulkan_drivers} \
-  -D video-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec \
-  -D dri3=enabled \
-  -D egl=enabled \
-  -D gallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
-  -D gallium-nine=%{?with_nine:true}%{!?with_nine:false} \
-  -D gallium-omx=%{?with_omx:bellagio}%{!?with_omx:disabled} \
-  -D gallium-va=%{?with_vaapi:enabled}%{!?with_vaapi:disabled} \
-  -D gallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
-  -D gallium-xa=enabled \
-  -D gallium-xvmc=disabled \
-  -D gbm=enabled \
-  -D gles1=disabled \
-  -D gles2=enabled \
-  -D glvnd=true \
-  -D glx=dri \
-  -D libunwind=enabled \
-  -D llvm=enabled \
+  -Dgallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
+  -Dgallium-omx=%{?with_omx:bellagio}%{!?with_omx:disabled} \
+  -Dgallium-va=%{?with_va:enabled}%{!?with_va:disabled} \
+  -Dgallium-xa=%{?with_xa:enabled}%{!?with_xa:disabled} \
+  -Dgallium-nine=%{?with_nine:true}%{!?with_nine:false} \
+  -Dgallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
+  -Dvulkan-drivers=%{?vulkan_drivers} \
+  -Dvulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
+  -Dshared-glapi=enabled \
+  -Dgles1=disabled \
+  -Dgles2=enabled \
+  -Dopengl=true \
+  -Dgbm=enabled \
+  -Dglx=dri \
+  -Degl=enabled \
+  -Dglvnd=true \
+  -Dmicrosoft-clc=disabled \
+  -Dllvm=enabled \
   -Dshared-llvm=enabled \
   -Dvalgrind=%{?with_valgrind:enabled}%{!?with_valgrind:disabled} \
   -Dbuild-tests=false \
   -Dselinux=true \
-  -D lmsensors=enabled \
-  -D osmesa=true \
-  -D shared-glapi=enabled \
-  -D gallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
-  -D vulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
-  -D tools=[]
+  -Dvideo-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec \
+  -Dgallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
+  -Dlibunwind=enabled \
+  -Dlmsensors=enabled \
   %{nil}
 %meson_build
 
@@ -441,7 +449,8 @@ ln -s %{_libdir}/libGLX_mesa.so.0 %{buildroot}%{_libdir}/libGLX_system.so.0
 
 # this keeps breaking, check it early.  note that the exit from eu-ftr is odd.
 pushd %{buildroot}%{_libdir}
-for i in libOSMesa*.so libGL.so ; do
+for i in libOSMesa*.so libGL*.so ; do
+    sleep 1
     eu-findtextrel $i && exit 1
 done
 popd
@@ -542,9 +551,13 @@ popd
   %{_libdir}/dri/r200_dri.so
   %{_libdir}/dri/nouveau_vieux_dri.so
  %endif
+%if 0%{?with_r300}
 %{_libdir}/dri/r300_dri.so
+%endif
 %if 0%{?with_radeonsi}
+%if 0%{?with_r600}
 %{_libdir}/dri/r600_dri.so
+%endif
 %{_libdir}/dri/radeonsi_dri.so
 %endif
 %ifarch %{ix86} x86_64
@@ -575,13 +588,8 @@ popd
 %{_libdir}/dri/panfrost_dri.so
 %endif
 %{_libdir}/dri/nouveau_dri.so
-%{_libdir}/dri/nouveau_drv_video.so
 %if 0%{?with_vmware}
 %{_libdir}/dri/vmwgfx_dri.so
-%endif
-%if 0%{?with_radeonsi}
-%{_libdir}/dri/r600_drv_video.so
-%{_libdir}/dri/radeonsi_drv_video.so
 %endif
 %{_libdir}/dri/crocus_dri.so
 %if 0%{?with_iris}
@@ -613,7 +621,6 @@ popd
 %{_libdir}/dri/kms_swrast_dri.so
 %{_libdir}/dri/swrast_dri.so
 %{_libdir}/dri/virtio_gpu_dri.so
-%{_libdir}/dri/virtio_gpu_drv_video.so
 
 
 %if 0%{?with_hardware}
@@ -621,13 +628,30 @@ popd
 %files omx-drivers
 %{_libdir}/bellagio/libomx_mesa.so
 %endif
+
+%if 0%{?with_va}
+%files va-drivers
+%{_libdir}/dri/virtio_gpu_drv_video.so
+%{_libdir}/dri/nouveau_drv_video.so
+%if 0%{?with_r600}
+%{_libdir}/dri/r600_drv_video.so
+%endif
+%if 0%{?with_radeonsi}
+%{_libdir}/dri/radeonsi_drv_video.so
+%endif
+%endif
+
 %if 0%{?with_vdpau}
 %files vdpau-drivers
 %{_libdir}/vdpau/libvdpau_nouveau.so.1*
-%{_libdir}/vdpau/libvdpau_r300.so.1*
 %{_libdir}/vdpau/libvdpau_virtio_gpu.so.1*
-%if 0%{?with_radeonsi}
+%if 0%{?with_r300}
+%{_libdir}/vdpau/libvdpau_r300.so.1*
+%endif
+%if 0%{?with_r600}
 %{_libdir}/vdpau/libvdpau_r600.so.1*
+%endif
+%if 0%{?with_radeonsi}
 %{_libdir}/vdpau/libvdpau_radeonsi.so.1*
 %endif
 %endif
@@ -637,7 +661,9 @@ popd
 %if 0%{?with_hardware}
 %ifarch %{ix86} x86_64
 %{_libdir}/libvulkan_intel.so
+%{_libdir}/libvulkan_intel_hasvk.so
 %{_datadir}/vulkan/icd.d/intel_icd.*.json
+%{_datadir}/vulkan/icd.d/intel_hasvk_icd.*.json
 %endif
 %{_libdir}/libvulkan_radeon.so
 %{_datadir}/vulkan/icd.d/radeon_icd.*.json
@@ -654,6 +680,21 @@ popd
 
 
 %changelog
+* Wed Nov 16 2022 Mihai Vultur <mihaivultur7@gmail.com>
+  Use '-Dcpp_std=gnu++17' to unbreak the build.
+
+* Thu Oct 06 2022 Ibrahim Ansari <retrixe@users.noreply.github.com>
+- The Intel ANV Vulkan driver no longer supports Gen7/8 integrated graphics,
+  instead, the Vulkan support for these GPUs has been moved into a new "HASVK" driver.
+- Enable 'intel_hasvk'.
+
+* Thu Oct 06 2022 Mihai Vultur <xanto@egaming.ro>
+- Carry over and adapt some patches from upstream:
+ 60b9e9d Rename mesa-vaapi-drivers to mesa-va-drivers
+ 07e1e0b mesa: split out vaapi drivers into separate package
+ 8a2edad Recommend mesa-dri-drivers from libGL, libEGL, and libgbm subpackages (rhbz#1900633)
+ 8d117d9 Remove old obsoletes
+
 * Mon Aug 15 2022 Mihai Vultur <xanto@egaming.ro>
 - Adjust specfile after eglextchromium.h removal
 - MR https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/17815
