@@ -127,6 +127,7 @@ BuildRequires:  pkgconfig(libdrm_etnaviv) >= 2.4.89
 %if 0%{?with_vc4}
 BuildRequires:  pkgconfig(libdrm) >= 2.4.89
 %endif
+BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(expat)
 BuildRequires:  pkgconfig(zlib) >= 1.2.3
 BuildRequires:  pkgconfig(libselinux)
@@ -427,6 +428,7 @@ cp %{SOURCE1} docs/
   -Dselinux=true \
   -Dvideo-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec \
   -Dgallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
+  -Dxmlconfig=enabled \
   -Dlibunwind=enabled \
   -Dlmsensors=enabled \
   %{nil}
@@ -543,8 +545,7 @@ popd
 
 %files dri-drivers
 %dir %{_datadir}/drirc.d
-%{_datadir}/drirc.d/00-mesa-defaults.conf
-%{_datadir}/drirc.d/00-radv-defaults.conf
+%{_datadir}/drirc.d/*.conf
 %if 0%{?with_hardware}
  %if 0%{?version_major} && 0%{?version_major} < 22
   %{_libdir}/dri/radeon_dri.so
@@ -680,6 +681,9 @@ popd
 
 
 %changelog
+* Mon Dec 12 2022 Mihai Vultur <mihaivultur7@gmail.com>
+  Use '-Dxmlconfig=enabled' otherwise drirc config files won't be generated..
+
 * Wed Nov 16 2022 Mihai Vultur <mihaivultur7@gmail.com>
   Use '-Dcpp_std=gnu++17' to unbreak the build.
 
