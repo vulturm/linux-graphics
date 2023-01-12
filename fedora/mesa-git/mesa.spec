@@ -7,7 +7,7 @@
 %define version_string 23.0.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit b9835fe6aaa96176519de860b30898aed174c426
+%define commit bee771412c03b03a503172023c82d8b37dca8d73
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global commit_date 20230112.15
 %global gitrel .%{commit_date}.%{shortcommit}
@@ -105,7 +105,7 @@ Patch3:         0003-evergreen-big-endian.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1560481
 #Patch7:         0001-gallium-Disable-rgb10-configs-by-default.patch
 
-BuildRequires:  meson >= 0.45
+BuildRequires:  meson >= 0.61.4
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
@@ -171,7 +171,11 @@ BuildRequires:  pkgconfig(libglvnd) >= 1.3.2
 BuildRequires:  llvm-devel >= 7.0.0
 %if 0%{?with_opencl}
 BuildRequires:  clang-devel
+BuildRequires:  bindgen
+BuildRequires:  rust-packaging
 BuildRequires:  pkgconfig(libclc)
+BuildRequires:  pkgconfig(SPIRV-Tools)
+BuildRequires:  pkgconfig(LLVMSPIRVLib)
 %endif
 %if %{with valgrind}
 BuildRequires:  pkgconfig(valgrind)
@@ -243,6 +247,9 @@ Provides:       libEGL-devel%{?_isa}
 %package dri-drivers
 Summary:        Mesa-based DRI drivers
 Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+%if 0%{?with_va}
+Recommends:     %{name}-va-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+%endif
 
 %description dri-drivers
 %{summary}.
@@ -260,6 +267,7 @@ Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{rel
 %package        va-drivers
 Summary:        Mesa-based VA-API video acceleration drivers
 Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Obsoletes:      %{name}-vaapi-drivers < 22.2.0-5
 
 %description va-drivers
 %{summary}.
@@ -410,6 +418,9 @@ cp %{SOURCE1} docs/
   -Dgallium-xa=%{?with_xa:enabled}%{!?with_xa:disabled} \
   -Dgallium-nine=%{?with_nine:true}%{!?with_nine:false} \
   -Dgallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
+ %if 0%{?with_opencl}
+  -Dgallium-rusticl=true -Dllvm=enabled -Drust_std=2021 \
+ %endif
   -Dvulkan-drivers=%{?vulkan_drivers} \
   -Dvulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
   -Dshared-glapi=enabled \
@@ -527,9 +538,12 @@ popd
 %ldconfig_scriptlets libOpenCL
 %files libOpenCL
 %{_libdir}/libMesaOpenCL.so.*
+%{_libdir}/libRusticlOpenCL.so.*
 %{_sysconfdir}/OpenCL/vendors/mesa.icd
+%{_sysconfdir}/OpenCL/vendors/rusticl.icd
 %files libOpenCL-devel
 %{_libdir}/libMesaOpenCL.so
+%{_libdir}/libRusticlOpenCL.so
 %endif
 
 %if 0%{?with_nine}
@@ -632,7 +646,6 @@ popd
 
 %if 0%{?with_va}
 %files va-drivers
-%{_libdir}/dri/virtio_gpu_drv_video.so
 %{_libdir}/dri/nouveau_drv_video.so
 %if 0%{?with_r600}
 %{_libdir}/dri/r600_drv_video.so
@@ -640,12 +653,12 @@ popd
 %if 0%{?with_radeonsi}
 %{_libdir}/dri/radeonsi_drv_video.so
 %endif
+%{_libdir}/dri/virtio_gpu_drv_video.so
 %endif
 
 %if 0%{?with_vdpau}
 %files vdpau-drivers
 %{_libdir}/vdpau/libvdpau_nouveau.so.1*
-%{_libdir}/vdpau/libvdpau_virtio_gpu.so.1*
 %if 0%{?with_r300}
 %{_libdir}/vdpau/libvdpau_r300.so.1*
 %endif
@@ -656,6 +669,7 @@ popd
 %{_libdir}/vdpau/libvdpau_radeonsi.so.1*
 %endif
 %endif
+%{_libdir}/vdpau/libvdpau_virtio_gpu.so.1*
 %endif
 
 %files vulkan-drivers
@@ -681,6 +695,9 @@ popd
 
 
 %changelog
+* Thu Jan 12 2023 Peter Robinson <pbrobinson@fedoraproject.org>
+   Enable rusticl as an optional OpenCL engine
+
 * Sat Dec 17 2022 Mihai Vultur <mihaivultur7@gmail.com>
   Use official freedesktop gitlab url for downloading source archive.
   .. for some reason it seems like mirroring to github is not working.
