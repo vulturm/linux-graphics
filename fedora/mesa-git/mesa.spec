@@ -7,9 +7,9 @@
 %define version_string 23.0.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 2e2775c11b0d17472afd53b1398a3af7d9086a75
+%define commit ab9a9f702aa440562ed9deaca92c306782e678b7
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20230112.16
+%global commit_date 20230112.18
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -20,6 +20,7 @@
 %global with_nine 1
 %global with_omx 1
 %global with_opencl 1
+%global with_opencl_rust 0
 %global base_drivers nouveau,r100,r200
 %endif
 
@@ -152,8 +153,10 @@ BuildRequires:  pkgconfig(libglvnd) >= 1.3.2
 BuildRequires:  llvm-devel >= 7.0.0
 %if 0%{?with_opencl}
 BuildRequires:  clang-devel
+%if 0%{?with_opencl_rust}
 BuildRequires:  bindgen
 BuildRequires:  rust-packaging
+%endif
 BuildRequires:  pkgconfig(libclc)
 BuildRequires:  pkgconfig(SPIRV-Tools)
 BuildRequires:  pkgconfig(LLVMSPIRVLib)
@@ -397,7 +400,7 @@ cp %{SOURCE1} docs/
   -Dgallium-xa=%{?with_xa:enabled}%{!?with_xa:disabled} \
   -Dgallium-nine=%{?with_nine:true}%{!?with_nine:false} \
   -Dgallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
- %if 0%{?with_opencl}
+ %if 0%{?with_opencl_rust}
   -Dgallium-rusticl=true -Dllvm=enabled -Drust_std=2021 \
  %endif
   -Dvulkan-drivers=%{?vulkan_drivers} \
@@ -517,12 +520,18 @@ popd
 %ldconfig_scriptlets libOpenCL
 %files libOpenCL
 %{_libdir}/libMesaOpenCL.so.*
+%if 0%{?with_opencl_rust}
 %{_libdir}/libRusticlOpenCL.so.*
+%endif
 %{_sysconfdir}/OpenCL/vendors/mesa.icd
+%if 0%{?with_opencl_rust}
 %{_sysconfdir}/OpenCL/vendors/rusticl.icd
+%endif
 %files libOpenCL-devel
 %{_libdir}/libMesaOpenCL.so
+%if 0%{?with_opencl_rust}
 %{_libdir}/libRusticlOpenCL.so
+%endif
 %endif
 
 %if 0%{?with_nine}
@@ -674,6 +683,9 @@ popd
 
 
 %changelog
+* Thu Jan 12 2023 Mihai Vultur <mihaivultur7@gmail.com>
+  Introduce 'with_opencl_rust' and temporary disable rust opencl.
+
 * Thu Jan 12 2023 Peter Robinson <pbrobinson@fedoraproject.org>
    Enable rusticl as an optional OpenCL engine
 
