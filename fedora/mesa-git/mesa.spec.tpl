@@ -12,12 +12,6 @@
 %global commit_date CODE_DATE
 %global gitrel .%{commit_date}.%{shortcommit}
 
-
-### LTO and debugpackages are not working together
-%if 0%{?fedora} >= 27
-%global debug_package %{nil}
-%endif
-
 %ifnarch s390x
 %global with_hardware 1
 %global with_vdpau 1
