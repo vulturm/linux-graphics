@@ -7,13 +7,14 @@
 %define version_string 23.0.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit bee771412c03b03a503172023c82d8b37dca8d73
+%define commit 2e2775c11b0d17472afd53b1398a3af7d9086a75
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20230112.15
+%global commit_date 20230112.16
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
 %global with_hardware 1
+%global with_vulkan_hw 1
 %global with_vdpau 1
 %global with_va 1
 %global with_nine 1
@@ -28,7 +29,6 @@
 %global with_iris   1
 %global with_vmware 1
 %global with_xa     1
-%global with_zink   1
 %global vulkan_drivers intel,intel_hasvk,amd
 %else
 %ifnarch s390x
@@ -107,20 +107,7 @@ BuildRequires:  gettext
 %if 0%{?with_hardware}
 BuildRequires:  kernel-headers
 %endif
-%ifarch %{ix86} x86_64
-BuildRequires:  pkgconfig(libdrm_intel) >= 2.4.75
-%endif
-%if 0%{?with_radeonsi}
-BuildRequires:  pkgconfig(libdrm_amdgpu) >= 2.4.97
-%endif
-BuildRequires:  pkgconfig(libdrm_radeon) >= 2.4.71
-BuildRequires:  pkgconfig(libdrm_nouveau) >= 2.4.66
-%if 0%{?with_etnaviv}
-BuildRequires:  pkgconfig(libdrm_etnaviv) >= 2.4.89
-%endif
-%if 0%{?with_vc4}
-BuildRequires:  pkgconfig(libdrm) >= 2.4.89
-%endif
+BuildRequires:  pkgconfig(libdrm) >= 2.4.97
 BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(expat)
 BuildRequires:  pkgconfig(zlib) >= 1.2.3
@@ -176,18 +163,16 @@ BuildRequires:  pkgconfig(valgrind)
 %endif
 BuildRequires:  python3-devel
 BuildRequires:  python3-mako
-%if 0%{?with_hardware}
 BuildRequires:  vulkan-headers
+BuildRequires:  glslang
+%if 0%{?with_vulkan_hw}
+BuildRequires:  pkgconfig(vulkan)
 %endif
 ## vulkan hud requires
 %if 0%{?with_vulkan_overlay}
-BuildRequires:  glslang
 BuildRequires:  lm_sensors-devel
 BuildRequires:  /usr/bin/pathfix.py
 %endif 
-%if 0%{?with_zink}
-BuildRequires:  pkgconfig(vulkan)
-%endif
 
 %description
 %{summary}.
@@ -402,7 +387,7 @@ cp %{SOURCE1} docs/
   -Ddri3=enabled \
   -Dosmesa=true \
 %if 0%{?with_hardware}
-  -Dgallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_zink:,zink} \
+  -Dgallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_vulkan_hw:,zink} \
 %else
   -Dgallium-drivers=swrast,virgl \
 %endif
@@ -604,7 +589,7 @@ popd
 %if 0%{?with_iris}
 %{_libdir}/dri/iris_dri.so
 %endif
-%if 0%{?with_zink}
+%if 0%{?with_vulkan_hw}
 %{_libdir}/dri/zink_dri.so
 %endif
 %endif
