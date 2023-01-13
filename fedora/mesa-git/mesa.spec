@@ -4,12 +4,12 @@
 %global __meson_auto_features disabled
 
 %global build_repo https://gitlab.freedesktop.org/mesa/mesa
-%define version_string 23.0.0
+%define version_string 23.1.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 18e91ad329102d821f06ee3f874067b4d97d05e2
+%define commit 2969850d886a980d87f7a2eb570e58c1a9a086de
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20230113.00
+%global commit_date 20230113.05
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
