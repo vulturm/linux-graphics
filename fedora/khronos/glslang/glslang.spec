@@ -7,9 +7,9 @@
 
 %define version_string 11.13.0
 
-%define commit 06a7078ce74ab5c7801a165b8145859678831fb8
+%define commit 1fb2f1d7896627d62a289439a2c3e750e551a7ab
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20230108
+%global commit_date 20230115
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
