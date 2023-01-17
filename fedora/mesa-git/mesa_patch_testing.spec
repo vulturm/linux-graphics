@@ -4,27 +4,23 @@
 %global __meson_auto_features disabled
 
 %global build_repo https://github.com/vulturm/mesa
-%define version_string 21.2.0
+%define version_string 1.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
 %define commit 0cec71d7ce0a793b35aca7c142f511417c3fd57a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20221121.14
+%global commit_date 20230118.00
 %global gitrel .%{commit_date}.%{shortcommit}
-
-
-### LTO and debugpackages are not working together
-%if 0%{?fedora} >= 27
-%global debug_package %{nil}
-%endif
 
 %ifnarch s390x
 %global with_hardware 1
+%global with_vulkan_hw 1
 %global with_vdpau 1
 %global with_va 1
 %global with_nine 1
 %global with_omx 1
 %global with_opencl 1
+%global with_opencl_rust 0
 %global base_drivers nouveau,r100,r200
 %endif
 
@@ -34,7 +30,6 @@
 %global with_iris   1
 %global with_vmware 1
 %global with_xa     1
-%global with_zink   1
 %global vulkan_drivers intel,intel_hasvk,amd
 %else
 %ifnarch s390x
@@ -92,7 +87,7 @@ Release:        0.3%{?gitrel}%{?dist}
 License:        MIT
 URL:            http://www.mesa3d.org
 
-Source0:        %{build_repo}/archive/%{commit}.tar.gz#/mesa-%{commit}.tar.gz
+Source0:        %{build_repo}/-/archive/%{commit}.tar.gz#/mesa-%{commit}.tar.gz
 # src/gallium/auxiliary/postprocess/pp_mlaa* have an ... interestingly worded license.
 # Source1 contains email correspondence clarifying the license terms.
 # Fedora opts to ignore the optional part of clause 2 and treat that code as 2 clause BSD.
@@ -105,7 +100,7 @@ Patch3:         0003-evergreen-big-endian.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1560481
 #Patch7:         0001-gallium-Disable-rgb10-configs-by-default.patch
 
-BuildRequires:  meson >= 0.45
+BuildRequires:  meson >= 0.61.4
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
@@ -113,20 +108,8 @@ BuildRequires:  gettext
 %if 0%{?with_hardware}
 BuildRequires:  kernel-headers
 %endif
-%ifarch %{ix86} x86_64
-BuildRequires:  pkgconfig(libdrm_intel) >= 2.4.75
-%endif
-%if 0%{?with_radeonsi}
-BuildRequires:  pkgconfig(libdrm_amdgpu) >= 2.4.97
-%endif
-BuildRequires:  pkgconfig(libdrm_radeon) >= 2.4.71
-BuildRequires:  pkgconfig(libdrm_nouveau) >= 2.4.66
-%if 0%{?with_etnaviv}
-BuildRequires:  pkgconfig(libdrm_etnaviv) >= 2.4.89
-%endif
-%if 0%{?with_vc4}
-BuildRequires:  pkgconfig(libdrm) >= 2.4.89
-%endif
+BuildRequires:  pkgconfig(libdrm) >= 2.4.97
+BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(expat)
 BuildRequires:  pkgconfig(zlib) >= 1.2.3
 BuildRequires:  pkgconfig(libselinux)
@@ -170,25 +153,29 @@ BuildRequires:  pkgconfig(libglvnd) >= 1.3.2
 BuildRequires:  llvm-devel >= 7.0.0
 %if 0%{?with_opencl}
 BuildRequires:  clang-devel
+%if 0%{?with_opencl_rust}
+BuildRequires:  bindgen
+BuildRequires:  rust-packaging
+%endif
 BuildRequires:  pkgconfig(libclc)
+BuildRequires:  pkgconfig(SPIRV-Tools)
+BuildRequires:  pkgconfig(LLVMSPIRVLib)
 %endif
 %if %{with valgrind}
 BuildRequires:  pkgconfig(valgrind)
 %endif
 BuildRequires:  python3-devel
 BuildRequires:  python3-mako
-%if 0%{?with_hardware}
 BuildRequires:  vulkan-headers
+BuildRequires:  glslang
+%if 0%{?with_vulkan_hw}
+BuildRequires:  pkgconfig(vulkan)
 %endif
 ## vulkan hud requires
 %if 0%{?with_vulkan_overlay}
-BuildRequires:  glslang
 BuildRequires:  lm_sensors-devel
 BuildRequires:  /usr/bin/pathfix.py
 %endif 
-%if 0%{?with_zink}
-BuildRequires:  pkgconfig(vulkan)
-%endif
 
 %description
 %{summary}.
@@ -242,6 +229,9 @@ Provides:       libEGL-devel%{?_isa}
 %package dri-drivers
 Summary:        Mesa-based DRI drivers
 Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+%if 0%{?with_va}
+Recommends:     %{name}-va-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+%endif
 
 %description dri-drivers
 %{summary}.
@@ -259,6 +249,7 @@ Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{rel
 %package        va-drivers
 Summary:        Mesa-based VA-API video acceleration drivers
 Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Obsoletes:      %{name}-vaapi-drivers < 22.2.0-5
 
 %description va-drivers
 %{summary}.
@@ -399,7 +390,7 @@ cp %{SOURCE1} docs/
   -Ddri3=enabled \
   -Dosmesa=true \
 %if 0%{?with_hardware}
-  -Dgallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_zink:,zink} \
+  -Dgallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_vulkan_hw:,zink} \
 %else
   -Dgallium-drivers=swrast,virgl \
 %endif
@@ -409,6 +400,9 @@ cp %{SOURCE1} docs/
   -Dgallium-xa=%{?with_xa:enabled}%{!?with_xa:disabled} \
   -Dgallium-nine=%{?with_nine:true}%{!?with_nine:false} \
   -Dgallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
+ %if 0%{?with_opencl_rust}
+  -Dgallium-rusticl=true -Dllvm=enabled -Drust_std=2021 \
+ %endif
   -Dvulkan-drivers=%{?vulkan_drivers} \
   -Dvulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
   -Dshared-glapi=enabled \
@@ -427,6 +421,7 @@ cp %{SOURCE1} docs/
   -Dselinux=true \
   -Dvideo-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec \
   -Dgallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
+  -Dxmlconfig=enabled \
   -Dlibunwind=enabled \
   -Dlmsensors=enabled \
   %{nil}
@@ -525,9 +520,18 @@ popd
 %ldconfig_scriptlets libOpenCL
 %files libOpenCL
 %{_libdir}/libMesaOpenCL.so.*
+%if 0%{?with_opencl_rust}
+%{_libdir}/libRusticlOpenCL.so.*
+%endif
 %{_sysconfdir}/OpenCL/vendors/mesa.icd
+%if 0%{?with_opencl_rust}
+%{_sysconfdir}/OpenCL/vendors/rusticl.icd
+%endif
 %files libOpenCL-devel
 %{_libdir}/libMesaOpenCL.so
+%if 0%{?with_opencl_rust}
+%{_libdir}/libRusticlOpenCL.so
+%endif
 %endif
 
 %if 0%{?with_nine}
@@ -543,8 +547,7 @@ popd
 
 %files dri-drivers
 %dir %{_datadir}/drirc.d
-%{_datadir}/drirc.d/00-mesa-defaults.conf
-%{_datadir}/drirc.d/00-radv-defaults.conf
+%{_datadir}/drirc.d/*.conf
 %if 0%{?with_hardware}
  %if 0%{?version_major} && 0%{?version_major} < 22
   %{_libdir}/dri/radeon_dri.so
@@ -595,7 +598,7 @@ popd
 %if 0%{?with_iris}
 %{_libdir}/dri/iris_dri.so
 %endif
-%if 0%{?with_zink}
+%if 0%{?with_vulkan_hw}
 %{_libdir}/dri/zink_dri.so
 %endif
 %endif
@@ -631,7 +634,6 @@ popd
 
 %if 0%{?with_va}
 %files va-drivers
-%{_libdir}/dri/virtio_gpu_drv_video.so
 %{_libdir}/dri/nouveau_drv_video.so
 %if 0%{?with_r600}
 %{_libdir}/dri/r600_drv_video.so
@@ -639,12 +641,12 @@ popd
 %if 0%{?with_radeonsi}
 %{_libdir}/dri/radeonsi_drv_video.so
 %endif
+%{_libdir}/dri/virtio_gpu_drv_video.so
 %endif
 
 %if 0%{?with_vdpau}
 %files vdpau-drivers
 %{_libdir}/vdpau/libvdpau_nouveau.so.1*
-%{_libdir}/vdpau/libvdpau_virtio_gpu.so.1*
 %if 0%{?with_r300}
 %{_libdir}/vdpau/libvdpau_r300.so.1*
 %endif
@@ -655,6 +657,7 @@ popd
 %{_libdir}/vdpau/libvdpau_radeonsi.so.1*
 %endif
 %endif
+%{_libdir}/vdpau/libvdpau_virtio_gpu.so.1*
 %endif
 
 %files vulkan-drivers
@@ -680,6 +683,19 @@ popd
 
 
 %changelog
+* Thu Jan 12 2023 Mihai Vultur <mihaivultur7@gmail.com>
+  Introduce 'with_opencl_rust' and temporary disable rust opencl.
+
+* Thu Jan 12 2023 Peter Robinson <pbrobinson@fedoraproject.org>
+   Enable rusticl as an optional OpenCL engine
+
+* Sat Dec 17 2022 Mihai Vultur <mihaivultur7@gmail.com>
+  Use official freedesktop gitlab url for downloading source archive.
+  .. for some reason it seems like mirroring to github is not working.
+
+* Mon Dec 12 2022 Mihai Vultur <mihaivultur7@gmail.com>
+  Use '-Dxmlconfig=enabled' otherwise drirc config files won't be generated..
+
 * Wed Nov 16 2022 Mihai Vultur <mihaivultur7@gmail.com>
   Use '-Dcpp_std=gnu++17' to unbreak the build.
 
