@@ -5,11 +5,11 @@
 %global version_file https://raw.githubusercontent.com/KhronosGroup/glslang/{}/.gitignore
 %global version_tag_regex reg_beg ([0-9.]+[0-9]) reg_end
 
-%define version_string 11.13.0
+%define version_string 12.0.0
 
-%define commit 1fb2f1d7896627d62a289439a2c3e750e551a7ab
+%define commit 0d3211ff7bb5b0fbad7866f5a21bdcd81886f4be
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20230115
+%global commit_date 20230122
 %global gitrel .%{commit_date}.%{shortcommit}
 
 
