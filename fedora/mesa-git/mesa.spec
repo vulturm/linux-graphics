@@ -7,9 +7,9 @@
 %define version_string 23.1.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit ff494361bee7506db701cb861073ab194ae3a6e9
+%define commit 7c62f6fa01d7c0d9d7eabec1c545950af20d0c92
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20230228.11
+%global commit_date 20230228.12
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -20,7 +20,7 @@
 %global with_nine 1
 %global with_omx 1
 %global with_opencl 1
-%global with_opencl_rust 0
+%global with_opencl_rust 1
 %global base_drivers nouveau,r100,r200
 %endif
 
