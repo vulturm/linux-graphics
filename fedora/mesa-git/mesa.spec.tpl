@@ -20,7 +20,7 @@
 %global with_nine 1
 %global with_omx 1
 %global with_opencl 1
-%global with_opencl_rust 1
+%global with_opencl_rust 0
 %global base_drivers nouveau,r100,r200
 %endif
 
