@@ -100,7 +100,7 @@ Patch3:         0003-evergreen-big-endian.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1560481
 #Patch7:         0001-gallium-Disable-rgb10-configs-by-default.patch
 
-BuildRequires:  meson >= 0.61.4
+BuildRequires:  meson >= 1.0.0
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
