@@ -380,6 +380,11 @@ Headers for development with the Vulkan API.
 cp %{SOURCE1} docs/
 
 %build
+%if 0%{?with_opencl_rust}
+# ensure standard Rust compiler flags are set
+export RUSTFLAGS="%build_rustflags"
+%endif
+
 # We've gotten a report that enabling LTO for mesa breaks some games. See
 # https://bugzilla.redhat.com/show_bug.cgi?id=1862771 for details.
 # Disable LTO for now
@@ -683,6 +688,9 @@ popd
 
 
 %changelog
+* Tue Feb 28 2023 Fabio Valentini <decathorpe@gmail.com>
+  Ensure standard Rust compiler flags are set.
+
 * Thu Jan 12 2023 Mihai Vultur <mihaivultur7@gmail.com>
   Introduce 'with_opencl_rust' and temporary disable rust opencl.
 
