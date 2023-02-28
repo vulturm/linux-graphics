@@ -652,9 +652,6 @@ popd
 %if 0%{?with_vdpau}
 %files vdpau-drivers
 %{_libdir}/vdpau/libvdpau_nouveau.so.1*
-%if 0%{?with_r300}
-%{_libdir}/vdpau/libvdpau_r300.so.1*
-%endif
 %if 0%{?with_r600}
 %{_libdir}/vdpau/libvdpau_r600.so.1*
 %endif
@@ -688,6 +685,10 @@ popd
 
 
 %changelog
+* Tue Feb 28 2023 Mihai Vultur <mihaivultur7@gmail.com>
+  According to https://gitlab.freedesktop.org/mesa/mesa/-/commit/a06ab9849db7fdf8f5194412f0c5a15abd8ece9b
+  Vdpau support for r300 has been dropped.
+
 * Tue Feb 28 2023 Fabio Valentini <decathorpe@gmail.com>
   Ensure standard Rust compiler flags are set.
 
