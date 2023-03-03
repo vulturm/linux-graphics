@@ -7,9 +7,9 @@
 %define version_string 23.1.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 689ce66a4332524b4eb98877de6f75d05dd05c60
+%define commit 9a4641cf6b669598d270117e5c64653db6e7db65
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20230303.00
+%global commit_date 20230303.05
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
