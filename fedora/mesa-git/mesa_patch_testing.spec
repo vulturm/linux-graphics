@@ -9,7 +9,7 @@
 
 %define commit 0cec71d7ce0a793b35aca7c142f511417c3fd57a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20230121.23
+%global commit_date 20230319.19
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -100,7 +100,7 @@ Patch3:         0003-evergreen-big-endian.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1560481
 #Patch7:         0001-gallium-Disable-rgb10-configs-by-default.patch
 
-BuildRequires:  meson >= 0.61.4
+BuildRequires:  meson >= 1.0.0
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
@@ -380,6 +380,11 @@ Headers for development with the Vulkan API.
 cp %{SOURCE1} docs/
 
 %build
+%if 0%{?with_opencl_rust}
+# ensure standard Rust compiler flags are set
+export RUSTFLAGS="%build_rustflags"
+%endif
+
 # We've gotten a report that enabling LTO for mesa breaks some games. See
 # https://bugzilla.redhat.com/show_bug.cgi?id=1862771 for details.
 # Disable LTO for now
@@ -647,9 +652,6 @@ popd
 %if 0%{?with_vdpau}
 %files vdpau-drivers
 %{_libdir}/vdpau/libvdpau_nouveau.so.1*
-%if 0%{?with_r300}
-%{_libdir}/vdpau/libvdpau_r300.so.1*
-%endif
 %if 0%{?with_r600}
 %{_libdir}/vdpau/libvdpau_r600.so.1*
 %endif
@@ -683,6 +685,13 @@ popd
 
 
 %changelog
+* Tue Feb 28 2023 Mihai Vultur <mihaivultur7@gmail.com>
+  According to https://gitlab.freedesktop.org/mesa/mesa/-/commit/a06ab9849db7fdf8f5194412f0c5a15abd8ece9b
+  Vdpau support for r300 has been dropped.
+
+* Tue Feb 28 2023 Fabio Valentini <decathorpe@gmail.com>
+  Ensure standard Rust compiler flags are set.
+
 * Thu Jan 12 2023 Mihai Vultur <mihaivultur7@gmail.com>
   Introduce 'with_opencl_rust' and temporary disable rust opencl.
 
