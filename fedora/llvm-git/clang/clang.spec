@@ -6,10 +6,10 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 78bb06b1270c5d266dc080e31a7fed2075b02052
+%define commit c67079f1be713fa558b3773562bd1eeb156cadbd
 
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20230425
+%global commit_date 20230427
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %global _default_patch_fuzz 2
