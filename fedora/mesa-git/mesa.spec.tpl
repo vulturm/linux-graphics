@@ -104,14 +104,17 @@ BuildRequires:  meson >= 1.0.0
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
-
 %if 0%{?with_hardware}
 BuildRequires:  kernel-headers
 %endif
+# We only check for the minimum version of pkgconfig(libdrm) needed so that the
+# SRPMs for each arch still have the same build dependencies. See:
+# https://bugzilla.redhat.com/show_bug.cgi?id=1859515
 BuildRequires:  pkgconfig(libdrm) >= 2.4.97
-BuildRequires:  pkgconfig(libxml-2.0)
+BuildRequires:  pkgconfig(libunwind)
 BuildRequires:  pkgconfig(expat)
 BuildRequires:  pkgconfig(zlib) >= 1.2.3
+BuildRequires:  pkgconfig(libzstd)
 BuildRequires:  pkgconfig(libselinux)
 BuildRequires:  pkgconfig(wayland-scanner)
 BuildRequires:  pkgconfig(wayland-protocols) >= 1.8
@@ -136,9 +139,9 @@ BuildRequires:  pkgconfig(glproto) >= 1.4.14
 BuildRequires:  pkgconfig(xcb-xfixes)
 BuildRequires:  pkgconfig(xcb-randr)
 BuildRequires:  pkgconfig(xrandr) >= 1.3
-BuildRequires:	pkgconfig(libunwind)
 BuildRequires:  bison
 BuildRequires:  flex
+BuildRequires:  lm_sensors-devel
 %if 0%{?with_vdpau}
 BuildRequires:  pkgconfig(vdpau) >= 1.1
 %endif
@@ -153,10 +156,8 @@ BuildRequires:  pkgconfig(libglvnd) >= 1.3.2
 BuildRequires:  llvm-devel >= 7.0.0
 %if 0%{?with_opencl}
 BuildRequires:  clang-devel
-%if 0%{?with_opencl_rust}
 BuildRequires:  bindgen
 BuildRequires:  rust-packaging
-%endif
 BuildRequires:  pkgconfig(libclc)
 BuildRequires:  pkgconfig(SPIRV-Tools)
 BuildRequires:  pkgconfig(LLVMSPIRVLib)
@@ -166,16 +167,15 @@ BuildRequires:  pkgconfig(valgrind)
 %endif
 BuildRequires:  python3-devel
 BuildRequires:  python3-mako
+%if 0%{?with_intel_clc}
+BuildRequires:  python3-ply
+%endif
 BuildRequires:  vulkan-headers
 BuildRequires:  glslang
 %if 0%{?with_vulkan_hw}
 BuildRequires:  pkgconfig(vulkan)
 %endif
-## vulkan hud requires
-%if 0%{?with_vulkan_overlay}
-BuildRequires:  lm_sensors-devel
-BuildRequires:  /usr/bin/pathfix.py
-%endif 
+
 
 %description
 %{summary}.
@@ -406,7 +406,7 @@ export RUSTFLAGS="%build_rustflags"
   -Dgallium-nine=%{?with_nine:true}%{!?with_nine:false} \
   -Dgallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
  %if 0%{?with_opencl_rust}
-  -Dgallium-rusticl=true -Dllvm=enabled -Drust_std=2021 \
+  -Dgallium-rusticl=true \
  %endif
   -Dvulkan-drivers=%{?vulkan_drivers} \
   -Dvulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
