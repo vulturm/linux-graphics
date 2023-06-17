@@ -20,7 +20,7 @@
 %global with_nine 1
 %global with_omx 1
 %global with_opencl 1
-%global with_opencl_rust 0
+%global with_opencl_rust 1
 %global base_drivers nouveau,r100,r200
 %endif
 
@@ -406,7 +406,7 @@ export RUSTFLAGS="%build_rustflags"
   -Dgallium-nine=%{?with_nine:true}%{!?with_nine:false} \
   -Dgallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
  %if 0%{?with_opencl_rust}
-  -Dgallium-rusticl=true \
+  -Dgallium-rusticl=true -Drust_std=2021 \
  %endif
   -Dvulkan-drivers=%{?vulkan_drivers} \
   -Dvulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
