@@ -422,13 +422,11 @@ export RUSTFLAGS="%build_rustflags"
   -Dllvm=enabled \
   -Dshared-llvm=enabled \
   -Dvalgrind=%{?with_valgrind:enabled}%{!?with_valgrind:disabled} \
-  -Dbuild-tests=false \
   -Dselinux=true \
   -Dvideo-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec \
   -Dgallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
-  -Dxmlconfig=enabled \
-  -Dlibunwind=enabled \
-  -Dlmsensors=enabled \
+  -Dbuild-tests=false \
+  -Dandroid-libbacktrace=disabled \
   %{nil}
 %meson_build
 
