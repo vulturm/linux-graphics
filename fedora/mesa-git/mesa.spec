@@ -2,15 +2,15 @@
 %global build_branch master
 %bcond_with hw_video_decoder
 %global _default_patch_fuzz 2
-%global __meson_auto_features disabled
+#global __meson_auto_features disabled
 
 %global build_repo https://gitlab.freedesktop.org/mesa/mesa
 %define version_string 23.2.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 714e11fe046f71a9184af475fe631df918a97cc7
+%define commit 0e728ea7b0779e299cec948d7ba06ab591c04992
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20230619.18
+%global commit_date 20230619.20
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
