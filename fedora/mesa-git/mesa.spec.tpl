@@ -2,7 +2,7 @@
 %global build_branch master
 %bcond_with hw_video_decoder
 %global _default_patch_fuzz 2
-%global __meson_auto_features disabled
+#global __meson_auto_features disabled
 
 %global build_repo BUILD_REPO
 %define version_string VERSION_STRING
