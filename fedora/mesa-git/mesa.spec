@@ -1,5 +1,6 @@
 %define package_name mesa
 %global build_branch master
+%bcond_with hw_video_decoder
 %global _default_patch_fuzz 2
 %global __meson_auto_features disabled
 
@@ -7,9 +8,9 @@
 %define version_string 23.2.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit a5cdc4840da25903869667409e1cefa4e4274bdd
+%define commit 714e11fe046f71a9184af475fe631df918a97cc7
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20230619.10
+%global commit_date 20230619.18
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -27,6 +28,9 @@
 %ifarch %{ix86} x86_64
 %global platform_drivers ,i915,i965
 %global with_crocus 1
+%if !0%{?rhel}
+%global with_intel_clc 1
+%endif
 %global with_iris   1
 %global with_vmware 1
 %global with_xa     1
@@ -209,6 +213,8 @@ Provides:       libGL-devel%{?_isa}
 %package libEGL
 Summary:        Mesa libEGL runtime libraries
 Requires:       libglvnd-egl%{?_isa} >= 1:1.3.2
+Requires:       %{name}-libgbm%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-libglapi%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 Recommends:     %{name}-dri-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 Obsoletes:      egl-icd < %{?epoch:%{epoch}:}%{version}-%{release}
 
@@ -229,8 +235,9 @@ Provides:       libEGL-devel%{?_isa}
 %package dri-drivers
 Summary:        Mesa-based DRI drivers
 Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-libglapi%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 %if 0%{?with_va}
-Recommends:     %{name}-va-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Recommends:     %{name}-va-drivers%{?_isa}
 %endif
 
 %description dri-drivers
@@ -380,10 +387,8 @@ Headers for development with the Vulkan API.
 cp %{SOURCE1} docs/
 
 %build
-%if 0%{?with_opencl_rust}
 # ensure standard Rust compiler flags are set
 export RUSTFLAGS="%build_rustflags"
-%endif
 
 # We've gotten a report that enabling LTO for mesa breaks some games. See
 # https://bugzilla.redhat.com/show_bug.cgi?id=1862771 for details.
@@ -406,7 +411,7 @@ export RUSTFLAGS="%build_rustflags"
   -Dgallium-nine=%{?with_nine:true}%{!?with_nine:false} \
   -Dgallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
  %if 0%{?with_opencl_rust}
-  -Dgallium-rusticl=true \
+  -Dgallium-rusticl=true -Drust_std=2021 \
  %endif
   -Dvulkan-drivers=%{?vulkan_drivers} \
   -Dvulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
@@ -418,15 +423,19 @@ export RUSTFLAGS="%build_rustflags"
   -Dglx=dri \
   -Degl=enabled \
   -Dglvnd=true \
+%if 0%{?with_intel_clc}
+  -Dintel-clc=enabled \
+%endif
   -Dmicrosoft-clc=disabled \
   -Dllvm=enabled \
   -Dshared-llvm=enabled \
   -Dvalgrind=%{?with_valgrind:enabled}%{!?with_valgrind:disabled} \
-  -Dselinux=true \
-  -Dvideo-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec \
-  -Dgallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
   -Dbuild-tests=false \
+  -Dselinux=true \
   -Dandroid-libbacktrace=disabled \
+%if %{with hw_video_decoder}
+  -Dvideo-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec \
+%endif
   %{nil}
 %meson_build
 
