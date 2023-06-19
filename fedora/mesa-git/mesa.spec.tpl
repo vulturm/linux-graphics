@@ -426,6 +426,9 @@ export RUSTFLAGS="%build_rustflags"
   -Dvideo-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec \
   -Dgallium-extra-hud=%{?with_gallium_extra_hud:true}%{!?with_gallium_extra_hud:false} \
   -Dbuild-tests=false \
+  -Dxmlconfig=enabled \
+  -Dlibunwind=enabled \
+  -Dlmsensors=enabled \
   -Dandroid-libbacktrace=disabled \
   %{nil}
 %meson_build
