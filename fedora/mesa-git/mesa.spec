@@ -34,7 +34,7 @@
 %global with_iris   1
 %global with_vmware 1
 %global with_xa     1
-%global vulkan_drivers intel,intel_hasvk,amd
+%global vulkan_drivers intel,intel_hasvk,amd,nouveau-experimental
 %else
 %ifnarch s390x
 %global vulkan_drivers amd
