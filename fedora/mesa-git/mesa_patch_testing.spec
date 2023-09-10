@@ -4,13 +4,13 @@
 %global _default_patch_fuzz 2
 #global __meson_auto_features disabled
 
-%global build_repo https://github.com/vulturm/mesa
-%define version_string 21.2.0
+%global build_repo https://gitlab.freedesktop.org/mesa/mesa
+%define version_string 23.3.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 0cec71d7ce0a793b35aca7c142f511417c3fd57a
+%define commit 39fca243bb914cea853e9d3502f1f38e6bf96ad4
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20230724.07
+%global commit_date 20230910.00
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -20,7 +20,7 @@
 %global with_va 1
 %global with_nine 1
 %global with_omx 1
-%global with_opencl 1
+%global with_opencl 0
 %global with_opencl_rust 1
 %global base_drivers nouveau,r100,r200
 %endif
@@ -158,7 +158,7 @@ BuildRequires:  pkgconfig(libomxil-bellagio)
 BuildRequires:  pkgconfig(libelf)
 BuildRequires:  pkgconfig(libglvnd) >= 1.3.2
 BuildRequires:  llvm-devel >= 7.0.0
-%if 0%{?with_opencl}
+%if 0%{?with_opencl} || 0%{?with_opencl_rust}
 BuildRequires:  clang-devel
 BuildRequires:  bindgen
 BuildRequires:  rust-packaging
