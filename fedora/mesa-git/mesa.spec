@@ -8,9 +8,9 @@
 %define version_string 23.3.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 2be9b66cddbe56136adb95013f084b3d881b8b71
+%define commit dbe2230408a5fefbd45188ead96f78a7490d9ad9
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20231001.20
+%global commit_date 20231001.21
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -96,8 +96,6 @@ Source0:        %{build_repo}/-/archive/%{commit}.tar.gz#/mesa-%{commit}.tar.gz
 # Source1 contains email correspondence clarifying the license terms.
 # Fedora opts to ignore the optional part of clause 2 and treat that code as 2 clause BSD.
 Source1:        Mesa-MLAA-License-Clarification-Email.txt
-
-Patch3:         0003-evergreen-big-endian.patch
 
 
 # Disable rgb10 configs by default:
