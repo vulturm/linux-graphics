@@ -4,13 +4,13 @@
 %global _default_patch_fuzz 2
 #global __meson_auto_features disabled
 
-%global build_repo https://gitlab.freedesktop.org/mesa/mesa
-%define version_string 23.3.0
+%global build_repo https://github.com/vulturm/mesa
+%define version_string 21.2.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit dbe2230408a5fefbd45188ead96f78a7490d9ad9
+%define commit 0cec71d7ce0a793b35aca7c142f511417c3fd57a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20231001.21
+%global commit_date 20231003.01
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -34,7 +34,7 @@
 %global with_iris   1
 %global with_vmware 1
 %global with_xa     1
-%global vulkan_drivers intel,intel_hasvk,amd,nouveau-experimental
+%global vulkan_drivers intel,intel_hasvk,amd
 %else
 %ifnarch s390x
 %global vulkan_drivers amd
