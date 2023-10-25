@@ -403,7 +403,7 @@ export RUSTFLAGS="%build_rustflags"
   -Dgallium-rusticl=true \
  %endif
   -Dvulkan-drivers=%{?vulkan_drivers} \
-  -Dvulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
+  -Dvulkan-layers=intel-nullhw,device-select%{?with_vulkan_overlay:,overlay} \
   -Dshared-glapi=enabled \
   -Dgles1=enabled \
   -Dgles2=enabled \
@@ -482,12 +482,10 @@ popd
 %dir %{_includedir}/EGL
 %{_includedir}/EGL/*.h
 
-%ldconfig_scriptlets libglapi
 %files libglapi
 %{_libdir}/libglapi.so.0
 %{_libdir}/libglapi.so.0.*
 
-%ldconfig_scriptlets libOSMesa
 %files libOSMesa
 %{_libdir}/libOSMesa.so.8*
 %files libOSMesa-devel
@@ -496,7 +494,6 @@ popd
 %{_libdir}/libOSMesa.so
 %{_libdir}/pkgconfig/osmesa.pc
 
-%ldconfig_scriptlets libgbm
 %files libgbm
 %{_libdir}/libgbm.so.1
 %{_libdir}/libgbm.so.1.*
@@ -506,7 +503,6 @@ popd
 %{_libdir}/pkgconfig/gbm.pc
 
 %if 0%{?with_xa}
-%ldconfig_scriptlets libxatracker
 %files libxatracker
 %if 0%{?with_hardware}
 %{_libdir}/libxatracker.so.2
@@ -524,7 +520,6 @@ popd
 %endif
 
 %if 0%{?with_opencl}
-%ldconfig_scriptlets libOpenCL
 %files libOpenCL
 %{_libdir}/libMesaOpenCL.so.*
 %if 0%{?with_opencl_rust}
