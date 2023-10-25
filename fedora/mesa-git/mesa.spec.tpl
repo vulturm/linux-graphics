@@ -18,54 +18,53 @@
 %global with_vulkan_hw 1
 %global with_vdpau 1
 %global with_va 1
+%if !0%{?rhel}
 %global with_nine 1
 %global with_omx 1
 %global with_opencl 1
 %global with_opencl_rust 1
-%global base_drivers nouveau,r100,r200
+%endif
+%global base_vulkan ,amd
 %endif
 
 %ifarch %{ix86} x86_64
-%global platform_drivers ,i915,i965
 %global with_crocus 1
+%global with_i915   1
 %if !0%{?rhel}
 %global with_intel_clc 1
 %endif
 %global with_iris   1
-%global with_vmware 1
 %global with_xa     1
-%global vulkan_drivers intel,intel_hasvk,amd
-%else
-%ifnarch s390x
-%global vulkan_drivers amd
-%endif
+%global intel_platform_vulkan ,intel,intel_hasvk
 %endif
 
-%ifarch %{arm} aarch64
+%ifarch aarch64 x86_64 %{ix86}
 %if !0%{?rhel}
- %global with_etnaviv   1
- %global with_lima      1
- %global with_vc4       1
- %global with_v3d       1
+%global with_lima      1
+%global with_vc4       1
 %endif
+%global with_etnaviv   1
 %global with_freedreno 1
 %global with_kmsro     1
 %global with_panfrost  1
 %global with_tegra     1
+%global with_v3d       1
 %global with_xa        1
+%global extra_platform_vulkan ,broadcom,freedreno,panfrost
 %endif
 
-%ifnarch %{arm} s390x
+%ifnarch s390x
 %if !0%{?rhel}
- %global with_r300 1
- %global with_r600 1
+%global with_r300 1
+%global with_r600 1
 %endif
 %global with_radeonsi 1
-%global with_iris     1
+%global with_vmware 1
 %endif
 
-%ifnarch %{x86}
-%global with_asm 1
+%if !0%{?rhel}
+%global with_libunwind 1
+%global with_lmsensors 1
 %endif
 
 %ifarch %{valgrind_arches}
@@ -75,13 +74,7 @@
 %endif
 
 %global with_vulkan_overlay 1
-
-%if !0%{?rhel}
-  %global dri_drivers %{?base_drivers}%{?platform_drivers}
-%endif
-
-%global sanitize 1
-
+%global vulkan_drivers swrast%{?base_vulkan}%{?intel_platform_vulkan}%{?extra_platform_vulkan}
 
 Name:           %{package_name}
 Summary:        Mesa 3D Graphics Library, git version
@@ -113,7 +106,9 @@ BuildRequires:  kernel-headers
 # SRPMs for each arch still have the same build dependencies. See:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1859515
 BuildRequires:  pkgconfig(libdrm) >= 2.4.97
+%if 0%{?with_libunwind}
 BuildRequires:  pkgconfig(libunwind)
+%endif
 BuildRequires:  pkgconfig(expat)
 BuildRequires:  pkgconfig(zlib) >= 1.2.3
 BuildRequires:  pkgconfig(libzstd)
@@ -143,7 +138,9 @@ BuildRequires:  pkgconfig(xcb-randr)
 BuildRequires:  pkgconfig(xrandr) >= 1.3
 BuildRequires:  bison
 BuildRequires:  flex
+%if 0%{?with_lmsensors}
 BuildRequires:  lm_sensors-devel
+%endif
 %if 0%{?with_vdpau}
 BuildRequires:  pkgconfig(vdpau) >= 1.1
 %endif
@@ -367,17 +364,11 @@ Requires:       %{name}-libd3d%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release
 %package vulkan-drivers
 Summary:        Mesa Vulkan drivers
 Requires:       vulkan%{_isa}
+Obsoletes:      mesa-vulkan-devel < %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description vulkan-drivers
 The drivers with support for the Vulkan API.
 
-%package vulkan-devel
-Summary:        Mesa Vulkan development files
-Requires:       %{name}-vulkan-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:       vulkan-devel
-
-%description vulkan-devel
-Headers for development with the Vulkan API.
 
 %prep
 %setup -q -c
@@ -398,7 +389,7 @@ export RUSTFLAGS="%build_rustflags"
   -Ddri3=enabled \
   -Dosmesa=true \
 %if 0%{?with_hardware}
-  -Dgallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_vulkan_hw:,zink} \
+  -Dgallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_i915:,i915}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi}%{?with_r600:,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_v3d:,v3d}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_vulkan_hw:,zink} \
 %else
   -Dgallium-drivers=swrast,virgl \
 %endif
@@ -409,12 +400,12 @@ export RUSTFLAGS="%build_rustflags"
   -Dgallium-nine=%{?with_nine:true}%{!?with_nine:false} \
   -Dgallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
  %if 0%{?with_opencl_rust}
-  -Dgallium-rusticl=true -Drust_std=2021 \
+  -Dgallium-rusticl=true \
  %endif
   -Dvulkan-drivers=%{?vulkan_drivers} \
   -Dvulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
   -Dshared-glapi=enabled \
-  -Dgles1=disabled \
+  -Dgles1=enabled \
   -Dgles2=enabled \
   -Dopengl=true \
   -Dgbm=enabled \
@@ -430,6 +421,12 @@ export RUSTFLAGS="%build_rustflags"
   -Dvalgrind=%{?with_valgrind:enabled}%{!?with_valgrind:disabled} \
   -Dbuild-tests=false \
   -Dselinux=true \
+%if !0%{?with_libunwind}
+  -Dlibunwind=disabled \
+%endif
+%if !0%{?with_lmsensors}
+  -Dlmsensors=disabled \
+%endif
   -Dandroid-libbacktrace=disabled \
 %if %{with hw_video_decoder}
   -Dvideo-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec \
@@ -558,30 +555,45 @@ popd
 %files dri-drivers
 %dir %{_datadir}/drirc.d
 %{_datadir}/drirc.d/*.conf
+%{_libdir}/dri/kms_swrast_dri.so
+%{_libdir}/dri/swrast_dri.so
+%{_libdir}/dri/virtio_gpu_dri.so
+
 %if 0%{?with_hardware}
- %if 0%{?version_major} && 0%{?version_major} < 22
-  %{_libdir}/dri/radeon_dri.so
-  %{_libdir}/dri/r200_dri.so
-  %{_libdir}/dri/nouveau_vieux_dri.so
- %endif
-%if 0%{?with_r300}
-%{_libdir}/dri/r300_dri.so
-%endif
-%if 0%{?with_radeonsi}
-%if 0%{?with_r600}
-%{_libdir}/dri/r600_dri.so
-%endif
-%{_libdir}/dri/radeonsi_dri.so
+  %if 0%{?with_r300}
+    %{_libdir}/dri/r300_dri.so
+  %endif
+  %if 0%{?with_radeonsi}
+    %if 0%{?with_r600}
+      %{_libdir}/dri/r600_dri.so
+    %endif
+  %{_libdir}/dri/radeonsi_dri.so
 %endif
 %ifarch %{ix86} x86_64
- %if 0%{?version_major} && 0%{?version_major} < 22
-  %{_libdir}/dri/i830_dri.so
+  %{_libdir}/dri/crocus_dri.so
   %{_libdir}/dri/i915_dri.so
-  %{_libdir}/dri/i965_dri.so
- %endif
+  %if 0%{?with_iris}
+    %{_libdir}/dri/iris_dri.so
+  %endif
+%endif
+
+%ifarch aarch64 x86_64 %{ix86}
+  %{_libdir}/dri/ingenic-drm_dri.so
+  %{_libdir}/dri/imx-drm_dri.so
+  %{_libdir}/dri/imx-lcdif_dri.so
+  %{_libdir}/dri/kirin_dri.so
+  %{_libdir}/dri/komeda_dri.so
+  %{_libdir}/dri/mali-dp_dri.so
+  %{_libdir}/dri/mcde_dri.so
+  %{_libdir}/dri/mxsfb-drm_dri.so
+  %{_libdir}/dri/rcar-du_dri.so
+  %{_libdir}/dri/stm_dri.so
 %endif
 %if 0%{?with_vc4}
 %{_libdir}/dri/vc4_dri.so
+%endif
+%if 0%{?with_v3d}
+%{_libdir}/dri/v3d_dri.so
 %endif
 %if 0%{?with_freedreno}
 %{_libdir}/dri/kgsl_dri.so
@@ -589,7 +601,6 @@ popd
 %endif
 %if 0%{?with_etnaviv}
 %{_libdir}/dri/etnaviv_dri.so
-%{_libdir}/dri/imx-drm_dri.so
 %endif
 %if 0%{?with_tegra}
 %{_libdir}/dri/tegra_dri.so
@@ -599,17 +610,11 @@ popd
 %endif
 %if 0%{?with_panfrost}
 %{_libdir}/dri/panfrost_dri.so
+%{_libdir}/dri/hdlcd_dri.so
 %endif
 %{_libdir}/dri/nouveau_dri.so
 %if 0%{?with_vmware}
 %{_libdir}/dri/vmwgfx_dri.so
-%endif
-%{_libdir}/dri/crocus_dri.so
-%if 0%{?with_iris}
-%{_libdir}/dri/iris_dri.so
-%endif
-%if 0%{?with_vulkan_hw}
-%{_libdir}/dri/zink_dri.so
 %endif
 %endif
 %if 0%{?with_hardware}
@@ -622,6 +627,8 @@ popd
 %{_libdir}/dri/hx8357d_dri.so
 %{_libdir}/dri/ili9225_dri.so
 %{_libdir}/dri/ili9341_dri.so
+%{_libdir}/dri/imx-dcss_dri.so
+%{_libdir}/dri/mediatek_dri.so
 %{_libdir}/dri/meson_dri.so
 %{_libdir}/dri/mi0283qt_dri.so
 %{_libdir}/dri/pl111_dri.so
@@ -631,9 +638,9 @@ popd
 %{_libdir}/dri/st7735r_dri.so
 %{_libdir}/dri/sun4i-drm_dri.so
 %endif
-%{_libdir}/dri/kms_swrast_dri.so
-%{_libdir}/dri/swrast_dri.so
-%{_libdir}/dri/virtio_gpu_dri.so
+%if 0%{?with_vulkan_hw}
+%{_libdir}/dri/zink_dri.so
+%endif
 
 
 %if 0%{?with_hardware}
@@ -668,16 +675,8 @@ popd
 %endif
 
 %files vulkan-drivers
-%if 0%{?with_hardware}
-%ifarch %{ix86} x86_64
-%{_libdir}/libvulkan_intel.so
-%{_libdir}/libvulkan_intel_hasvk.so
-%{_datadir}/vulkan/icd.d/intel_icd.*.json
-%{_datadir}/vulkan/icd.d/intel_hasvk_icd.*.json
-%endif
-%{_libdir}/libvulkan_radeon.so
-%{_datadir}/vulkan/icd.d/radeon_icd.*.json
-%endif
+%{_libdir}/libvulkan_lvp.so
+%{_datadir}/vulkan/icd.d/lvp_icd.*.json
 %if 0%{?with_vulkan_overlay}
 %{_bindir}/mesa-overlay-control.py
 %{_libdir}/libVkLayer_MESA_overlay.so
@@ -686,10 +685,31 @@ popd
 %{_libdir}/libVkLayer_MESA_device_select.so
 %{_datadir}/vulkan/implicit_layer.d/VkLayer_MESA_device_select.json
 
-%files vulkan-devel
+%if 0%{?with_vulkan_hw}
+%{_libdir}/libvulkan_radeon.so
+%{_datadir}/vulkan/icd.d/radeon_icd.*.json
 
+%ifarch %{ix86} x86_64
+  %{_libdir}/libvulkan_intel.so
+  %{_libdir}/libvulkan_intel_hasvk.so
+  %{_datadir}/vulkan/icd.d/intel_icd.*.json
+  %{_datadir}/vulkan/icd.d/intel_hasvk_icd.*.json
+%endif
+%ifarch aarch64 x86_64 %{ix86}
+  %{_libdir}/libvulkan_broadcom.so
+  %{_datadir}/vulkan/icd.d/broadcom_icd.*.json
+  %{_libdir}/libvulkan_freedreno.so
+  %{_datadir}/vulkan/icd.d/freedreno_icd.*.json
+  %{_libdir}/libvulkan_panfrost.so
+  %{_datadir}/vulkan/icd.d/panfrost_icd.*.json
+%endif
+%endif
 
 %changelog
+* Wed Oct 25 2023 Mihai Vultur <mihaivultur7@gmail.com>
+  Various modifications and adjustments to more closely follow the official spec.
+  + hdlcd_dri.so
+ 
 * Tue Feb 28 2023 Mihai Vultur <mihaivultur7@gmail.com>
   According to https://gitlab.freedesktop.org/mesa/mesa/-/commit/a06ab9849db7fdf8f5194412f0c5a15abd8ece9b
   Vdpau support for r300 has been dropped.
