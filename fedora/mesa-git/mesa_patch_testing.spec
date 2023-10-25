@@ -10,7 +10,7 @@
 
 %define commit 0cec71d7ce0a793b35aca7c142f511417c3fd57a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20231022.18
+%global commit_date 20231024.20
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -18,54 +18,53 @@
 %global with_vulkan_hw 1
 %global with_vdpau 1
 %global with_va 1
+%if !0%{?rhel}
 %global with_nine 1
 %global with_omx 1
 %global with_opencl 1
 %global with_opencl_rust 1
-%global base_drivers nouveau,r100,r200
+%endif
+%global base_vulkan ,amd
 %endif
 
 %ifarch %{ix86} x86_64
-%global platform_drivers ,i915,i965
 %global with_crocus 1
+%global with_i915   1
 %if !0%{?rhel}
 %global with_intel_clc 1
 %endif
 %global with_iris   1
-%global with_vmware 1
 %global with_xa     1
-%global vulkan_drivers intel,intel_hasvk,amd
-%else
-%ifnarch s390x
-%global vulkan_drivers amd
-%endif
+%global intel_platform_vulkan ,intel,intel_hasvk
 %endif
 
-%ifarch %{arm} aarch64
+%ifarch aarch64 x86_64 %{ix86}
 %if !0%{?rhel}
- %global with_etnaviv   1
- %global with_lima      1
- %global with_vc4       1
- %global with_v3d       1
+%global with_lima      1
+%global with_vc4       1
 %endif
+%global with_etnaviv   1
 %global with_freedreno 1
 %global with_kmsro     1
 %global with_panfrost  1
 %global with_tegra     1
+%global with_v3d       1
 %global with_xa        1
+%global extra_platform_vulkan ,broadcom,freedreno,panfrost
 %endif
 
-%ifnarch %{arm} s390x
+%ifnarch s390x
 %if !0%{?rhel}
- %global with_r300 1
- %global with_r600 1
+%global with_r300 1
+%global with_r600 1
 %endif
 %global with_radeonsi 1
-%global with_iris     1
+%global with_vmware 1
 %endif
 
-%ifnarch %{x86}
-%global with_asm 1
+%if !0%{?rhel}
+%global with_libunwind 1
+%global with_lmsensors 1
 %endif
 
 %ifarch %{valgrind_arches}
@@ -76,12 +75,9 @@
 
 %global with_vulkan_overlay 1
 
-%if !0%{?rhel}
-  %global dri_drivers %{?base_drivers}%{?platform_drivers}
-%endif
-
 %global sanitize 1
 
+%global vulkan_drivers swrast%{?base_vulkan}%{?intel_platform_vulkan}%{?extra_platform_vulkan}
 
 Name:           %{package_name}
 Summary:        Mesa 3D Graphics Library, git version
@@ -113,7 +109,9 @@ BuildRequires:  kernel-headers
 # SRPMs for each arch still have the same build dependencies. See:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1859515
 BuildRequires:  pkgconfig(libdrm) >= 2.4.97
+%if 0%{?with_libunwind}
 BuildRequires:  pkgconfig(libunwind)
+%endif
 BuildRequires:  pkgconfig(expat)
 BuildRequires:  pkgconfig(zlib) >= 1.2.3
 BuildRequires:  pkgconfig(libzstd)
@@ -143,7 +141,9 @@ BuildRequires:  pkgconfig(xcb-randr)
 BuildRequires:  pkgconfig(xrandr) >= 1.3
 BuildRequires:  bison
 BuildRequires:  flex
+%if 0%{?with_lmsensors}
 BuildRequires:  lm_sensors-devel
+%endif
 %if 0%{?with_vdpau}
 BuildRequires:  pkgconfig(vdpau) >= 1.1
 %endif
@@ -398,7 +398,7 @@ export RUSTFLAGS="%build_rustflags"
   -Ddri3=enabled \
   -Dosmesa=true \
 %if 0%{?with_hardware}
-  -Dgallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_vulkan_hw:,zink} \
+  -Dgallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_i915:,i915}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi}%{?with_r600:,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_v3d:,v3d}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_vulkan_hw:,zink} \
 %else
   -Dgallium-drivers=swrast,virgl \
 %endif
@@ -409,7 +409,7 @@ export RUSTFLAGS="%build_rustflags"
   -Dgallium-nine=%{?with_nine:true}%{!?with_nine:false} \
   -Dgallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
  %if 0%{?with_opencl_rust}
-  -Dgallium-rusticl=true -Drust_std=2021 \
+  -Dgallium-rusticl=true \
  %endif
   -Dvulkan-drivers=%{?vulkan_drivers} \
   -Dvulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
@@ -430,6 +430,12 @@ export RUSTFLAGS="%build_rustflags"
   -Dvalgrind=%{?with_valgrind:enabled}%{!?with_valgrind:disabled} \
   -Dbuild-tests=false \
   -Dselinux=true \
+%if !0%{?with_libunwind}
+  -Dlibunwind=disabled \
+%endif
+%if !0%{?with_lmsensors}
+  -Dlmsensors=disabled \
+%endif
   -Dandroid-libbacktrace=disabled \
 %if %{with hw_video_decoder}
   -Dvideo-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec \
@@ -582,6 +588,9 @@ popd
 %endif
 %if 0%{?with_vc4}
 %{_libdir}/dri/vc4_dri.so
+%endif
+%if 0%{?with_v3d}
+%{_libdir}/dri/v3d_dri.so
 %endif
 %if 0%{?with_freedreno}
 %{_libdir}/dri/kgsl_dri.so
