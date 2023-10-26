@@ -10,7 +10,7 @@
 
 %define commit d446ccfc81bc985e592949bc440fbd6709ecf737
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20231026.10
+%global commit_date 20231026.11
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -403,7 +403,7 @@ export RUSTFLAGS="%build_rustflags"
   -Dgallium-rusticl=true \
  %endif
   -Dvulkan-drivers=%{?vulkan_drivers} \
-  -Dvulkan-layers=intel-nullhw,device-select%{?with_vulkan_overlay:,overlay} \
+  -Dvulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
   -Dshared-glapi=enabled \
   -Dgles1=enabled \
   -Dgles2=enabled \
