@@ -403,7 +403,7 @@ export RUSTFLAGS="%build_rustflags"
   -Dgallium-rusticl=true \
  %endif
   -Dvulkan-drivers=%{?vulkan_drivers} \
-  -Dvulkan-layers=intel-nullhw,device-select%{?with_vulkan_overlay:,overlay} \
+  -Dvulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
   -Dshared-glapi=enabled \
   -Dgles1=enabled \
   -Dgles2=enabled \
