@@ -10,7 +10,7 @@
 
 %define commit 0cec71d7ce0a793b35aca7c142f511417c3fd57a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20231024.20
+%global commit_date 20231029.18
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -74,9 +74,6 @@
 %endif
 
 %global with_vulkan_overlay 1
-
-%global sanitize 1
-
 %global vulkan_drivers swrast%{?base_vulkan}%{?intel_platform_vulkan}%{?extra_platform_vulkan}
 
 Name:           %{package_name}
@@ -367,17 +364,11 @@ Requires:       %{name}-libd3d%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release
 %package vulkan-drivers
 Summary:        Mesa Vulkan drivers
 Requires:       vulkan%{_isa}
+Obsoletes:      mesa-vulkan-devel < %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description vulkan-drivers
 The drivers with support for the Vulkan API.
 
-%package vulkan-devel
-Summary:        Mesa Vulkan development files
-Requires:       %{name}-vulkan-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:       vulkan-devel
-
-%description vulkan-devel
-Headers for development with the Vulkan API.
 
 %prep
 %setup -q -c
@@ -414,7 +405,7 @@ export RUSTFLAGS="%build_rustflags"
   -Dvulkan-drivers=%{?vulkan_drivers} \
   -Dvulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
   -Dshared-glapi=enabled \
-  -Dgles1=disabled \
+  -Dgles1=enabled \
   -Dgles2=enabled \
   -Dopengl=true \
   -Dgbm=enabled \
@@ -491,12 +482,10 @@ popd
 %dir %{_includedir}/EGL
 %{_includedir}/EGL/*.h
 
-%ldconfig_scriptlets libglapi
 %files libglapi
 %{_libdir}/libglapi.so.0
 %{_libdir}/libglapi.so.0.*
 
-%ldconfig_scriptlets libOSMesa
 %files libOSMesa
 %{_libdir}/libOSMesa.so.8*
 %files libOSMesa-devel
@@ -505,7 +494,6 @@ popd
 %{_libdir}/libOSMesa.so
 %{_libdir}/pkgconfig/osmesa.pc
 
-%ldconfig_scriptlets libgbm
 %files libgbm
 %{_libdir}/libgbm.so.1
 %{_libdir}/libgbm.so.1.*
@@ -515,7 +503,6 @@ popd
 %{_libdir}/pkgconfig/gbm.pc
 
 %if 0%{?with_xa}
-%ldconfig_scriptlets libxatracker
 %files libxatracker
 %if 0%{?with_hardware}
 %{_libdir}/libxatracker.so.2
@@ -533,7 +520,6 @@ popd
 %endif
 
 %if 0%{?with_opencl}
-%ldconfig_scriptlets libOpenCL
 %files libOpenCL
 %{_libdir}/libMesaOpenCL.so.*
 %if 0%{?with_opencl_rust}
@@ -564,27 +550,39 @@ popd
 %files dri-drivers
 %dir %{_datadir}/drirc.d
 %{_datadir}/drirc.d/*.conf
+%{_libdir}/dri/kms_swrast_dri.so
+%{_libdir}/dri/swrast_dri.so
+%{_libdir}/dri/virtio_gpu_dri.so
+
 %if 0%{?with_hardware}
- %if 0%{?version_major} && 0%{?version_major} < 22
-  %{_libdir}/dri/radeon_dri.so
-  %{_libdir}/dri/r200_dri.so
-  %{_libdir}/dri/nouveau_vieux_dri.so
- %endif
-%if 0%{?with_r300}
-%{_libdir}/dri/r300_dri.so
-%endif
-%if 0%{?with_radeonsi}
-%if 0%{?with_r600}
-%{_libdir}/dri/r600_dri.so
-%endif
-%{_libdir}/dri/radeonsi_dri.so
+  %if 0%{?with_r300}
+    %{_libdir}/dri/r300_dri.so
+  %endif
+  %if 0%{?with_radeonsi}
+    %if 0%{?with_r600}
+      %{_libdir}/dri/r600_dri.so
+    %endif
+  %{_libdir}/dri/radeonsi_dri.so
 %endif
 %ifarch %{ix86} x86_64
- %if 0%{?version_major} && 0%{?version_major} < 22
-  %{_libdir}/dri/i830_dri.so
+  %{_libdir}/dri/crocus_dri.so
   %{_libdir}/dri/i915_dri.so
-  %{_libdir}/dri/i965_dri.so
- %endif
+  %if 0%{?with_iris}
+    %{_libdir}/dri/iris_dri.so
+  %endif
+%endif
+
+%ifarch aarch64 x86_64 %{ix86}
+  %{_libdir}/dri/ingenic-drm_dri.so
+  %{_libdir}/dri/imx-drm_dri.so
+  %{_libdir}/dri/imx-lcdif_dri.so
+  %{_libdir}/dri/kirin_dri.so
+  %{_libdir}/dri/komeda_dri.so
+  %{_libdir}/dri/mali-dp_dri.so
+  %{_libdir}/dri/mcde_dri.so
+  %{_libdir}/dri/mxsfb-drm_dri.so
+  %{_libdir}/dri/rcar-du_dri.so
+  %{_libdir}/dri/stm_dri.so
 %endif
 %if 0%{?with_vc4}
 %{_libdir}/dri/vc4_dri.so
@@ -598,7 +596,6 @@ popd
 %endif
 %if 0%{?with_etnaviv}
 %{_libdir}/dri/etnaviv_dri.so
-%{_libdir}/dri/imx-drm_dri.so
 %endif
 %if 0%{?with_tegra}
 %{_libdir}/dri/tegra_dri.so
@@ -608,17 +605,11 @@ popd
 %endif
 %if 0%{?with_panfrost}
 %{_libdir}/dri/panfrost_dri.so
+%{_libdir}/dri/hdlcd_dri.so
 %endif
 %{_libdir}/dri/nouveau_dri.so
 %if 0%{?with_vmware}
 %{_libdir}/dri/vmwgfx_dri.so
-%endif
-%{_libdir}/dri/crocus_dri.so
-%if 0%{?with_iris}
-%{_libdir}/dri/iris_dri.so
-%endif
-%if 0%{?with_vulkan_hw}
-%{_libdir}/dri/zink_dri.so
 %endif
 %endif
 %if 0%{?with_hardware}
@@ -631,6 +622,8 @@ popd
 %{_libdir}/dri/hx8357d_dri.so
 %{_libdir}/dri/ili9225_dri.so
 %{_libdir}/dri/ili9341_dri.so
+%{_libdir}/dri/imx-dcss_dri.so
+%{_libdir}/dri/mediatek_dri.so
 %{_libdir}/dri/meson_dri.so
 %{_libdir}/dri/mi0283qt_dri.so
 %{_libdir}/dri/pl111_dri.so
@@ -640,9 +633,9 @@ popd
 %{_libdir}/dri/st7735r_dri.so
 %{_libdir}/dri/sun4i-drm_dri.so
 %endif
-%{_libdir}/dri/kms_swrast_dri.so
-%{_libdir}/dri/swrast_dri.so
-%{_libdir}/dri/virtio_gpu_dri.so
+%if 0%{?with_vulkan_hw}
+%{_libdir}/dri/zink_dri.so
+%endif
 
 
 %if 0%{?with_hardware}
@@ -677,16 +670,8 @@ popd
 %endif
 
 %files vulkan-drivers
-%if 0%{?with_hardware}
-%ifarch %{ix86} x86_64
-%{_libdir}/libvulkan_intel.so
-%{_libdir}/libvulkan_intel_hasvk.so
-%{_datadir}/vulkan/icd.d/intel_icd.*.json
-%{_datadir}/vulkan/icd.d/intel_hasvk_icd.*.json
-%endif
-%{_libdir}/libvulkan_radeon.so
-%{_datadir}/vulkan/icd.d/radeon_icd.*.json
-%endif
+%{_libdir}/libvulkan_lvp.so
+%{_datadir}/vulkan/icd.d/lvp_icd.*.json
 %if 0%{?with_vulkan_overlay}
 %{_bindir}/mesa-overlay-control.py
 %{_libdir}/libVkLayer_MESA_overlay.so
@@ -695,10 +680,31 @@ popd
 %{_libdir}/libVkLayer_MESA_device_select.so
 %{_datadir}/vulkan/implicit_layer.d/VkLayer_MESA_device_select.json
 
-%files vulkan-devel
+%if 0%{?with_vulkan_hw}
+%{_libdir}/libvulkan_radeon.so
+%{_datadir}/vulkan/icd.d/radeon_icd.*.json
 
+%ifarch %{ix86} x86_64
+  %{_libdir}/libvulkan_intel.so
+  %{_libdir}/libvulkan_intel_hasvk.so
+  %{_datadir}/vulkan/icd.d/intel_icd.*.json
+  %{_datadir}/vulkan/icd.d/intel_hasvk_icd.*.json
+%endif
+%ifarch aarch64 x86_64 %{ix86}
+  %{_libdir}/libvulkan_broadcom.so
+  %{_datadir}/vulkan/icd.d/broadcom_icd.*.json
+  %{_libdir}/libvulkan_freedreno.so
+  %{_datadir}/vulkan/icd.d/freedreno_icd.*.json
+  %{_libdir}/libvulkan_panfrost.so
+  %{_datadir}/vulkan/icd.d/panfrost_icd.*.json
+%endif
+%endif
 
 %changelog
+* Wed Oct 25 2023 Mihai Vultur <mihaivultur7@gmail.com>
+  Various modifications and adjustments to more closely follow the official spec.
+  + hdlcd_dri.so
+ 
 * Tue Feb 28 2023 Mihai Vultur <mihaivultur7@gmail.com>
   According to https://gitlab.freedesktop.org/mesa/mesa/-/commit/a06ab9849db7fdf8f5194412f0c5a15abd8ece9b
   Vdpau support for r300 has been dropped.
