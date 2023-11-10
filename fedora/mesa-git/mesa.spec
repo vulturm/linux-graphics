@@ -8,9 +8,9 @@
 %define version_string 24.0.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit fcd025c1ce658f1efd18b2e0072ef5c82862db2b
+%define commit 2d49f834b20d705d901414f6fc2b1fec019689c4
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20231110.20
+%global commit_date 20231110.23
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -581,6 +581,7 @@ popd
   %{_libdir}/dri/mali-dp_dri.so
   %{_libdir}/dri/mcde_dri.so
   %{_libdir}/dri/mxsfb-drm_dri.so
+  %{_libdir}/dri/panel-mipi-dbi_dri.so
   %{_libdir}/dri/rcar-du_dri.so
   %{_libdir}/dri/stm_dri.so
 %endif
@@ -619,9 +620,12 @@ popd
 %if 0%{?with_kmsro}
 %{_libdir}/dri/armada-drm_dri.so
 %{_libdir}/dri/exynos_dri.so
+%{_libdir}/dri/gm12u320_dri.so
 %{_libdir}/dri/hx8357d_dri.so
+%{_libdir}/dri/ili9163_dri.so
 %{_libdir}/dri/ili9225_dri.so
 %{_libdir}/dri/ili9341_dri.so
+%{_libdir}/dri/ili9486_dri.so
 %{_libdir}/dri/imx-dcss_dri.so
 %{_libdir}/dri/mediatek_dri.so
 %{_libdir}/dri/meson_dri.so
@@ -632,6 +636,7 @@ popd
 %{_libdir}/dri/st7586_dri.so
 %{_libdir}/dri/st7735r_dri.so
 %{_libdir}/dri/sun4i-drm_dri.so
+%{_libdir}/dri/udl_dri.so
 %endif
 %if 0%{?with_vulkan_hw}
 %{_libdir}/dri/zink_dri.so
@@ -701,6 +706,9 @@ popd
 %endif
 
 %changelog
+* Fri Nov 11 2023 Mihai Vultur <mihaivultur7@gmail.com>
+  Add new drivers to the list: https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/26129
+ 
 * Wed Oct 25 2023 Mihai Vultur <mihaivultur7@gmail.com>
   Various modifications and adjustments to more closely follow the official spec.
   + hdlcd_dri.so
