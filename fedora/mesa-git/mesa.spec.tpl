@@ -428,6 +428,9 @@ export RUSTFLAGS="%build_rustflags"
   -Dlmsensors=disabled \
 %endif
   -Dandroid-libbacktrace=disabled \
+%ifarch %{ix86}
+  -Dglx-read-only-text=true \
+%endif
 %if %{with hw_video_decoder}
   -Dvideo-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec \
 %endif
@@ -706,6 +709,13 @@ popd
 %endif
 
 %changelog
+
+* Mon Nov 27 2023 José Expósitojexposit@redhat.com>
+  Set glx-read-only-text on i386
+  An update on the linker will now refuse to create binaries with a loadable
+  memory segment that has read, write and execute permissions set.
+  mesa creates one unless "glx-read-only-text" is enabled.
+ 
 * Fri Nov 11 2023 Mihai Vultur <mihaivultur7@gmail.com>
   Add new drivers to the list: https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/26129
  
