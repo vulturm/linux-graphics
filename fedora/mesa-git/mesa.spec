@@ -8,9 +8,9 @@
 %define version_string 24.0.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 19420731123e850e10c68eb3cd672b00561c48d7
+%define commit cf510e38a51250702ec90bece7a9d397669ae28f
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20231127.15
+%global commit_date 20231127.17
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -428,6 +428,9 @@ export RUSTFLAGS="%build_rustflags"
   -Dlmsensors=disabled \
 %endif
   -Dandroid-libbacktrace=disabled \
+%ifarch %{ix86}
+  -Dglx-read-only-text=true \
+%endif
 %if %{with hw_video_decoder}
   -Dvideo-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec \
 %endif
@@ -706,6 +709,13 @@ popd
 %endif
 
 %changelog
+
+* Mon Nov 27 2023 José Expósitojexposit@redhat.com>
+  Set glx-read-only-text on i386
+  An update on the linker will now refuse to create binaries with a loadable
+  memory segment that has read, write and execute permissions set.
+  mesa creates one unless "glx-read-only-text" is enabled.
+ 
 * Fri Nov 11 2023 Mihai Vultur <mihaivultur7@gmail.com>
   Add new drivers to the list: https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/26129
  
