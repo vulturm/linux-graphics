@@ -8,7 +8,7 @@
 %define version_string 24.0.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 4f48a140ac9dc2d1581faed21ac07914c6744cb5
+%define commit 748b7f80ef1cf6a3fed9991d70230e69fef51a0e
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global commit_date 20231129.20
 %global gitrel .%{commit_date}.%{shortcommit}
@@ -586,6 +586,7 @@ popd
   %{_libdir}/dri/mxsfb-drm_dri.so
   %{_libdir}/dri/panel-mipi-dbi_dri.so
   %{_libdir}/dri/rcar-du_dri.so
+  %{_libdir}/dri/sti_dri.so
   %{_libdir}/dri/stm_dri.so
 %endif
 %if 0%{?with_vc4}
@@ -716,7 +717,7 @@ popd
   memory segment that has read, write and execute permissions set.
   mesa creates one unless "glx-read-only-text" is enabled.
  
-* Fri Nov 11 2023 Mihai Vultur <mihaivultur7@gmail.com>
+* Sat Nov 11 2023 Mihai Vultur <mihaivultur7@gmail.com>
   Add new drivers to the list: https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/26129
  
 * Wed Oct 25 2023 Mihai Vultur <mihaivultur7@gmail.com>
