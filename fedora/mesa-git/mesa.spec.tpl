@@ -586,6 +586,7 @@ popd
   %{_libdir}/dri/mxsfb-drm_dri.so
   %{_libdir}/dri/panel-mipi-dbi_dri.so
   %{_libdir}/dri/rcar-du_dri.so
+  %{_libdir}/dri/sti_dri.so
   %{_libdir}/dri/stm_dri.so
 %endif
 %if 0%{?with_vc4}
@@ -716,7 +717,7 @@ popd
   memory segment that has read, write and execute permissions set.
   mesa creates one unless "glx-read-only-text" is enabled.
  
-* Fri Nov 11 2023 Mihai Vultur <mihaivultur7@gmail.com>
+* Sat Nov 11 2023 Mihai Vultur <mihaivultur7@gmail.com>
   Add new drivers to the list: https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/26129
  
 * Wed Oct 25 2023 Mihai Vultur <mihaivultur7@gmail.com>
