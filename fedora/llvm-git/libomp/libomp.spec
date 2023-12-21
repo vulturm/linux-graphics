@@ -7,8 +7,8 @@
 %global min_ver 0
 %global patch_ver 0
 
-%define commit edbd034248bcec94863199de7c7dcfd3347284a9
-%global commit_date 20231219
+%define commit 528150b90bb54618b5cceddb85601718c2346f3f
+%global commit_date 20231221
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 %global gitrel .%{commit_date}.git%{shortcommit}
