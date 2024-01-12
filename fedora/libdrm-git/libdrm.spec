@@ -8,8 +8,14 @@
 
 %global rel_build %{build_timestamp}.%{build_shortcommit}%{?dist}
 
-
 %define bcond_meson() %{lua: do
+  local option = rpm.expand("%{1}")
+  local with = rpm.expand("%{?with_" .. option .. "}")
+  local value = (with ~= '') and "enabled" or "disabled"
+  option = option:gsub('_', '-')
+  print(string.format("-D%s=%s", option, value))
+end}
+%define bcond_meson_tf() %{lua: do
   local option = rpm.expand("%{1}")
   local with = rpm.expand("%{?with_" .. option .. "}")
   local value = (with ~= '') and "true" or "false"
@@ -17,7 +23,6 @@
   print(string.format("-D%s=%s", option, value))
 end}
 
-%bcond_without libkms
 %ifarch %{ix86} x86_64
 %bcond_without intel
 %else
@@ -72,7 +77,6 @@ BuildRequires:  meson >= 0.43
 BuildRequires:  gcc
 BuildRequires:  libatomic_ops-devel
 BuildRequires:  kernel-headers
-BuildRequires:  python3-docutils
 %if %{with intel}
 BuildRequires:  pkgconfig(pciaccess) >= 0.10
 %endif
@@ -81,9 +85,7 @@ BuildRequires:  pkgconfig(pciaccess) >= 0.10
 BuildRequires:  pkgconfig(cairo)
 %endif
 %if %{with man_pages}
-BuildRequires:  %{_bindir}/xsltproc
-BuildRequires:  %{_bindir}/sed
-BuildRequires:  docbook-style-xsl
+BuildRequires:  python3-docutils
 %endif
 %if %{with valgrind}
 BuildRequires:  valgrind-devel
@@ -119,12 +121,10 @@ Utility programs for the kernel DRM interface.  Will void your warranty.
 %endif
 
 %prep
-%setup -q -c
 %autosetup -n drm-%{build_branch} -p1
 
 %build
 %meson \
-  %{bcond_meson libkms}                \
   %{bcond_meson intel}                 \
   %{bcond_meson radeon}                \
   %{bcond_meson amdgpu}                \
@@ -139,9 +139,9 @@ Utility programs for the kernel DRM interface.  Will void your warranty.
   %{bcond_meson cairo_tests}           \
   %{bcond_meson man_pages}             \
   %{bcond_meson valgrind}              \
-  %{bcond_meson freedreno_kgsl}        \
-  %{bcond_meson install_test_programs} \
-  %{bcond_meson udev}                  \
+  %{bcond_meson_tf freedreno_kgsl}        \
+  %{bcond_meson_tf install_test_programs} \
+  %{bcond_meson_tf udev}                  \
   %{nil}
 %meson_build
 
@@ -164,10 +164,6 @@ cp %{SOURCE1} %{buildroot}%{_docdir}/libdrm
 %{_libdir}/libdrm.so.2
 %{_libdir}/libdrm.so.2.4.0
 %dir %{_datadir}/libdrm
-%if %{with libkms}
-%{_libdir}/libkms.so.1
-%{_libdir}/libkms.so.1.0.0
-%endif
 %if %{with intel}
 %{_libdir}/libdrm_intel.so.1
 %{_libdir}/libdrm_intel.so.1.0.0
@@ -218,11 +214,6 @@ cp %{SOURCE1} %{buildroot}%{_docdir}/libdrm
 %{_includedir}/libdrm/*_drm.h
 %{_libdir}/libdrm.so
 %{_libdir}/pkgconfig/libdrm.pc
-%if %{with libkms}
-%{_includedir}/libkms/
-%{_libdir}/libkms.so
-%{_libdir}/pkgconfig/libkms.pc
-%endif
 %if %{with intel}
 %{_includedir}/libdrm/intel_*.h
 %{_libdir}/libdrm_intel.so
@@ -295,11 +286,6 @@ cp %{SOURCE1} %{buildroot}%{_docdir}/libdrm
 %if %{with exynos}
 %exclude %{_bindir}/exynos_*
 %endif
-%{_bindir}/kms-steal-crtc
-%{_bindir}/kms-universal-planes
-%if %{with libkms}
-%{_bindir}/kmstest
-%endif
 %{_bindir}/modeprint
 %{_bindir}/modetest
 %{_bindir}/proptest
@@ -307,6 +293,9 @@ cp %{SOURCE1} %{buildroot}%{_docdir}/libdrm
 %endif
 
 %changelog
+* Sun Jan 13 2024 Mihai Vultur <xanto@egaming.ro>
+- Sync specfile to upstream, update libdrm to latest git - 2.4.119
+
 * Sun Jun 07 2020 Mihai Vultur <xanto@egaming.ro>
 - Remove no_bc patch. Makes our life easier from a patch maintenance standpoint.
 
