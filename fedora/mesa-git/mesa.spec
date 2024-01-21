@@ -10,7 +10,7 @@
 
 %define commit c3a64f8dd1192bef2b1cea29283a82f5f82f79a8
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240121.00
+%global commit_date 20240121.03
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -432,7 +432,7 @@ export RUSTFLAGS="%build_rustflags"
   -Dglx-read-only-text=true \
 %endif
 %if %{with hw_video_decoder}
-  -Dvideo-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec \
+  -Dvideo-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec,av1dec,av1enc,vp9dec \
 %endif
   %{nil}
 %meson_build
@@ -710,6 +710,9 @@ popd
 %endif
 
 %changelog
+
+* Sun Jan 21 2024 Mihai Vultur <xanto@egaming.ro>
+  Enable av1 dec/enc and vp9 dec codecs.
 
 * Mon Nov 27 2023 José Expósitojexposit@redhat.com>
   Set glx-read-only-text on i386
