@@ -1,13 +1,13 @@
 %global build_branch master
 %global build_repo https://github.com/llvm/llvm-project
 
-%global maj_ver 18
+%global maj_ver 19
 %global min_ver 0
 %global patch_ver 0
 
-%define commit 16343f0db286a5d2aaf9494dd402cda0d088d0a1
+%define commit 7b4622514d232ce5f7110dd8b20d90e81127c467
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240123
+%global commit_date 20240125
 
 %global gitrel .%{commit_date}.git%{shortcommit}
 %define _unpackaged_files_terminate_build 0
