@@ -637,6 +637,7 @@ popd
 %{_libdir}/dri/pl111_dri.so
 %{_libdir}/dri/repaper_dri.so
 %{_libdir}/dri/rockchip_dri.so
+%{_libdir}/dri/ssd130x_dri.so
 %{_libdir}/dri/st7586_dri.so
 %{_libdir}/dri/st7735r_dri.so
 %{_libdir}/dri/sun4i-drm_dri.so
@@ -710,6 +711,10 @@ popd
 %endif
 
 %changelog
+
+* Sut Jan 27 2024 Mihai Vultur <xanto@egaming.ro
+  Add ssd130x to the list of kmsro drivers 
+  https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/27135
 
 * Sun Jan 21 2024 Mihai Vultur <xanto@egaming.ro>
   Enable av1 dec/enc and vp9 dec codecs.
