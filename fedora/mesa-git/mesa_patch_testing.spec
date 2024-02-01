@@ -10,7 +10,7 @@
 
 %define commit 0cec71d7ce0a793b35aca7c142f511417c3fd57a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240109.15
+%global commit_date 20240201.03
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -432,7 +432,7 @@ export RUSTFLAGS="%build_rustflags"
   -Dglx-read-only-text=true \
 %endif
 %if %{with hw_video_decoder}
-  -Dvideo-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec \
+  -Dvideo-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec,av1dec,av1enc,vp9dec \
 %endif
   %{nil}
 %meson_build
@@ -637,6 +637,7 @@ popd
 %{_libdir}/dri/pl111_dri.so
 %{_libdir}/dri/repaper_dri.so
 %{_libdir}/dri/rockchip_dri.so
+%{_libdir}/dri/ssd130x_dri.so
 %{_libdir}/dri/st7586_dri.so
 %{_libdir}/dri/st7735r_dri.so
 %{_libdir}/dri/sun4i-drm_dri.so
@@ -710,6 +711,13 @@ popd
 %endif
 
 %changelog
+
+* Sut Jan 27 2024 Mihai Vultur <xanto@egaming.ro
+  Add ssd130x to the list of kmsro drivers 
+  https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/27135
+
+* Sun Jan 21 2024 Mihai Vultur <xanto@egaming.ro>
+  Enable av1 dec/enc and vp9 dec codecs.
 
 * Mon Nov 27 2023 José Expósitojexposit@redhat.com>
   Set glx-read-only-text on i386
