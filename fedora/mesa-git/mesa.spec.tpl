@@ -20,6 +20,7 @@
 %global with_va 1
 %if !0%{?rhel}
 %global with_nine 1
+%global with_nvk %{with vulkan_hw}
 %global with_omx 1
 %global with_opencl 1
 %global with_opencl_rust 1
@@ -74,7 +75,7 @@
 %endif
 
 %global with_vulkan_overlay 1
-%global vulkan_drivers swrast%{?base_vulkan}%{?intel_platform_vulkan}%{?extra_platform_vulkan}
+%global vulkan_drivers swrast%{?base_vulkan}%{?intel_platform_vulkan}%{?extra_platform_vulkan}%{?with_nvk:,nouveau-experimental}
 
 Name:           %{package_name}
 Summary:        Mesa 3D Graphics Library, git version
@@ -95,7 +96,7 @@ Source1:        Mesa-MLAA-License-Clarification-Email.txt
 # https://bugzilla.redhat.com/show_bug.cgi?id=1560481
 #Patch7:         0001-gallium-Disable-rgb10-configs-by-default.patch
 
-BuildRequires:  meson >= 1.0.0
+BuildRequires:  meson >= 1.3.0
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
@@ -153,13 +154,19 @@ BuildRequires:  pkgconfig(libomxil-bellagio)
 BuildRequires:  pkgconfig(libelf)
 BuildRequires:  pkgconfig(libglvnd) >= 1.3.2
 BuildRequires:  llvm-devel >= 7.0.0
-%if 0%{?with_opencl}
+%if 0%{?with_opencl} || 0%{?with_nvk}
 BuildRequires:  clang-devel
 BuildRequires:  bindgen
 BuildRequires:  rust-packaging
 BuildRequires:  pkgconfig(libclc)
 BuildRequires:  pkgconfig(SPIRV-Tools)
 BuildRequires:  pkgconfig(LLVMSPIRVLib)
+%endif
+%if 0%{?with_nvk}
+BuildRequires:  (crate(proc-macro2) >= 1.0.56 with crate(proc-macro2) < 2)
+BuildRequires:  (crate(quote) >= 1.0.25 with crate(quote) < 2)
+BuildRequires:  (crate(syn/clone-impls) >= 2.0.15 with crate(syn/clone-impls) < 3)
+BuildRequires:  (crate(unicode-ident) >= 1.0.6 with crate(unicode-ident) < 2)
 %endif
 %if %{with valgrind}
 BuildRequires:  pkgconfig(valgrind)
@@ -378,6 +385,18 @@ cp %{SOURCE1} docs/
 %build
 # ensure standard Rust compiler flags are set
 export RUSTFLAGS="%build_rustflags"
+
+%if 0%{?with_nvk}
+export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
+# So... Meson can't actually find them without tweaks
+%define inst_crate_nameversion() %(basename %{cargo_registry}/%{1}-*)
+%define rewrite_wrap_file() sed -e "/source.*/d" -e "s/%{1}-.*/%{inst_crate_nameversion %{1}}/" -i subprojects/%{1}.wrap
+
+%rewrite_wrap_file proc-macro2
+%rewrite_wrap_file quote
+%rewrite_wrap_file syn
+%rewrite_wrap_file unicode-ident
+%endif 
 
 # We've gotten a report that enabling LTO for mesa breaks some games. See
 # https://bugzilla.redhat.com/show_bug.cgi?id=1862771 for details.
@@ -693,7 +712,10 @@ popd
 %if 0%{?with_vulkan_hw}
 %{_libdir}/libvulkan_radeon.so
 %{_datadir}/vulkan/icd.d/radeon_icd.*.json
-
+%if 0%{?with_nvk}
+%{_libdir}/libvulkan_nouveau.so
+%{_datadir}/vulkan/icd.d/nouveau_icd.*.json
+%endif
 %ifarch %{ix86} x86_64
   %{_libdir}/libvulkan_intel.so
   %{_libdir}/libvulkan_intel_hasvk.so
@@ -717,6 +739,7 @@ popd
 
 * Sun Feb 04 2024 Mihai Vultur <xanto@egaming.ro
   Enable imagination-experimental (PowerVR) Vulkan Driver.
+  Enable nouveau-experimental for Nvidia Drivers. For Kernel 6.7+
 
 * Sun Jan 27 2024 Mihai Vultur <xanto@egaming.ro
   Add ssd130x to the list of kmsro drivers
