@@ -50,7 +50,7 @@
 %global with_tegra     1
 %global with_v3d       1
 %global with_xa        1
-%global extra_platform_vulkan ,broadcom,freedreno,panfrost
+%global extra_platform_vulkan ,broadcom,freedreno,panfrost,imagination-experimental
 %endif
 
 %ifnarch s390x
@@ -707,13 +707,19 @@ popd
   %{_datadir}/vulkan/icd.d/freedreno_icd.*.json
   %{_libdir}/libvulkan_panfrost.so
   %{_datadir}/vulkan/icd.d/panfrost_icd.*.json
+  %{_libdir}/libpowervr_rogue.so
+  %{_libdir}/libvulkan_powervr_mesa.so
+  %{_datadir}/vulkan/icd.d/powervr_mesa_icd.*.json
 %endif
 %endif
 
 %changelog
 
-* Sut Jan 27 2024 Mihai Vultur <xanto@egaming.ro
-  Add ssd130x to the list of kmsro drivers 
+* Sun Feb 04 2024 Mihai Vultur <xanto@egaming.ro
+  Enable imagination-experimental (PowerVR) Vulkan Driver.
+
+* Sun Jan 27 2024 Mihai Vultur <xanto@egaming.ro
+  Add ssd130x to the list of kmsro drivers
   https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/27135
 
 * Sun Jan 21 2024 Mihai Vultur <xanto@egaming.ro>
