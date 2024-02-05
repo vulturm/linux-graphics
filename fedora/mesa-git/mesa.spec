@@ -8,9 +8,9 @@
 %define version_string 24.1.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 8368a972943d5265b22eab86aa17c9a3cfe3406b
+%define commit c6286e39ecc6f1ee20de9a830430a50fac51d210
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240204.22
+%global commit_date 20240205.10
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -20,15 +20,12 @@
 %global with_va 1
 %if !0%{?rhel}
 %global with_nine 1
+%global with_nvk %{with vulkan_hw}
 %global with_omx 1
 %global with_opencl 1
 %global with_opencl_rust 1
 %endif
 %global base_vulkan ,amd
-%endif
-
-%if 0%{?with_vulkan_hw}
-%global with_nvk 1
 %endif
 
 %ifarch %{ix86} x86_64
