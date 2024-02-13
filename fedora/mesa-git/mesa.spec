@@ -8,9 +8,9 @@
 %define version_string 24.1.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 3f7b3449309b7422d99d982b189473b4daed775a
+%define commit b6b980a904838260540541dcbb34c72de8437b67
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240213.15
+%global commit_date 20240213.20
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -734,7 +734,11 @@ popd
 %endif
 
 %changelog
-
+* Tue Feb 13 2024 Mihai Vultur <xanto@egaming.ro
+  https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/27593
+  If we do a native build, regardless of the host architecture and we
+  build Anv or Iris, we need intel-clc. So force building that tool.
+ 
 * Sun Feb 04 2024 Mihai Vultur <xanto@egaming.ro
   Enable imagination-experimental (PowerVR) Vulkan Driver.
   Enable nouveau-experimental for Nvidia Drivers. For Kernel 6.7+

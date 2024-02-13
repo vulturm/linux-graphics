@@ -734,7 +734,11 @@ popd
 %endif
 
 %changelog
-
+* Tue Feb 13 2024 Mihai Vultur <xanto@egaming.ro
+  https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/27593
+  If we do a native build, regardless of the host architecture and we
+  build Anv or Iris, we need intel-clc. So force building that tool.
+ 
 * Sun Feb 04 2024 Mihai Vultur <xanto@egaming.ro
   Enable imagination-experimental (PowerVR) Vulkan Driver.
   Enable nouveau-experimental for Nvidia Drivers. For Kernel 6.7+
