@@ -31,9 +31,7 @@
 %ifarch %{ix86} x86_64
 %global with_crocus 1
 %global with_i915   1
-%if !0%{?rhel}
 %global with_intel_clc 1
-%endif
 %global with_iris   1
 %global with_xa     1
 %global intel_platform_vulkan ,intel,intel_hasvk
