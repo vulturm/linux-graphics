@@ -741,7 +741,7 @@ popd
   Enable imagination-experimental (PowerVR) Vulkan Driver.
   Enable nouveau-experimental for Nvidia Drivers. For Kernel 6.7+
 
-* Sun Jan 27 2024 Mihai Vultur <xanto@egaming.ro
+* Sat Jan 27 2024 Mihai Vultur <xanto@egaming.ro
   Add ssd130x to the list of kmsro drivers
   https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/27135
 
