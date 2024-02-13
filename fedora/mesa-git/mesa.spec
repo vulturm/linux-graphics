@@ -31,9 +31,7 @@
 %ifarch %{ix86} x86_64
 %global with_crocus 1
 %global with_i915   1
-%if !0%{?rhel}
 %global with_intel_clc 1
-%endif
 %global with_iris   1
 %global with_xa     1
 %global intel_platform_vulkan ,intel,intel_hasvk
@@ -741,7 +739,7 @@ popd
   Enable imagination-experimental (PowerVR) Vulkan Driver.
   Enable nouveau-experimental for Nvidia Drivers. For Kernel 6.7+
 
-* Sun Jan 27 2024 Mihai Vultur <xanto@egaming.ro
+* Sat Jan 27 2024 Mihai Vultur <xanto@egaming.ro
   Add ssd130x to the list of kmsro drivers
   https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/27135
 
