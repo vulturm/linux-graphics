@@ -10,7 +10,7 @@
 
 %define commit 0cec71d7ce0a793b35aca7c142f511417c3fd57a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240219.03
+%global commit_date 20240221.03
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -32,6 +32,7 @@
 %global with_crocus 1
 %global with_i915   1
 %global with_intel_clc 1
+%global with_intel_rt disabled
 %global with_iris   1
 %global with_xa     1
 %global intel_platform_vulkan ,intel,intel_hasvk
@@ -432,6 +433,7 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 %if 0%{?with_intel_clc}
   -Dintel-clc=enabled \
 %endif
+  -Dintel-rt=%{?with_intel_rt}%{!?with_intel_rt:disabled} \
   -Dmicrosoft-clc=disabled \
   -Dllvm=enabled \
   -Dshared-llvm=enabled \
@@ -734,6 +736,10 @@ popd
 %endif
 
 %changelog
+* Mon Feb 19 2024 Mihai Vultur <xanto@egaming.ro
+  Disable intel-rt until the issue with 32bit compilation is fixed.
+  Bugzilla: https://gitlab.freedesktop.org/mesa/mesa/-/issues/10629
+
 * Tue Feb 13 2024 Mihai Vultur <xanto@egaming.ro
   https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/27593
   If we do a native build, regardless of the host architecture and we
