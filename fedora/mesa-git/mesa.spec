@@ -8,10 +8,13 @@
 %define version_string 24.1.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 373130a66c9f3ea0cd8945e5c5cc467a3b5ff075
+%define commit 1b1afd7b2412b142d140d482e0517aaf1778658f
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240224.05
+%global commit_date 20240227.10
 %global gitrel .%{commit_date}.%{shortcommit}
+
+%global meson_gallium_dri_file %(curl -s https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/src/gallium/targets/dri/meson.build?ref_type=%{commit})
+%define get_gallium_driver_files %(echo  %{meson_gallium_dri_file} | grep -Pzo '(?s)\[%1\, \K.*?(?=\])' | grep -oP '(.*)_dri.so' | sed -e "s=.*'=%{_libdir}/dri/=g")
 
 %ifnarch s390x
 %global with_hardware 1
@@ -641,26 +644,7 @@ popd
 %{_libdir}/gallium-pipe/*.so
 %endif
 %if 0%{?with_kmsro}
-%{_libdir}/dri/armada-drm_dri.so
-%{_libdir}/dri/exynos_dri.so
-%{_libdir}/dri/gm12u320_dri.so
-%{_libdir}/dri/hx8357d_dri.so
-%{_libdir}/dri/ili9163_dri.so
-%{_libdir}/dri/ili9225_dri.so
-%{_libdir}/dri/ili9341_dri.so
-%{_libdir}/dri/ili9486_dri.so
-%{_libdir}/dri/imx-dcss_dri.so
-%{_libdir}/dri/mediatek_dri.so
-%{_libdir}/dri/meson_dri.so
-%{_libdir}/dri/mi0283qt_dri.so
-%{_libdir}/dri/pl111_dri.so
-%{_libdir}/dri/repaper_dri.so
-%{_libdir}/dri/rockchip_dri.so
-%{_libdir}/dri/ssd130x_dri.so
-%{_libdir}/dri/st7586_dri.so
-%{_libdir}/dri/st7735r_dri.so
-%{_libdir}/dri/sun4i-drm_dri.so
-%{_libdir}/dri/udl_dri.so
+%{get_gallium_driver_files with_gallium_kmsro}
 %endif
 %if 0%{?with_vulkan_hw}
 %{_libdir}/dri/zink_dri.so
@@ -736,6 +720,10 @@ popd
 %endif
 
 %changelog
+* Sat Feb 24 2024 Mihai Vultur <xanto@egaming.ro
+  Implement a logic for gallium drivers dri files because it becomes a
+  maintenance burden to whitelist them one by one
+
 * Mon Feb 19 2024 Mihai Vultur <xanto@egaming.ro
   Disable intel-rt until the issue with 32bit compilation is fixed.
   Bugzilla: https://gitlab.freedesktop.org/mesa/mesa/-/issues/10629
