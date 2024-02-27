@@ -8,13 +8,13 @@
 %define version_string 24.1.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 1b1afd7b2412b142d140d482e0517aaf1778658f
+%define commit a80a23dc49c0c98811b44327623a5f95298d07b4
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240227.10
+%global commit_date 20240227.15
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %global meson_gallium_dri_file %(curl -s https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/src/gallium/targets/dri/meson.build?ref_type=%{commit})
-%define get_gallium_driver_files %(echo  %{meson_gallium_dri_file} | grep -Pzo '(?s)\[%1\, \K.*?(?=\])' | grep -oP '(.*)_dri.so' | sed -e "s=.*'=%{_libdir}/dri/=g")
+%define get_gallium_driver_files() %(echo  %{meson_gallium_dri_file} | grep -Pzo '(?s)\[%1\, \K.*?(?=\])' | grep -oP '(.*)_dri.so' | sed -e "s=.*'=%{_libdir}/dri/=g")
 
 %ifnarch s390x
 %global with_hardware 1
