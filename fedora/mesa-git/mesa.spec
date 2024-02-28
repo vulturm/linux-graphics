@@ -8,9 +8,9 @@
 %define version_string 24.1.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 373130a66c9f3ea0cd8945e5c5cc467a3b5ff075
+%define commit 25a0eadcaef9612865ee29156018923c51e2e8cb
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240224.05
+%global commit_date 20240228.18
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -656,11 +656,13 @@ popd
 %{_libdir}/dri/pl111_dri.so
 %{_libdir}/dri/repaper_dri.so
 %{_libdir}/dri/rockchip_dri.so
+%{_libdir}/dri/rzg2l-du_dri.so
 %{_libdir}/dri/ssd130x_dri.so
 %{_libdir}/dri/st7586_dri.so
 %{_libdir}/dri/st7735r_dri.so
 %{_libdir}/dri/sun4i-drm_dri.so
 %{_libdir}/dri/udl_dri.so
+%{_libdir}/dri/zynqmp-dpsub_dri.so
 %endif
 %if 0%{?with_vulkan_hw}
 %{_libdir}/dri/zink_dri.so
