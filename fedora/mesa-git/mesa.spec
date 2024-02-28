@@ -8,9 +8,9 @@
 %define version_string 24.1.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 803a1a5adac2b3fe637f16a8d4d2fc2ec1d6f751
+%define commit 55e99728e03cc8a290db4d1b97d7d512361b362c
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240228.10
+%global commit_date 20240228.15
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %global meson_gallium_dri_file %(curl -s https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/src/gallium/targets/dri/meson.build?ref_type=%{commit})
