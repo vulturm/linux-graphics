@@ -8,9 +8,9 @@
 %define version_string 24.1.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit fe037dec6e14cfbfdc6a1c30e0a6009b067ee319
+%define commit 185d420b27199af2fed3f2b53f95accdf0e0d2ce
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240229.10
+%global commit_date 20240229.13
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -74,7 +74,7 @@
 %endif
 
 %global with_vulkan_overlay 1
-%global vulkan_drivers swrast%{?base_vulkan}%{?intel_platform_vulkan}%{?extra_platform_vulkan}%{?with_nvk:,nouveau-experimental}
+%global vulkan_drivers swrast%{?base_vulkan}%{?intel_platform_vulkan}%{?extra_platform_vulkan}%{?with_nvk:,nouveau}
 
 Name:           %{package_name}
 Summary:        Mesa 3D Graphics Library, git version
@@ -738,6 +738,9 @@ popd
 %endif
 
 %changelog
+* Thu Feb 29 2024 Mihai Vultur <xanto@egaming.ro
+  NVK got vulkan conformance, 'nouveau-experimental', becomes 'nouveou' now.
+
 * Mon Feb 19 2024 Mihai Vultur <xanto@egaming.ro
   Disable intel-rt until the issue with 32bit compilation is fixed.
   Bugzilla: https://gitlab.freedesktop.org/mesa/mesa/-/issues/10629
