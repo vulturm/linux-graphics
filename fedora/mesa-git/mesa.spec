@@ -8,9 +8,9 @@
 %define version_string 24.1.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 3711964f33625add10b486cdfe8cb37d12e5c85e
+%define commit 73d98848fa98ee5d1fbd69e55cf2fd226c747c48
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240301.15
+%global commit_date 20240301.19
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -653,6 +653,7 @@ popd
 %{_libdir}/dri/mediatek_dri.so
 %{_libdir}/dri/meson_dri.so
 %{_libdir}/dri/mi0283qt_dri.so
+%{_libdir}/dri/panthor_dri.so
 %{_libdir}/dri/pl111_dri.so
 %{_libdir}/dri/repaper_dri.so
 %{_libdir}/dri/rockchip_dri.so
