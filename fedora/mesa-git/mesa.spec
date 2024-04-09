@@ -8,9 +8,9 @@
 %define version_string 24.1.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 85dd83aa46061f7f0762ba7d01db14601eedcc2f
+%define commit 5028a9ede3f6a24e9991d5a9cec3fe4a7bfd1f67
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240409.15
+%global commit_date 20240409.16
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -96,6 +96,7 @@ Source1:        Mesa-MLAA-License-Clarification-Email.txt
 #Patch7:         0001-gallium-Disable-rgb10-configs-by-default.patch
 
 BuildRequires:  meson >= 1.3.0
+BuildRequires:  cbindgen
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
@@ -162,6 +163,7 @@ BuildRequires:  pkgconfig(SPIRV-Tools)
 BuildRequires:  pkgconfig(LLVMSPIRVLib)
 %endif
 %if 0%{?with_nvk}
+BuildRequires:  (crate(paste/default) >= 1.0.0 with crate(paste/default) < 2.0.0~)
 BuildRequires:  (crate(proc-macro2) >= 1.0.56 with crate(proc-macro2) < 2)
 BuildRequires:  (crate(quote) >= 1.0.25 with crate(quote) < 2)
 BuildRequires:  (crate(syn/clone-impls) >= 2.0.15 with crate(syn/clone-impls) < 3)
@@ -429,7 +431,7 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
   -Dgbm=enabled \
   -Dglx=dri \
   -Degl=enabled \
-  -Dglvnd=true \
+  -Dglvnd=enabled \
 %if 0%{?with_intel_clc}
   -Dintel-clc=enabled \
 %endif
@@ -739,6 +741,9 @@ popd
 %endif
 
 %changelog
+* Tue Apr 09 2024 Mihai Vultur <xanto@egaming.ro
+  NVK depends on cbindgen and rust-paste now. Adjust dependencies.
+
 * Thu Feb 29 2024 Mihai Vultur <xanto@egaming.ro
   NVK got vulkan conformance, 'nouveau-experimental', becomes 'nouveou' now.
 
