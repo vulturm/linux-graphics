@@ -4,13 +4,13 @@
 %global _default_patch_fuzz 2
 #global __meson_auto_features disabled
 
-%global build_repo https://github.com/vulturm/mesa
-%define version_string 21.2.0
+%global build_repo https://gitlab.freedesktop.org/mesa/mesa
+%define version_string 24.1.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 0cec71d7ce0a793b35aca7c142f511417c3fd57a
+%define commit 6cc780173a8b1f427b434d59c4a32c5f553e661c
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240221.03
+%global commit_date 20240414.14
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -74,7 +74,7 @@
 %endif
 
 %global with_vulkan_overlay 1
-%global vulkan_drivers swrast%{?base_vulkan}%{?intel_platform_vulkan}%{?extra_platform_vulkan}%{?with_nvk:,nouveau-experimental}
+%global vulkan_drivers swrast%{?base_vulkan}%{?intel_platform_vulkan}%{?extra_platform_vulkan}%{?with_nvk:,nouveau}
 
 Name:           %{package_name}
 Summary:        Mesa 3D Graphics Library, git version
@@ -96,6 +96,7 @@ Source1:        Mesa-MLAA-License-Clarification-Email.txt
 #Patch7:         0001-gallium-Disable-rgb10-configs-by-default.patch
 
 BuildRequires:  meson >= 1.3.0
+BuildRequires:  cbindgen
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
@@ -136,6 +137,7 @@ BuildRequires:  pkgconfig(glproto) >= 1.4.14
 BuildRequires:  pkgconfig(xcb-xfixes)
 BuildRequires:  pkgconfig(xcb-randr)
 BuildRequires:  pkgconfig(xrandr) >= 1.3
+BuildRequires:  python3-pycparser
 BuildRequires:  bison
 BuildRequires:  flex
 %if 0%{?with_lmsensors}
@@ -162,6 +164,7 @@ BuildRequires:  pkgconfig(SPIRV-Tools)
 BuildRequires:  pkgconfig(LLVMSPIRVLib)
 %endif
 %if 0%{?with_nvk}
+BuildRequires:  (crate(paste/default) >= 1.0.0 with crate(paste/default) < 2.0.0~)
 BuildRequires:  (crate(proc-macro2) >= 1.0.56 with crate(proc-macro2) < 2)
 BuildRequires:  (crate(quote) >= 1.0.25 with crate(quote) < 2)
 BuildRequires:  (crate(syn/clone-impls) >= 2.0.15 with crate(syn/clone-impls) < 3)
@@ -429,7 +432,7 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
   -Dgbm=enabled \
   -Dglx=dri \
   -Degl=enabled \
-  -Dglvnd=true \
+  -Dglvnd=enabled \
 %if 0%{?with_intel_clc}
   -Dintel-clc=enabled \
 %endif
@@ -653,14 +656,17 @@ popd
 %{_libdir}/dri/mediatek_dri.so
 %{_libdir}/dri/meson_dri.so
 %{_libdir}/dri/mi0283qt_dri.so
+%{_libdir}/dri/panthor_dri.so
 %{_libdir}/dri/pl111_dri.so
 %{_libdir}/dri/repaper_dri.so
 %{_libdir}/dri/rockchip_dri.so
+%{_libdir}/dri/rzg2l-du_dri.so
 %{_libdir}/dri/ssd130x_dri.so
 %{_libdir}/dri/st7586_dri.so
 %{_libdir}/dri/st7735r_dri.so
 %{_libdir}/dri/sun4i-drm_dri.so
 %{_libdir}/dri/udl_dri.so
+%{_libdir}/dri/zynqmp-dpsub_dri.so
 %endif
 %if 0%{?with_vulkan_hw}
 %{_libdir}/dri/zink_dri.so
@@ -736,6 +742,12 @@ popd
 %endif
 
 %changelog
+* Tue Apr 09 2024 Mihai Vultur <xanto@egaming.ro
+  NVK depends on cbindgen and rust-paste now. Adjust dependencies.
+
+* Thu Feb 29 2024 Mihai Vultur <xanto@egaming.ro
+  NVK got vulkan conformance, 'nouveau-experimental', becomes 'nouveou' now.
+
 * Mon Feb 19 2024 Mihai Vultur <xanto@egaming.ro
   Disable intel-rt until the issue with 32bit compilation is fixed.
   Bugzilla: https://gitlab.freedesktop.org/mesa/mesa/-/issues/10629
