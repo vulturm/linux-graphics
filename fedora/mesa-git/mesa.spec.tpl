@@ -137,6 +137,7 @@ BuildRequires:  pkgconfig(glproto) >= 1.4.14
 BuildRequires:  pkgconfig(xcb-xfixes)
 BuildRequires:  pkgconfig(xcb-randr)
 BuildRequires:  pkgconfig(xrandr) >= 1.3
+BuildRequires:  python3-pycparser
 BuildRequires:  bison
 BuildRequires:  flex
 %if 0%{?with_lmsensors}
