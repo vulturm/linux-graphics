@@ -10,7 +10,7 @@
 
 %define commit 6cc780173a8b1f427b434d59c4a32c5f553e661c
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240414.00
+%global commit_date 20240414.11
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -137,6 +137,7 @@ BuildRequires:  pkgconfig(glproto) >= 1.4.14
 BuildRequires:  pkgconfig(xcb-xfixes)
 BuildRequires:  pkgconfig(xcb-randr)
 BuildRequires:  pkgconfig(xrandr) >= 1.3
+BuildRequires:  python3-pycparser
 BuildRequires:  bison
 BuildRequires:  flex
 %if 0%{?with_lmsensors}
