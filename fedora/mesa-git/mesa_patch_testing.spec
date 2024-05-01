@@ -8,9 +8,9 @@
 %define version_string 24.2.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 46598758e7a2ce0b81610db612cb2beeb5c49a8d
+%define commit 47f6e24ad5dfcb59dd1511800aee8c56b4f8fee4
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240425.14
+%global commit_date 20240501.10
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -94,6 +94,7 @@ Source1:        Mesa-MLAA-License-Clarification-Email.txt
 # Disable rgb10 configs by default:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1560481
 #Patch7:         0001-gallium-Disable-rgb10-configs-by-default.patch
+Patch1:         001-disable-proc_macro2-unstable-features.patch
 
 BuildRequires:  meson >= 1.3.0
 BuildRequires:  cbindgen
