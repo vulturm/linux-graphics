@@ -10,7 +10,7 @@
 
 %define commit caca5e0de6079e888d68c09b436c01c0ec006207
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240517.12
+%global commit_date 20240517.15
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
