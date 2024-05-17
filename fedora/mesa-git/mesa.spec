@@ -8,9 +8,9 @@
 %define version_string 24.2.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit f0200a54d953ef411c09f9e3e84f6a297942b384
+%define commit caca5e0de6079e888d68c09b436c01c0ec006207
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240517.10
+%global commit_date 20240517.12
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -395,6 +395,7 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 %define inst_crate_nameversion() %(basename %{cargo_registry}/%{1}-*)
 %define rewrite_wrap_file() sed -e "/source.*/d" -e "s/%{1}-.*/%{inst_crate_nameversion %{1}}/" -i subprojects/%{1}.wrap
 
+%rewrite_wrap_file paste
 %rewrite_wrap_file proc-macro2
 %rewrite_wrap_file quote
 %rewrite_wrap_file syn
