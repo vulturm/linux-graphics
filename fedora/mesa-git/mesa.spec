@@ -8,9 +8,9 @@
 %define version_string 24.2.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 44e6850016d6222f531ef805fdc568959a9e1a9e
+%define commit b7982152ffce193f9f1636e9d2866228d4b41d13
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240614.15
+%global commit_date 20240614.18
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -668,6 +668,7 @@ popd
 %{_libdir}/dri/st7735r_dri.so
 %{_libdir}/dri/sun4i-drm_dri.so
 %{_libdir}/dri/udl_dri.so
+%{_libdir}/dri/vkms_dri.so
 %{_libdir}/dri/zynqmp-dpsub_dri.so
 %endif
 %if 0%{?with_vulkan_hw}
