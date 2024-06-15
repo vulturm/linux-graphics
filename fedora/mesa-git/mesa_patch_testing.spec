@@ -10,7 +10,7 @@
 
 %define commit 0cec71d7ce0a793b35aca7c142f511417c3fd57a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240529.23
+%global commit_date 20240615.12
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -668,6 +668,7 @@ popd
 %{_libdir}/dri/st7735r_dri.so
 %{_libdir}/dri/sun4i-drm_dri.so
 %{_libdir}/dri/udl_dri.so
+%{_libdir}/dri/vkms_dri.so
 %{_libdir}/dri/zynqmp-dpsub_dri.so
 %endif
 %if 0%{?with_vulkan_hw}
