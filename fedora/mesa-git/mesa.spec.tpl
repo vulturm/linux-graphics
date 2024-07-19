@@ -644,6 +644,8 @@ popd
 %if 0%{?with_hardware}
 %dir %{_libdir}/gallium-pipe
 %{_libdir}/gallium-pipe/*.so
+%{_libdir}/dri/libdril_dri.so
+%{_libdir}/dri/libgallium.so
 %endif
 %if 0%{?with_kmsro}
 %{_libdir}/dri/armada-drm_dri.so
@@ -690,8 +692,11 @@ popd
 %{_libdir}/dri/virtio_gpu_drv_video.so
 %endif
 
+%{_libdir}/dri/libgallium_drv_video.so
+
 %if 0%{?with_vdpau}
 %files vdpau-drivers
+%{_libdir}/vdpau/libvdpau_gallium.so.1*
 %{_libdir}/vdpau/libvdpau_nouveau.so.1*
 %if 0%{?with_r600}
 %{_libdir}/vdpau/libvdpau_r600.so.1*
@@ -741,6 +746,9 @@ popd
 %endif
 
 %changelog
+* Fri Jul 19 2024 Mihai Vultur <xanto@egaming.ro
+  Adaptations for commit d5ec3a89
+
 * Fri Jul 19 2024 Mihai Vultur <xanto@egaming.ro
   Commit d709b421 removed zink_dri.so
 
