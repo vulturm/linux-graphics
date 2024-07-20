@@ -175,6 +175,7 @@ BuildRequires:  (crate(unicode-ident) >= 1.0.6 with crate(unicode-ident) < 2)
 BuildRequires:  pkgconfig(valgrind)
 %endif
 BuildRequires:  python3-devel
+BuildRequires:  python3-yaml
 BuildRequires:  python3-mako
 %if 0%{?with_intel_clc}
 BuildRequires:  python3-ply
