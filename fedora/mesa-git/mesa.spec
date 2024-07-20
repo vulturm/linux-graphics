@@ -8,9 +8,9 @@
 %define version_string 24.3.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit bed6e0d691c125eecfbd504ee96c5a4a6027418e
+%define commit 2f6919e6c2d898ff940e791f558d0d919fa47747
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240720.15
+%global commit_date 20240720.19
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -175,6 +175,7 @@ BuildRequires:  (crate(unicode-ident) >= 1.0.6 with crate(unicode-ident) < 2)
 BuildRequires:  pkgconfig(valgrind)
 %endif
 BuildRequires:  python3-devel
+BuildRequires:  python3-yaml
 BuildRequires:  python3-mako
 %if 0%{?with_intel_clc}
 BuildRequires:  python3-ply
