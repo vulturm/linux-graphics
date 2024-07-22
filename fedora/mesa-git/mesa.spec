@@ -8,9 +8,9 @@
 %define version_string 24.3.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 159a3edd80a988dec263708f851ed35eec881a78
+%define commit 3aa29c47b9f8c435a89ce622a4dfb034350a3f38
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240722.15
+%global commit_date 20240722.16
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -159,6 +159,7 @@ BuildRequires:  llvm-devel >= 7.0.0
 %if 0%{?with_opencl} || 0%{?with_nvk}
 BuildRequires:  clang-devel
 BuildRequires:  bindgen
+BuildRequires:  rustfmt
 BuildRequires:  rust-packaging
 BuildRequires:  pkgconfig(libclc)
 BuildRequires:  pkgconfig(SPIRV-Tools)
@@ -747,6 +748,9 @@ popd
 %endif
 
 %changelog
+* Mon Jul 22 2024 Mihai Vultur <xanto@egaming.ro
+  'rustfmt' has become a build dependency.
+
 * Fri Jul 19 2024 Mihai Vultur <xanto@egaming.ro
   Adaptations for commit d5ec3a89
 
