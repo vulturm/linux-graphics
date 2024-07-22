@@ -159,6 +159,7 @@ BuildRequires:  llvm-devel >= 7.0.0
 %if 0%{?with_opencl} || 0%{?with_nvk}
 BuildRequires:  clang-devel
 BuildRequires:  bindgen
+BuildRequires:  rustfmt
 BuildRequires:  rust-packaging
 BuildRequires:  pkgconfig(libclc)
 BuildRequires:  pkgconfig(SPIRV-Tools)
@@ -747,6 +748,9 @@ popd
 %endif
 
 %changelog
+* Mon Jul 22 2024 Mihai Vultur <xanto@egaming.ro
+  'rustfmt' has become a build dependency.
+
 * Fri Jul 19 2024 Mihai Vultur <xanto@egaming.ro
   Adaptations for commit d5ec3a89
 
