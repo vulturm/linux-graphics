@@ -32,7 +32,7 @@
 %global with_crocus 1
 %global with_i915   1
 %global with_intel_clc 1
-%global with_intel_rt enabled
+%global with_intel_rt disabled
 %global with_iris   1
 %global with_xa     1
 %global intel_platform_vulkan ,intel,intel_hasvk
