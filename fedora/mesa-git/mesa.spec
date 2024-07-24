@@ -8,9 +8,9 @@
 %define version_string 24.3.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 794947171658739f279544a353f894a9fafc6bd8
+%define commit 8b1a889e453d36fab948246adf6fe1310fa7853b
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240724.22
+%global commit_date 20240725.00
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -650,7 +650,6 @@ popd
 %dir %{_libdir}/gallium-pipe
 %{_libdir}/gallium-pipe/*.so
 %{_libdir}/dri/libdril_dri.so
-%{_libdir}/dri/libgallium.so
 %endif
 %if 0%{?with_kmsro}
 %{_libdir}/dri/armada-drm_dri.so
