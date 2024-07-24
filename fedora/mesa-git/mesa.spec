@@ -8,9 +8,9 @@
 %define version_string 24.3.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 945564e49866f19af267c9d634fc8a4a807ec604
+%define commit 794947171658739f279544a353f894a9fafc6bd8
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240724.20
+%global commit_date 20240724.21
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -32,7 +32,7 @@
 %global with_crocus 1
 %global with_i915   1
 %global with_intel_clc 1
-%global with_intel_rt disabled
+%global with_intel_rt enabled
 %global with_iris   1
 %global with_xa     1
 %global intel_platform_vulkan ,intel,intel_hasvk
