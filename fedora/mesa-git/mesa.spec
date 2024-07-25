@@ -650,6 +650,7 @@ popd
 %dir %{_libdir}/gallium-pipe
 %{_libdir}/gallium-pipe/*.so
 %{_libdir}/dri/libdril_dri.so
+%{_libdir}/libgallium-*.so
 %endif
 %if 0%{?with_kmsro}
 %{_libdir}/dri/armada-drm_dri.so
