@@ -10,7 +10,7 @@
 
 %define commit 0cec71d7ce0a793b35aca7c142f511417c3fd57a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240718.22
+%global commit_date 20240728.12
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %ifnarch s390x
@@ -32,10 +32,13 @@
 %global with_crocus 1
 %global with_i915   1
 %global with_intel_clc 1
-%global with_intel_rt disabled
 %global with_iris   1
 %global with_xa     1
 %global intel_platform_vulkan ,intel,intel_hasvk
+%endif
+
+%ifarch x86_64
+%global with_intel_vk_rt 1
 %endif
 
 %ifarch aarch64 x86_64 %{ix86}
@@ -159,6 +162,7 @@ BuildRequires:  llvm-devel >= 7.0.0
 %if 0%{?with_opencl} || 0%{?with_nvk}
 BuildRequires:  clang-devel
 BuildRequires:  bindgen
+BuildRequires:  rustfmt
 BuildRequires:  rust-packaging
 BuildRequires:  pkgconfig(libclc)
 BuildRequires:  pkgconfig(SPIRV-Tools)
@@ -175,6 +179,7 @@ BuildRequires:  (crate(unicode-ident) >= 1.0.6 with crate(unicode-ident) < 2)
 BuildRequires:  pkgconfig(valgrind)
 %endif
 BuildRequires:  python3-devel
+BuildRequires:  python3-yaml
 BuildRequires:  python3-mako
 %if 0%{?with_intel_clc}
 BuildRequires:  python3-ply
@@ -438,7 +443,7 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 %if 0%{?with_intel_clc}
   -Dintel-clc=enabled \
 %endif
-  -Dintel-rt=%{?with_intel_rt}%{!?with_intel_rt:disabled} \
+  -Dintel-rt=%{?with_intel_vk_rt:enabled}%{!?with_intel_vk_rt:disabled} \
   -Dmicrosoft-clc=disabled \
   -Dllvm=enabled \
   -Dshared-llvm=enabled \
@@ -644,6 +649,8 @@ popd
 %if 0%{?with_hardware}
 %dir %{_libdir}/gallium-pipe
 %{_libdir}/gallium-pipe/*.so
+%{_libdir}/dri/libdril_dri.so
+%{_libdir}/libgallium-*.so
 %endif
 %if 0%{?with_kmsro}
 %{_libdir}/dri/armada-drm_dri.so
@@ -671,10 +678,6 @@ popd
 %{_libdir}/dri/vkms_dri.so
 %{_libdir}/dri/zynqmp-dpsub_dri.so
 %endif
-%if 0%{?with_vulkan_hw}
-%{_libdir}/dri/zink_dri.so
-%endif
-
 
 %if 0%{?with_hardware}
 %if 0%{?with_omx}
@@ -694,8 +697,11 @@ popd
 %{_libdir}/dri/virtio_gpu_drv_video.so
 %endif
 
+%{_libdir}/dri/libgallium_drv_video.so
+
 %if 0%{?with_vdpau}
 %files vdpau-drivers
+%{_libdir}/vdpau/libvdpau_gallium.so.1*
 %{_libdir}/vdpau/libvdpau_nouveau.so.1*
 %if 0%{?with_r600}
 %{_libdir}/vdpau/libvdpau_r600.so.1*
@@ -745,26 +751,38 @@ popd
 %endif
 
 %changelog
-* Tue Apr 09 2024 Mihai Vultur <xanto@egaming.ro
+* Wed Jul 24 2024 Mihai Vultur <xanto@egaming.ro>
+  Enable 'intel-rt' for x64 bit targets.
+
+* Mon Jul 22 2024 Mihai Vultur <xanto@egaming.ro>
+  'rustfmt' has become a build dependency.
+
+* Fri Jul 19 2024 Mihai Vultur <xanto@egaming.ro>
+  Adaptations for commit d5ec3a89
+
+* Fri Jul 19 2024 Mihai Vultur <xanto@egaming.ro>
+  Commit d709b421 removed zink_dri.so
+
+* Tue Apr 09 2024 Mihai Vultur <xanto@egaming.ro>
   NVK depends on cbindgen and rust-paste now. Adjust dependencies.
 
-* Thu Feb 29 2024 Mihai Vultur <xanto@egaming.ro
+* Thu Feb 29 2024 Mihai Vultur <xanto@egaming.ro>
   NVK got vulkan conformance, 'nouveau-experimental', becomes 'nouveou' now.
 
-* Mon Feb 19 2024 Mihai Vultur <xanto@egaming.ro
+* Mon Feb 19 2024 Mihai Vultur <xanto@egaming.ro>
   Disable intel-rt until the issue with 32bit compilation is fixed.
   Bugzilla: https://gitlab.freedesktop.org/mesa/mesa/-/issues/10629
 
-* Tue Feb 13 2024 Mihai Vultur <xanto@egaming.ro
+* Tue Feb 13 2024 Mihai Vultur <xanto@egaming.ro>
   https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/27593
   If we do a native build, regardless of the host architecture and we
   build Anv or Iris, we need intel-clc. So force building that tool.
  
-* Sun Feb 04 2024 Mihai Vultur <xanto@egaming.ro
+* Sun Feb 04 2024 Mihai Vultur <xanto@egaming.ro>
   Enable imagination-experimental (PowerVR) Vulkan Driver.
   Enable nouveau-experimental for Nvidia Drivers. For Kernel 6.7+
 
-* Sat Jan 27 2024 Mihai Vultur <xanto@egaming.ro
+* Sat Jan 27 2024 Mihai Vultur <xanto@egaming.ro>
   Add ssd130x to the list of kmsro drivers
   https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/27135
 
