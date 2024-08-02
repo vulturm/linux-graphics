@@ -1,6 +1,6 @@
 %define package_name mesa
 %global build_branch master
-%bcond_with hw_video_decoder
+%bcond_with patented_video_codecs 0
 %global _default_patch_fuzz 2
 #global __meson_auto_features disabled
 
@@ -12,6 +12,9 @@
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global commit_date CODE_DATE
 %global gitrel .%{commit_date}.%{shortcommit}
+
+%global hw_video_codecs_free vc1dec,av1dec,av1enc,vp9dec
+%global hw_video_codecs_patented ,h264dec,h264enc,h265dec,h265enc
 
 %ifnarch s390x
 %global with_hardware 1
@@ -460,9 +463,7 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 %ifarch %{ix86}
   -Dglx-read-only-text=true \
 %endif
-%if %{with hw_video_decoder}
-  -Dvideo-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec,av1dec,av1enc,vp9dec \
-%endif
+  -Dvideo-codecs=%{?hw_video_codecs_free}%{?with_patented_video_codecs:%{hw_video_codecs_patented}} \
   %{nil}
 %meson_build
 
@@ -752,6 +753,9 @@ popd
 %endif
 
 %changelog
+* Fri Aug 02 2024 Mihai Vultur <xanto@egaming.ro>
+  Compile mesa without patented codecs, as per COPR System Team request.
+
 * Fri Aug 02 2024 Mihai Vultur <xanto@egaming.ro>
   Remove kmsro option after: https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/30463
 
