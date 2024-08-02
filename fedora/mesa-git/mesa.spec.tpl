@@ -417,7 +417,7 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
   -Ddri3=enabled \
   -Dosmesa=true \
 %if 0%{?with_hardware}
-  -Dgallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_i915:,i915}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi}%{?with_r600:,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_v3d:,v3d}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_vulkan_hw:,zink} \
+  -Dgallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_i915:,i915}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi}%{?with_r600:,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_v3d:,v3d}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_vulkan_hw:,zink} \
 %else
   -Dgallium-drivers=swrast,virgl \
 %endif
@@ -652,7 +652,8 @@ popd
 %{_libdir}/dri/libdril_dri.so
 %{_libdir}/libgallium-*.so
 %endif
-%if 0%{?with_kmsro}
+
+# old kmsro drivers
 %{_libdir}/dri/armada-drm_dri.so
 %{_libdir}/dri/exynos_dri.so
 %{_libdir}/dri/gm12u320_dri.so
@@ -677,7 +678,7 @@ popd
 %{_libdir}/dri/udl_dri.so
 %{_libdir}/dri/vkms_dri.so
 %{_libdir}/dri/zynqmp-dpsub_dri.so
-%endif
+# kmsro end
 
 %if 0%{?with_hardware}
 %if 0%{?with_omx}
@@ -751,6 +752,9 @@ popd
 %endif
 
 %changelog
+* Fri Aug 02 2024 Mihai Vultur <xanto@egaming.ro>
+  Remove kmsro option after: https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/30463
+
 * Wed Jul 24 2024 Mihai Vultur <xanto@egaming.ro>
   Enable 'intel-rt' for x64 bit targets.
 
