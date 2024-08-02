@@ -1,6 +1,6 @@
 %define package_name mesa
 %global build_branch master
-%bcond_with hw_video_decoder
+%bcond_with patented_video_codecs 0
 %global _default_patch_fuzz 2
 #global __meson_auto_features disabled
 
@@ -8,10 +8,13 @@
 %define version_string 24.3.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 8bca7e520ce01a59292c982f3b992bd4a2b3547e
+%define commit fb03aed435912244975f60da08d245898b97f935
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20240802.05
+%global commit_date 20240802.15
 %global gitrel .%{commit_date}.%{shortcommit}
+
+%global hw_video_codecs_free vc1dec,av1dec,av1enc,vp9dec
+%global hw_video_codecs_patented ,h264dec,h264enc,h265dec,h265enc
 
 %ifnarch s390x
 %global with_hardware 1
@@ -417,7 +420,7 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
   -Ddri3=enabled \
   -Dosmesa=true \
 %if 0%{?with_hardware}
-  -Dgallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_i915:,i915}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi}%{?with_r600:,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_v3d:,v3d}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_vulkan_hw:,zink} \
+  -Dgallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_i915:,i915}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi}%{?with_r600:,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_v3d:,v3d}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_vulkan_hw:,zink} \
 %else
   -Dgallium-drivers=swrast,virgl \
 %endif
@@ -460,9 +463,7 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 %ifarch %{ix86}
   -Dglx-read-only-text=true \
 %endif
-%if %{with hw_video_decoder}
-  -Dvideo-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec,av1dec,av1enc,vp9dec \
-%endif
+  -Dvideo-codecs=%{?hw_video_codecs_free}%{?with_patented_video_codecs:%{hw_video_codecs_patented}} \
   %{nil}
 %meson_build
 
@@ -652,7 +653,8 @@ popd
 %{_libdir}/dri/libdril_dri.so
 %{_libdir}/libgallium-*.so
 %endif
-%if 0%{?with_kmsro}
+
+# old kmsro drivers
 %{_libdir}/dri/armada-drm_dri.so
 %{_libdir}/dri/exynos_dri.so
 %{_libdir}/dri/gm12u320_dri.so
@@ -677,7 +679,7 @@ popd
 %{_libdir}/dri/udl_dri.so
 %{_libdir}/dri/vkms_dri.so
 %{_libdir}/dri/zynqmp-dpsub_dri.so
-%endif
+# kmsro end
 
 %if 0%{?with_hardware}
 %if 0%{?with_omx}
@@ -751,6 +753,12 @@ popd
 %endif
 
 %changelog
+* Fri Aug 02 2024 Mihai Vultur <xanto@egaming.ro>
+  Compile mesa without patented codecs, as per COPR System Team request.
+
+* Fri Aug 02 2024 Mihai Vultur <xanto@egaming.ro>
+  Remove kmsro option after: https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/30463
+
 * Wed Jul 24 2024 Mihai Vultur <xanto@egaming.ro>
   Enable 'intel-rt' for x64 bit targets.
 
