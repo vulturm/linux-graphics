@@ -8,9 +8,9 @@
 %define version_string 24.3.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit f7d45cb3623a5c1c8e8121330fe83b12bed1e455
+%define commit 5fe3f57d3fe5598f11f07d36e1560942298cd779
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20241004.20
+%global commit_date 20241005.00
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %global hw_video_codecs_free vc1dec,av1dec,av1enc,vp9dec
@@ -24,7 +24,6 @@
 %if !0%{?rhel}
 %global with_nine 1
 %global with_nvk %{with vulkan_hw}
-%global with_omx 1
 %global with_opencl 1
 %global with_opencl_rust 1
 %endif
@@ -156,9 +155,6 @@ BuildRequires:  pkgconfig(vdpau) >= 1.1
 %if 0%{?with_va}
 BuildRequires:  pkgconfig(libva) >= 0.38.0
 %endif
-%if 0%{?with_omx}
-BuildRequires:  pkgconfig(libomxil-bellagio)
-%endif
 BuildRequires:  pkgconfig(libelf)
 BuildRequires:  pkgconfig(libglvnd) >= 1.3.2
 BuildRequires:  llvm-devel >= 7.0.0
@@ -255,15 +251,6 @@ Recommends:     %{name}-va-drivers%{?_isa}
 
 %description dri-drivers
 %{summary}.
-
-%if 0%{?with_omx}
-%package omx-drivers
-Summary:        Mesa-based OMX drivers
-Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-
-%description omx-drivers
-%{summary}.
-%endif
 
 %if 0%{?with_va}
 %package        va-drivers
@@ -417,7 +404,6 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 
 %meson \
   -Dplatforms=x11,wayland \
-  -Ddri3=enabled \
   -Dosmesa=true \
 %if 0%{?with_hardware}
   -Dgallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_i915:,i915}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi}%{?with_r600:,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_v3d:,v3d}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_vulkan_hw:,zink} \
@@ -425,7 +411,6 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
   -Dgallium-drivers=swrast,virgl \
 %endif
   -Dgallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
-  -Dgallium-omx=%{?with_omx:bellagio}%{!?with_omx:disabled} \
   -Dgallium-va=%{?with_va:enabled}%{!?with_va:disabled} \
   -Dgallium-xa=%{?with_xa:enabled}%{!?with_xa:disabled} \
   -Dgallium-nine=%{?with_nine:true}%{!?with_nine:false} \
@@ -528,6 +513,7 @@ popd
 %{_libdir}/pkgconfig/osmesa.pc
 
 %files libgbm
+%{_libdir}/gbm/dri_gbm.so
 %{_libdir}/libgbm.so.1
 %{_libdir}/libgbm.so.1.*
 %files libgbm-devel
@@ -679,14 +665,10 @@ popd
 %{_libdir}/dri/udl_dri.so
 %{_libdir}/dri/vkms_dri.so
 %{_libdir}/dri/zynqmp-dpsub_dri.so
+%{_libdir}/dri/zink_dri.so
 # kmsro end
 
 %if 0%{?with_hardware}
-%if 0%{?with_omx}
-%files omx-drivers
-%{_libdir}/bellagio/libomx_mesa.so
-%endif
-
 %if 0%{?with_va}
 %files va-drivers
 %{_libdir}/dri/nouveau_drv_video.so
@@ -699,11 +681,8 @@ popd
 %{_libdir}/dri/virtio_gpu_drv_video.so
 %endif
 
-%{_libdir}/dri/libgallium_drv_video.so
-
 %if 0%{?with_vdpau}
 %files vdpau-drivers
-%{_libdir}/vdpau/libvdpau_gallium.so.1*
 %{_libdir}/vdpau/libvdpau_nouveau.so.1*
 %if 0%{?with_r600}
 %{_libdir}/vdpau/libvdpau_r600.so.1*
@@ -753,6 +732,15 @@ popd
 %endif
 
 %changelog
+* Fri Sep 20 2024 Mihai Vultur <xanto@egaming.ro>
+  New dri_gbm.so after: https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/31074
+
+* Fri Sep 13 2024 Mihai Vultur <xanto@egaming.ro>
+  libgallium_drv_video and libvdpau_gallium are no longer being generated.
+
+* Tue Sep 10 2024 Mihai Vultur <xanto@egaming.ro>
+  Remove references to OMX as it was removed from mesa.
+
 * Fri Aug 02 2024 Mihai Vultur <xanto@egaming.ro>
   Compile mesa without patented codecs, as per COPR System Team request.
 
