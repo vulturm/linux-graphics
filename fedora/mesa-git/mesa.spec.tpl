@@ -1,6 +1,5 @@
 %define package_name mesa
 %global build_branch master
-%bcond_with patented_video_codecs 1
 %global _default_patch_fuzz 2
 #global __meson_auto_features disabled
 
@@ -13,8 +12,7 @@
 %global commit_date CODE_DATE
 %global gitrel .%{commit_date}.%{shortcommit}
 
-%global hw_video_codecs_free vc1dec,av1dec,av1enc,vp9dec
-%global hw_video_codecs_patented ,h264dec,h264enc,h265dec,h265enc
+%global hw_video_codecs vc1dec,av1dec,av1enc,vp9dec,h264dec,h264enc,h265dec,h265enc
 
 %ifnarch s390x
 %global with_hardware 1
@@ -448,7 +446,7 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 %ifarch %{ix86}
   -Dglx-read-only-text=true \
 %endif
-  -Dvideo-codecs=%{?hw_video_codecs_free}%{?with_patented_video_codecs:%{hw_video_codecs_patented}} \
+  -Dvideo-codecs=%{?hw_video_codecs} \
   %{nil}
 %meson_build
 
