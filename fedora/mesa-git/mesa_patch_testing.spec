@@ -4,13 +4,13 @@
 %global _default_patch_fuzz 2
 #global __meson_auto_features disabled
 
-%global build_repo https://github.com/vulturm/mesa
-%define version_string 21.2.0
+%global build_repo https://gitlab.freedesktop.org/mesa/mesa
+%define version_string 25.0.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 0cec71d7ce0a793b35aca7c142f511417c3fd57a
+%define commit 4818bc90d9a0b007c051f1aa34fbc078f38b739d
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20241030.15
+%global commit_date 20250124.20
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %global hw_video_codecs_free vc1dec,av1dec,av1enc,vp9dec
