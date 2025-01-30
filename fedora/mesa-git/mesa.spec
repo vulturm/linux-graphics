@@ -5,12 +5,12 @@
 #global __meson_auto_features disabled
 
 %global build_repo https://gitlab.freedesktop.org/mesa/mesa
-%define version_string 25.0.0
+%define version_string 25.1.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 5b291c7ce652c27800624808f6bfef513d7ac3de
+%define commit 6f5c227e2c8f1e5a1960d9e92b09f3bdf72af93a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20250130.20
+%global commit_date 20250131.00
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %global hw_video_codecs_free vc1dec,av1dec,av1enc,vp9dec
