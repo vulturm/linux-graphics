@@ -4,12 +4,12 @@
 #global __meson_auto_features disabled
 
 %global build_repo https://gitlab.freedesktop.org/mesa/mesa
-%define version_string 25.0.0
+%define version_string 25.1.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 6968794c504e19a06dcd826afc379c148d22e1fc
+%define commit 5b11c3ff0a4f20fecfea718b06e726a404cc0300
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20250104.00
+%global commit_date 20250316.05
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %global hw_video_codecs vc1dec,av1dec,av1enc,vp9dec,h264dec,h264enc,h265dec,h265enc
@@ -194,13 +194,14 @@ BuildRequires:  pkgconfig(vulkan)
 %package filesystem
 Summary:        Mesa driver filesystem
 Provides:       mesa-dri-filesystem = %{?epoch:%{epoch}:}%{version}-%{release}
+Obsoletes:      mesa-omx-drivers < %{?epoch:%{epoch}:}%{version}-%{release}
+Obsoletes:      mesa-libglapi < %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description filesystem
 %{summary}.
 
 %package libGL
 Summary:        Mesa libGL runtime libraries
-Requires:       %{name}-libglapi%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires:       libglvnd-glx%{?_isa} >= 1:1.3.2
 Recommends:     %{name}-dri-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 
@@ -221,9 +222,9 @@ Provides:       libGL-devel%{?_isa}
 Summary:        Mesa libEGL runtime libraries
 Requires:       libglvnd-egl%{?_isa} >= 1:1.3.2
 Requires:       %{name}-libgbm%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:       %{name}-libglapi%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 Recommends:     %{name}-dri-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 Obsoletes:      egl-icd < %{?epoch:%{epoch}:}%{version}-%{release}
+Obsoletes:      libOSMesa < %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description libEGL
 %{summary}.
@@ -235,6 +236,8 @@ Requires:       libglvnd-devel%{?_isa} >= 1:1.3.2
 Requires:       %{name}-khr-devel%{?_isa}
 Provides:       libEGL-devel
 Provides:       libEGL-devel%{?_isa}
+Obsoletes:      libOSMesa-devel < %{?epoch:%{epoch}:}%{version}-%{release}
+
 
 %description libEGL-devel
 %{summary}.
@@ -242,7 +245,6 @@ Provides:       libEGL-devel%{?_isa}
 %package dri-drivers
 Summary:        Mesa-based DRI drivers
 Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:       %{name}-libglapi%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 %if 0%{?with_va}
 Recommends:     %{name}-va-drivers%{?_isa}
 %endif
@@ -268,22 +270,6 @@ Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{rel
 %description vdpau-drivers
 %{summary}.
 %endif
-
-%package libOSMesa
-Summary:        Mesa offscreen rendering libraries
-Requires:       %{name}-libglapi%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Provides:       libOSMesa
-Provides:       libOSMesa%{?_isa}
-
-%description libOSMesa
-%{summary}.
-
-%package libOSMesa-devel
-Summary:        Mesa offscreen rendering development package
-Requires:       %{name}-libOSMesa%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-
-%description libOSMesa-devel
-%{summary}.
 
 %package libgbm
 Summary:        Mesa gbm runtime library
@@ -321,14 +307,6 @@ Provides:       libxatracker-devel%{?_isa}
 %description libxatracker-devel
 %{summary}.
 %endif
-
-%package libglapi
-Summary:        Mesa shared glapi
-Provides:       libglapi
-Provides:       libglapi%{?_isa}
-
-%description libglapi
-%{summary}.
 
 %if 0%{?with_opencl}
 %package libOpenCL
@@ -402,7 +380,6 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 
 %meson \
   -Dplatforms=x11,wayland \
-  -Dosmesa=true \
 %if 0%{?with_hardware}
   -Dgallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_i915:,i915}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi}%{?with_r600:,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_v3d:,v3d}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_vulkan_hw:,zink} \
 %else
@@ -467,7 +444,7 @@ ln -s %{_libdir}/libGLX_mesa.so.0 %{buildroot}%{_libdir}/libGLX_system.so.0
 
 # this keeps breaking, check it early.  note that the exit from eu-ftr is odd.
 pushd %{buildroot}%{_libdir}
-for i in libOSMesa*.so libGL*.so ; do
+for i in libGL*.so ; do
     sleep 1
     eu-findtextrel $i && exit 1
 done
@@ -488,7 +465,6 @@ popd
 %files libGL-devel
 %{_includedir}/GL/*
 %{_libdir}/pkgconfig/dri.pc
-%{_libdir}/libglapi.so
 
 
 %files libEGL
@@ -497,18 +473,6 @@ popd
 %files libEGL-devel
 %dir %{_includedir}/EGL
 %{_includedir}/EGL/*.h
-
-%files libglapi
-%{_libdir}/libglapi.so.0
-%{_libdir}/libglapi.so.0.*
-
-%files libOSMesa
-%{_libdir}/libOSMesa.so.8*
-%files libOSMesa-devel
-%dir %{_includedir}/GL
-%{_includedir}/GL/osmesa.h
-%{_libdir}/libOSMesa.so
-%{_libdir}/pkgconfig/osmesa.pc
 
 %files libgbm
 %{_libdir}/gbm/dri_gbm.so
@@ -730,6 +694,14 @@ popd
 %endif
 
 %changelog
+* Thu Mar 06 2025 Mihai Vultur <xanto@egaming.ro>
+  Remove references to osmesa as it has been removed after:
+  https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/33836
+
+* Fri Jan 24 2025 Mihai Vultur <xanto@egaming.ro>
+  Remove references to libglapi as it is no longer generated by mesa after:
+  https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/32789
+
 * Fri Sep 20 2024 Mihai Vultur <xanto@egaming.ro>
   New dri_gbm.so after: https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/31074
 
