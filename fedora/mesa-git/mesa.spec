@@ -10,7 +10,7 @@
 
 %define commit 359f69ba0cee03cab72d4e8b50a2a3e180bc438a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20250329.21
+%global commit_date 20250330.00
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %global hw_video_codecs_free vc1dec,av1dec,av1enc,vp9dec
