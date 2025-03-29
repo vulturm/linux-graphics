@@ -383,9 +383,9 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 %meson \
   -Dplatforms=x11,wayland \
 %if 0%{?with_hardware}
-  -Dgallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_i915:,i915}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi}%{?with_r600:,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_v3d:,v3d}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_vulkan_hw:,zink} \
+  -Dgallium-drivers=llvmpipe,softpipe,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_i915:,i915}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi}%{?with_r600:,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_v3d:,v3d}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_vulkan_hw:,zink} \
 %else
-  -Dgallium-drivers=swrast,virgl \
+  -Dgallium-drivers=llvmpipe,softpipe,virgl \
 %endif
   -Dgallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
   -Dgallium-va=%{?with_va:enabled}%{!?with_va:disabled} \
@@ -696,6 +696,10 @@ popd
 %endif
 
 %changelog
+* Sat Mar 29 2025 Mihai Vultur <xanto@egaming.ro>
+  swrast has been removed in favor of softpipe+llvmpipe:
+  https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/34217
+
 * Thu Mar 06 2025 Mihai Vultur <xanto@egaming.ro>
   Remove references to osmesa as it has been removed after:
   https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/33836
