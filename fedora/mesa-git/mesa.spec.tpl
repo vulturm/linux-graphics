@@ -401,7 +401,6 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
   -Dgles1=enabled \
   -Dgles2=enabled \
   -Dopengl=true \
-  -Dgbm=enabled \
   -Dglx=dri \
   -Degl=enabled \
   -Dglvnd=enabled \
@@ -480,6 +479,8 @@ popd
 %{_libdir}/gbm/dri_gbm.so
 %{_libdir}/libgbm.so.1
 %{_libdir}/libgbm.so.1.*
+%{_includedir}/gbm_backend_abi.h
+
 %files libgbm-devel
 %{_libdir}/libgbm.so
 %{_includedir}/gbm.h
@@ -533,6 +534,7 @@ popd
 %files dri-drivers
 %dir %{_datadir}/drirc.d
 %{_datadir}/drirc.d/*.conf
+%{_libdir}/dri/apple_dri.so
 %{_libdir}/dri/kms_swrast_dri.so
 %{_libdir}/dri/swrast_dri.so
 %{_libdir}/dri/virtio_gpu_dri.so
@@ -696,6 +698,10 @@ popd
 %endif
 
 %changelog
+* Fri Apr 11 2025 Mihai Vultur <xanto@egaming.ro>
+  support building with system libgbm
+  https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/33890
+
 * Sat Mar 29 2025 Mihai Vultur <xanto@egaming.ro>
   swrast has been removed in favor of softpipe+llvmpipe:
   https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/34217
