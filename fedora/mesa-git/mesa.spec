@@ -8,9 +8,9 @@
 %define version_string 25.1.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 23c0d64e240fa16d9bef62020abaa122d462759e
+%define commit fc7badeac09f88ba4fe204cba79cde5bee64c986
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20250411.20
+%global commit_date 20250412.23
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %global hw_video_codecs_free vc1dec,av1dec,av1enc,vp9dec
@@ -401,7 +401,6 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
   -Dgles1=enabled \
   -Dgles2=enabled \
   -Dopengl=true \
-  -Dgbm=enabled \
   -Dglx=dri \
   -Degl=enabled \
   -Dglvnd=enabled \
@@ -480,6 +479,8 @@ popd
 %{_libdir}/gbm/dri_gbm.so
 %{_libdir}/libgbm.so.1
 %{_libdir}/libgbm.so.1.*
+%{_includedir}/gbm_backend_abi.h
+
 %files libgbm-devel
 %{_libdir}/libgbm.so
 %{_includedir}/gbm.h
@@ -533,6 +534,7 @@ popd
 %files dri-drivers
 %dir %{_datadir}/drirc.d
 %{_datadir}/drirc.d/*.conf
+%{_libdir}/dri/apple_dri.so
 %{_libdir}/dri/kms_swrast_dri.so
 %{_libdir}/dri/swrast_dri.so
 %{_libdir}/dri/virtio_gpu_dri.so
@@ -696,6 +698,10 @@ popd
 %endif
 
 %changelog
+* Fri Apr 11 2025 Mihai Vultur <xanto@egaming.ro>
+  support building with system libgbm
+  https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/33890
+
 * Sat Mar 29 2025 Mihai Vultur <xanto@egaming.ro>
   swrast has been removed in favor of softpipe+llvmpipe:
   https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/34217
