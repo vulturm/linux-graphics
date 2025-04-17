@@ -22,7 +22,6 @@
 %global with_vdpau 1
 %global with_va 1
 %if !0%{?rhel}
-%global with_nine 1
 %global with_nvk %{with vulkan_hw}
 %global with_opencl 1
 %global with_opencl_rust 1
@@ -35,7 +34,6 @@
 %global with_i915   1
 %global with_intel_clc 1
 %global with_iris   1
-%global with_xa     1
 %global intel_platform_vulkan ,intel,intel_hasvk
 %endif
 
@@ -54,7 +52,6 @@
 %global with_panfrost  1
 %global with_tegra     1
 %global with_v3d       1
-%global with_xa        1
 %global extra_platform_vulkan ,broadcom,freedreno,panfrost,imagination-experimental
 %endif
 
@@ -119,7 +116,6 @@ BuildRequires:  pkgconfig(libunwind)
 BuildRequires:  pkgconfig(expat)
 BuildRequires:  pkgconfig(zlib) >= 1.2.3
 BuildRequires:  pkgconfig(libzstd)
-BuildRequires:  pkgconfig(libselinux)
 BuildRequires:  pkgconfig(wayland-scanner)
 BuildRequires:  pkgconfig(wayland-protocols) >= 1.8
 BuildRequires:  pkgconfig(wayland-client) >= 1.11
@@ -198,6 +194,9 @@ Summary:        Mesa driver filesystem
 Provides:       mesa-dri-filesystem = %{?epoch:%{epoch}:}%{version}-%{release}
 Obsoletes:      mesa-omx-drivers < %{?epoch:%{epoch}:}%{version}-%{release}
 Obsoletes:      mesa-libglapi < %{?epoch:%{epoch}:}%{version}-%{release}
+Obsoletes:      mesa-libxatracker < %{?epoch:%{epoch}:}%{version}-%{release}
+Obsoletes:      mesa-libxatracker-devel < %{?epoch:%{epoch}:}%{version}-%{release}
+
 
 %description filesystem
 %{summary}.
@@ -291,25 +290,6 @@ Provides:       libgbm-devel%{?_isa}
 %description libgbm-devel
 %{summary}.
 
-%if 0%{?with_xa}
-%package libxatracker
-Summary:        Mesa XA state tracker
-Provides:       libxatracker
-Provides:       libxatracker%{?_isa}
-
-%description libxatracker
-%{summary}.
-
-%package libxatracker-devel
-Summary:        Mesa XA state tracker development package
-Requires:       %{name}-libxatracker%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Provides:       libxatracker-devel
-Provides:       libxatracker-devel%{?_isa}
-
-%description libxatracker-devel
-%{summary}.
-%endif
-
 %if 0%{?with_opencl}
 %package libOpenCL
 Summary:        Mesa OpenCL runtime library
@@ -329,20 +309,6 @@ Requires:       %{name}-libOpenCL%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{rele
 %{summary}.
 %endif
 
-%if 0%{?with_nine}
-%package libd3d
-Summary:        Mesa Direct3D9 state tracker
-
-%description libd3d
-%{summary}.
-
-%package libd3d-devel
-Summary:        Mesa Direct3D9 state tracker development package
-Requires:       %{name}-libd3d%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-
-%description libd3d-devel
-%{summary}.
-%endif
 
 %package vulkan-drivers
 Summary:        Mesa Vulkan drivers
@@ -389,15 +355,12 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 %endif
   -Dgallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
   -Dgallium-va=%{?with_va:enabled}%{!?with_va:disabled} \
-  -Dgallium-xa=%{?with_xa:enabled}%{!?with_xa:disabled} \
-  -Dgallium-nine=%{?with_nine:true}%{!?with_nine:false} \
   -Dgallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
  %if 0%{?with_opencl_rust}
   -Dgallium-rusticl=true \
  %endif
   -Dvulkan-drivers=%{?vulkan_drivers} \
   -Dvulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
-  -Dshared-glapi=enabled \
   -Dgles1=enabled \
   -Dgles2=enabled \
   -Dopengl=true \
@@ -413,7 +376,6 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
   -Dshared-llvm=enabled \
   -Dvalgrind=%{?with_valgrind:enabled}%{!?with_valgrind:disabled} \
   -Dbuild-tests=false \
-  -Dselinux=true \
 %if !0%{?with_libunwind}
   -Dlibunwind=disabled \
 %endif
@@ -486,21 +448,6 @@ popd
 %{_includedir}/gbm.h
 %{_libdir}/pkgconfig/gbm.pc
 
-%if 0%{?with_xa}
-%files libxatracker
-%if 0%{?with_hardware}
-%{_libdir}/libxatracker.so.2
-%{_libdir}/libxatracker.so.2.*
-%endif
-
-%files libxatracker-devel
-%if 0%{?with_hardware}
-%{_libdir}/libxatracker.so
-%{_includedir}/xa_tracker.h
-%{_includedir}/xa_composite.h
-%{_includedir}/xa_context.h
-%{_libdir}/pkgconfig/xatracker.pc
-%endif
 %endif
 
 %if 0%{?with_opencl}
@@ -518,17 +465,6 @@ popd
 %if 0%{?with_opencl_rust}
 %{_libdir}/libRusticlOpenCL.so
 %endif
-%endif
-
-%if 0%{?with_nine}
-%files libd3d
-%dir %{_libdir}/d3d/
-%{_libdir}/d3d/*.so.*
-
-%files libd3d-devel
-%{_libdir}/pkgconfig/d3d.pc
-%{_includedir}/d3dadapter/
-%{_libdir}/d3d/*.so
 %endif
 
 %files dri-drivers
