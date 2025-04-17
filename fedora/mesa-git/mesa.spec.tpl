@@ -24,7 +24,6 @@
 %if !0%{?rhel}
 %global with_nvk %{with vulkan_hw}
 %global with_opencl 1
-%global with_opencl_rust 1
 %endif
 %global base_vulkan ,amd
 %endif
@@ -355,10 +354,7 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 %endif
   -Dgallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
   -Dgallium-va=%{?with_va:enabled}%{!?with_va:disabled} \
-  -Dgallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
- %if 0%{?with_opencl_rust}
-  -Dgallium-rusticl=true \
- %endif
+  -Dgallium-rusticl=%{?with_opencl:true}%{!?with_opencl:false} \
   -Dvulkan-drivers=%{?vulkan_drivers} \
   -Dvulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
   -Dgles1=enabled \
@@ -417,9 +413,11 @@ popd
 %doc docs/Mesa-MLAA-License-Clarification-Email.txt
 %dir %{_libdir}/dri
 %if 0%{?with_hardware}
+
 %if 0%{?with_vdpau}
 %dir %{_libdir}/vdpau
 %endif
+
 %endif
 
 %files libGL
@@ -448,23 +446,16 @@ popd
 %{_includedir}/gbm.h
 %{_libdir}/pkgconfig/gbm.pc
 
-%endif
 
 %if 0%{?with_opencl}
+
 %files libOpenCL
-%{_libdir}/libMesaOpenCL.so.*
-%if 0%{?with_opencl_rust}
 %{_libdir}/libRusticlOpenCL.so.*
-%endif
-%{_sysconfdir}/OpenCL/vendors/mesa.icd
-%if 0%{?with_opencl_rust}
 %{_sysconfdir}/OpenCL/vendors/rusticl.icd
-%endif
+
 %files libOpenCL-devel
-%{_libdir}/libMesaOpenCL.so
-%if 0%{?with_opencl_rust}
 %{_libdir}/libRusticlOpenCL.so
-%endif
+
 %endif
 
 %files dri-drivers
@@ -535,7 +526,7 @@ popd
 %{_libdir}/dri/vmwgfx_dri.so
 %endif
 %endif
-%if 0%{?with_hardware}
+%if 0%{?with_hardware_xxmitsu_disabled}
 %dir %{_libdir}/gallium-pipe
 %{_libdir}/gallium-pipe/*.so
 %{_libdir}/dri/libdril_dri.so
@@ -634,6 +625,11 @@ popd
 %endif
 
 %changelog
+* Thu Apr 17 2025 Mihai Vultur <xanto@egaming.ro>
+  Remove 'gallium-opencl' now that clover was removed. 
+  https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/19385
+
+
 * Fri Apr 11 2025 Mihai Vultur <xanto@egaming.ro>
   support building with system libgbm
   https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/33890
