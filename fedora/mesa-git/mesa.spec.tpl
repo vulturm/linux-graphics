@@ -354,6 +354,7 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 %endif
   -Dgallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
   -Dgallium-va=%{?with_va:enabled}%{!?with_va:disabled} \
+  -Dgallium-xa=disabled \
   -Dgallium-rusticl=%{?with_opencl:true}%{!?with_opencl:false} \
   -Dvulkan-drivers=%{?vulkan_drivers} \
   -Dvulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
@@ -526,9 +527,7 @@ popd
 %{_libdir}/dri/vmwgfx_dri.so
 %endif
 %endif
-%if 0%{?with_hardware_xxmitsu_disabled}
-%dir %{_libdir}/gallium-pipe
-%{_libdir}/gallium-pipe/*.so
+%if 0%{?with_hardware}
 %{_libdir}/dri/libdril_dri.so
 %{_libdir}/libgallium-*.so
 %endif
