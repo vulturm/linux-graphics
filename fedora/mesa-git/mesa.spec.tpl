@@ -168,6 +168,7 @@ BuildRequires:  (crate(proc-macro2) >= 1.0.56 with crate(proc-macro2) < 2)
 BuildRequires:  (crate(quote) >= 1.0.25 with crate(quote) < 2)
 BuildRequires:  (crate(syn/clone-impls) >= 2.0.15 with crate(syn/clone-impls) < 3)
 BuildRequires:  (crate(unicode-ident) >= 1.0.6 with crate(unicode-ident) < 2)
+BuildRequires:  (crate(rustc-hash) >= 2.0.0 with crate(rustc-hash) < 3)
 %endif
 %if %{with valgrind}
 BuildRequires:  pkgconfig(valgrind)
@@ -624,6 +625,11 @@ popd
 %endif
 
 %changelog
+* Wed May 21 2025 Mihai Vultur <xanto@egaming.ro>
+  Add 'rustc-hash' dependency required for building nvk.
+  https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/34865
+
+
 * Thu Apr 17 2025 Mihai Vultur <xanto@egaming.ro>
   Remove 'gallium-opencl' now that clover was removed. 
   https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/19385
