@@ -353,9 +353,9 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 %else
   -Dgallium-drivers=llvmpipe,softpipe,virgl \
 %endif
+  -Dgallium-mediafoundation=disabled \
   -Dgallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
   -Dgallium-va=%{?with_va:enabled}%{!?with_va:disabled} \
-  -Dgallium-xa=disabled \
   -Dgallium-rusticl=%{?with_opencl:true}%{!?with_opencl:false} \
   -Dvulkan-drivers=%{?vulkan_drivers} \
   -Dvulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
@@ -625,15 +625,18 @@ popd
 %endif
 
 %changelog
+* Sun May 25 2025 Mihai Vultur <xanto@egaming.ro>
+  Don't use 'gallium-xa' anymore.
+  Explicitely set -Dgallium-mediafoundation=disabled
+  https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/35113
+
 * Wed May 21 2025 Mihai Vultur <xanto@egaming.ro>
   Add 'rustc-hash' dependency required for building nvk.
   https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/34865
 
-
 * Thu Apr 17 2025 Mihai Vultur <xanto@egaming.ro>
   Remove 'gallium-opencl' now that clover was removed. 
   https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/19385
-
 
 * Fri Apr 11 2025 Mihai Vultur <xanto@egaming.ro>
   support building with system libgbm
