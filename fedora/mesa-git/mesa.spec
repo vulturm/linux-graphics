@@ -8,9 +8,9 @@
 %define version_string 25.3.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit cfd5fbfde12de2b6f09d7e3200ed124a0c0d9a16
+%define commit 4c7254d1058645fa730874fd1451e3f3208be2e7
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20250802.00
+%global commit_date 20250802.02
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %global hw_video_codecs_free vc1dec,av1dec,av1enc,vp9dec
@@ -95,7 +95,7 @@ Source1:        Mesa-MLAA-License-Clarification-Email.txt
 # Disable rgb10 configs by default:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1560481
 #Patch7:         0001-gallium-Disable-rgb10-configs-by-default.patch
-Patch1:         001-disable-proc_macro2-unstable-features.patch
+#Patch1:         001-disable-proc_macro2-unstable-features.patch
 
 BuildRequires:  meson >= 1.3.0
 BuildRequires:  cbindgen
@@ -169,6 +169,7 @@ BuildRequires:  (crate(quote) >= 1.0.25 with crate(quote) < 2)
 BuildRequires:  (crate(syn/clone-impls) >= 2.0.15 with crate(syn/clone-impls) < 3)
 BuildRequires:  (crate(unicode-ident) >= 1.0.6 with crate(unicode-ident) < 2)
 BuildRequires:  (crate(rustc-hash) >= 2.0.0 with crate(rustc-hash) < 3)
+BuildRequires: rust-syn+clone-impls >= 2.0.15
 %endif
 %if %{with valgrind}
 BuildRequires:  pkgconfig(valgrind)
@@ -334,11 +335,6 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 %define inst_crate_nameversion() %(basename %{cargo_registry}/%{1}-*)
 %define rewrite_wrap_file() sed -e "/source.*/d" -e "s/%{1}-.*/%{inst_crate_nameversion %{1}}/" -i subprojects/%{1}.wrap
 
-%rewrite_wrap_file paste
-%rewrite_wrap_file proc-macro2
-%rewrite_wrap_file quote
-%rewrite_wrap_file syn
-%rewrite_wrap_file unicode-ident
 %endif 
 
 # We've gotten a report that enabling LTO for mesa breaks some games. See
