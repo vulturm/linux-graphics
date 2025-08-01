@@ -95,7 +95,7 @@ Source1:        Mesa-MLAA-License-Clarification-Email.txt
 # Disable rgb10 configs by default:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1560481
 #Patch7:         0001-gallium-Disable-rgb10-configs-by-default.patch
-Patch1:         001-disable-proc_macro2-unstable-features.patch
+#Patch1:         001-disable-proc_macro2-unstable-features.patch
 
 BuildRequires:  meson >= 1.3.0
 BuildRequires:  cbindgen
