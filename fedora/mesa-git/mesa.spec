@@ -8,9 +8,9 @@
 %define version_string 25.3.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 20dab5f819f7016b8d7f4e88927855a0e5ff7a61
+%define commit 2d691d7dd31463a9ec2d832a98164e0aa9225068
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20250806.15
+%global commit_date 20250807.15
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %global hw_video_codecs_free vc1dec,av1dec,av1enc,vp9dec
@@ -115,6 +115,7 @@ BuildRequires:  pkgconfig(libunwind)
 BuildRequires:  pkgconfig(expat)
 BuildRequires:  pkgconfig(zlib) >= 1.2.3
 BuildRequires:  pkgconfig(libzstd)
+BuildRequires:  pkgconfig(libdisplay-info)
 BuildRequires:  pkgconfig(wayland-scanner)
 BuildRequires:  pkgconfig(wayland-protocols) >= 1.8
 BuildRequires:  pkgconfig(wayland-client) >= 1.11
@@ -331,8 +332,24 @@ export RUSTFLAGS="%build_rustflags"
 %if 0%{?with_nvk}
 export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 # So... Meson can't actually find them without tweaks
-%define inst_crate_nameversion() %(basename %{cargo_registry}/%{1}-*)
-%define rewrite_wrap_file() sed -e "/source.*/d" -e "s/%{1}-.*/%{inst_crate_nameversion %{1}}/" -i subprojects/%{1}.wrap
+
+%define inst_crate_nameversion() %( \
+  found_dir=$(find %{cargo_registry} -maxdepth 1 -type d -name '%{1}-*' 2>/dev/null | head -n1); \
+  if [ -n "$found_dir" ]; then basename "$found_dir"; fi \
+)
+
+%define rewrite_wrap_file() \
+  wrapfile=$(find subprojects -maxdepth 1 -name '%{1}*.wrap' | head -n1) && \
+  if [ -z "$wrapfile" ]; then \
+    echo "ERROR: .wrap file not found for crate %{1}" >&2; exit 1; \
+  fi && \
+  crate_dir="%{expand:%%inst_crate_nameversion %{1}}" && \
+  if [ -z "$crate_dir" ]; then \
+    echo "ERROR: Crate directory not found in %{cargo_registry} for %{1}" >&2; exit 1; \
+  fi && \
+  echo "→ Rewriting $wrapfile to use directory = $crate_dir" && \
+  sed -i -e '/^source_/d' -e "s|^directory = .*|directory = ${crate_dir}|" "$wrapfile"
+
 
 %rewrite_wrap_file paste
 %rewrite_wrap_file proc-macro2
@@ -625,6 +642,10 @@ popd
 %endif
 
 %changelog
+* Thu Aug 07 2025 Mihai Vultur <xanto@egaming.ro>
+  Modify 'rewrite_wrap_file' define to also modify the directory = directive in meson wrap.
+  Because it seems that meson can't reliably use those by default.
+
 * Sun May 25 2025 Mihai Vultur <xanto@egaming.ro>
   Don't use 'gallium-xa' anymore.
   Explicitely set -Dgallium-mediafoundation=disabled
