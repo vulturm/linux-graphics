@@ -31,7 +31,6 @@
 %ifarch %{ix86} x86_64
 %global with_crocus 1
 %global with_i915   1
-%global with_intel_clc 1
 %global with_iris   1
 %global intel_platform_vulkan ,intel,intel_hasvk
 %endif
@@ -177,9 +176,6 @@ BuildRequires:  pkgconfig(valgrind)
 BuildRequires:  python3-devel
 BuildRequires:  python3-yaml
 BuildRequires:  python3-mako
-%if 0%{?with_intel_clc}
-BuildRequires:  python3-ply
-%endif
 BuildRequires:  vulkan-headers
 BuildRequires:  glslang
 %if 0%{?with_vulkan_hw}
@@ -382,9 +378,6 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
   -Dglx=dri \
   -Degl=enabled \
   -Dglvnd=enabled \
-%if 0%{?with_intel_clc}
-  -Dintel-clc=enabled \
-%endif
   -Dintel-rt=%{?with_intel_vk_rt:enabled}%{!?with_intel_vk_rt:disabled} \
   -Dmicrosoft-clc=disabled \
   -Dllvm=enabled \
@@ -642,6 +635,10 @@ popd
 %endif
 
 %changelog
+* Fri Aug 08 2025 Mihai Vultur <xanto@egaming.ro>
+  Remove 'intel-clc' option after:
+  https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/36625
+
 * Thu Aug 07 2025 Mihai Vultur <xanto@egaming.ro>
   Modify 'rewrite_wrap_file' define to also modify the directory = directive in meson wrap.
   Because it seems that meson can't reliably use those by default.
