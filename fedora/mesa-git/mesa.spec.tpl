@@ -19,7 +19,6 @@
 %ifnarch s390x
 %global with_hardware 1
 %global with_vulkan_hw 1
-%global with_vdpau 1
 %global with_va 1
 %if !0%{?rhel}
 %global with_nvk %{with vulkan_hw}
@@ -144,9 +143,6 @@ BuildRequires:  flex
 %if 0%{?with_lmsensors}
 BuildRequires:  lm_sensors-devel
 %endif
-%if 0%{?with_vdpau}
-BuildRequires:  pkgconfig(vdpau) >= 1.1
-%endif
 %if 0%{?with_va}
 BuildRequires:  pkgconfig(libva) >= 0.38.0
 %endif
@@ -254,18 +250,11 @@ Recommends:     %{name}-va-drivers%{?_isa}
 %package        va-drivers
 Summary:        Mesa-based VA-API video acceleration drivers
 Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Obsoletes:      %{name}-vaapi-drivers < 22.2.0-5
+Obsoletes:      %{name}-vaapi-drivers < %{?epoch:%{epoch}:}%{version}-%{release}
+Obsoletes:      %{name}-vdpau-drivers < %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:       %{name}-vdpau-drivers = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description va-drivers
-%{summary}.
-%endif
-
-%if 0%{?with_vdpau}
-%package        vdpau-drivers
-Summary:        Mesa-based VDPAU drivers
-Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-
-%description vdpau-drivers
 %{summary}.
 %endif
 
@@ -367,7 +356,6 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
   -Dgallium-drivers=llvmpipe,softpipe,virgl \
 %endif
   -Dgallium-mediafoundation=disabled \
-  -Dgallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
   -Dgallium-va=%{?with_va:enabled}%{!?with_va:disabled} \
   -Dgallium-rusticl=%{?with_opencl:true}%{!?with_opencl:false} \
   -Dvulkan-drivers=%{?vulkan_drivers} \
@@ -401,9 +389,7 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 %install
 %meson_install
 
-# libvdpau opens the versioned name, don't bother including the unversioned
-rm -vf %{buildroot}%{_libdir}/vdpau/*.so
-# likewise glvnd
+# glvnd opens the versioned name, don't bother including the unversioned
 rm -vf %{buildroot}%{_libdir}/libGLX_mesa.so
 rm -vf %{buildroot}%{_libdir}/libEGL_mesa.so
 # XXX can we just not build this
@@ -425,10 +411,6 @@ popd
 %doc docs/Mesa-MLAA-License-Clarification-Email.txt
 %dir %{_libdir}/dri
 %if 0%{?with_hardware}
-
-%if 0%{?with_vdpau}
-%dir %{_libdir}/vdpau
-%endif
 
 %endif
 
@@ -583,18 +565,6 @@ popd
 %endif
 %{_libdir}/dri/virtio_gpu_drv_video.so
 %endif
-
-%if 0%{?with_vdpau}
-%files vdpau-drivers
-%{_libdir}/vdpau/libvdpau_nouveau.so.1*
-%if 0%{?with_r600}
-%{_libdir}/vdpau/libvdpau_r600.so.1*
-%endif
-%if 0%{?with_radeonsi}
-%{_libdir}/vdpau/libvdpau_radeonsi.so.1*
-%endif
-%endif
-%{_libdir}/vdpau/libvdpau_virtio_gpu.so.1*
 %endif
 
 %files vulkan-drivers
@@ -635,6 +605,10 @@ popd
 %endif
 
 %changelog
+* Thu Sep 11 2025 Mihai Vultur <xanto@egaming.ro>
+  Remove 'gallium-vdpau' option after:
+  https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/36632
+
 * Fri Aug 08 2025 Mihai Vultur <xanto@egaming.ro>
   Remove 'intel-clc' option after:
   https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/36625
