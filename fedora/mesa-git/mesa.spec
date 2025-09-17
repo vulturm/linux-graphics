@@ -8,9 +8,9 @@
 %define version_string 25.3.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 1ca87b2173f41471eae34efc0027b2b0ff165ef5
+%define commit 81df5175537a20133e4460c2c4d047a4fe09d8f8
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20250917.10
+%global commit_date 20250917.13
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %global hw_video_codecs_free vc1dec,av1dec,av1enc,vp9dec
@@ -38,7 +38,7 @@
 %global with_intel_vk_rt 1
 %endif
 
-%ifarch aarch64 x86_64 %{ix86}
+%ifarch aarch64
 %if !0%{?rhel}
 %global with_lima      1
 %global with_vc4       1
@@ -455,7 +455,6 @@ popd
 %files dri-drivers
 %dir %{_datadir}/drirc.d
 %{_datadir}/drirc.d/*.conf
-%{_libdir}/dri/apple_dri.so
 %{_libdir}/dri/kms_swrast_dri.so
 %{_libdir}/dri/swrast_dri.so
 %{_libdir}/dri/virtio_gpu_dri.so
@@ -478,7 +477,8 @@ popd
   %endif
 %endif
 
-%ifarch aarch64 x86_64 %{ix86}
+%ifarch aarch64
+  %{_libdir}/dri/apple_dri.so
   %{_libdir}/dri/ingenic-drm_dri.so
   %{_libdir}/dri/imx-drm_dri.so
   %{_libdir}/dri/imx-lcdif_dri.so
@@ -491,6 +491,32 @@ popd
   %{_libdir}/dri/rcar-du_dri.so
   %{_libdir}/dri/sti_dri.so
   %{_libdir}/dri/stm_dri.so
+  # old kmsro drivers
+  %{_libdir}/dri/armada-drm_dri.so
+  %{_libdir}/dri/exynos_dri.so
+  %{_libdir}/dri/gm12u320_dri.so
+  %{_libdir}/dri/hx8357d_dri.so
+  %{_libdir}/dri/ili9163_dri.so
+  %{_libdir}/dri/ili9225_dri.so
+  %{_libdir}/dri/ili9341_dri.so
+  %{_libdir}/dri/ili9486_dri.so
+  %{_libdir}/dri/imx-dcss_dri.so
+  %{_libdir}/dri/mediatek_dri.so
+  %{_libdir}/dri/meson_dri.so
+  %{_libdir}/dri/mi0283qt_dri.so
+  %{_libdir}/dri/panthor_dri.so
+  %{_libdir}/dri/pl111_dri.so
+  %{_libdir}/dri/repaper_dri.so
+  %{_libdir}/dri/rockchip_dri.so
+  %{_libdir}/dri/rzg2l-du_dri.so
+  %{_libdir}/dri/ssd130x_dri.so
+  %{_libdir}/dri/st7586_dri.so
+  %{_libdir}/dri/st7735r_dri.so
+  %{_libdir}/dri/sun4i-drm_dri.so
+  %{_libdir}/dri/udl_dri.so
+  %{_libdir}/dri/vkms_dri.so
+  %{_libdir}/dri/zynqmp-dpsub_dri.so
+  # kmsro end
 %endif
 %if 0%{?with_vc4}
 %{_libdir}/dri/vc4_dri.so
@@ -525,33 +551,7 @@ popd
 %{_libdir}/libgallium-*.so
 %endif
 
-# old kmsro drivers
-%{_libdir}/dri/armada-drm_dri.so
-%{_libdir}/dri/exynos_dri.so
-%{_libdir}/dri/gm12u320_dri.so
-%{_libdir}/dri/hx8357d_dri.so
-%{_libdir}/dri/ili9163_dri.so
-%{_libdir}/dri/ili9225_dri.so
-%{_libdir}/dri/ili9341_dri.so
-%{_libdir}/dri/ili9486_dri.so
-%{_libdir}/dri/imx-dcss_dri.so
-%{_libdir}/dri/mediatek_dri.so
-%{_libdir}/dri/meson_dri.so
-%{_libdir}/dri/mi0283qt_dri.so
-%{_libdir}/dri/panthor_dri.so
-%{_libdir}/dri/pl111_dri.so
-%{_libdir}/dri/repaper_dri.so
-%{_libdir}/dri/rockchip_dri.so
-%{_libdir}/dri/rzg2l-du_dri.so
-%{_libdir}/dri/ssd130x_dri.so
-%{_libdir}/dri/st7586_dri.so
-%{_libdir}/dri/st7735r_dri.so
-%{_libdir}/dri/sun4i-drm_dri.so
-%{_libdir}/dri/udl_dri.so
-%{_libdir}/dri/vkms_dri.so
-%{_libdir}/dri/zynqmp-dpsub_dri.so
 %{_libdir}/dri/zink_dri.so
-# kmsro end
 
 %if 0%{?with_hardware}
 %if 0%{?with_va}
@@ -591,7 +591,7 @@ popd
   %{_datadir}/vulkan/icd.d/intel_icd.*.json
   %{_datadir}/vulkan/icd.d/intel_hasvk_icd.*.json
 %endif
-%ifarch aarch64 x86_64 %{ix86}
+%ifarch aarch64
   %{_libdir}/libvulkan_broadcom.so
   %{_datadir}/vulkan/icd.d/broadcom_icd.*.json
   %{_libdir}/libvulkan_freedreno.so
@@ -605,6 +605,9 @@ popd
 %endif
 
 %changelog
+* Wed Sep 17 2025 Mihai Vultur <xanto@egaming.ro>
+  Disable compiling of ARM specific drivers in x86_64 builds
+
 * Thu Sep 11 2025 Mihai Vultur <xanto@egaming.ro>
   Remove 'gallium-vdpau' option after:
   https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/36632
