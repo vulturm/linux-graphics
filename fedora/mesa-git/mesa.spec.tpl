@@ -477,7 +477,8 @@ popd
   %endif
 %endif
 
-%ifarch aarch64
+%ifarch aarch64 %{ix86} x86_64
+  %{_libdir}/dri/hdlcd_dri.so
   %{_libdir}/dri/apple_dri.so
   %{_libdir}/dri/ingenic-drm_dri.so
   %{_libdir}/dri/imx-drm_dri.so
@@ -504,7 +505,6 @@ popd
   %{_libdir}/dri/mediatek_dri.so
   %{_libdir}/dri/meson_dri.so
   %{_libdir}/dri/mi0283qt_dri.so
-  %{_libdir}/dri/panthor_dri.so
   %{_libdir}/dri/pl111_dri.so
   %{_libdir}/dri/repaper_dri.so
   %{_libdir}/dri/rockchip_dri.so
@@ -538,8 +538,8 @@ popd
 %{_libdir}/dri/lima_dri.so
 %endif
 %if 0%{?with_panfrost}
+%{_libdir}/dri/panthor_dri.so
 %{_libdir}/dri/panfrost_dri.so
-%{_libdir}/dri/hdlcd_dri.so
 %endif
 %{_libdir}/dri/nouveau_dri.so
 %if 0%{?with_vmware}
