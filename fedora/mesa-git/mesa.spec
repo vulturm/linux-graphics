@@ -8,9 +8,9 @@
 %define version_string 25.3.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit d52452a486c5861384c67909e9fc502ca99f23bb
+%define commit d3cedd2fa56050636ff898af51aaff6ebec74c2c
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20250922.10
+%global commit_date 20250922.16
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %global hw_video_codecs_free vc1dec,av1dec,av1enc,vp9dec
@@ -477,7 +477,8 @@ popd
   %endif
 %endif
 
-%ifarch aarch64
+%ifarch aarch64 %{ix86} x86_64
+  %{_libdir}/dri/hdlcd_dri.so
   %{_libdir}/dri/apple_dri.so
   %{_libdir}/dri/ingenic-drm_dri.so
   %{_libdir}/dri/imx-drm_dri.so
@@ -504,7 +505,6 @@ popd
   %{_libdir}/dri/mediatek_dri.so
   %{_libdir}/dri/meson_dri.so
   %{_libdir}/dri/mi0283qt_dri.so
-  %{_libdir}/dri/panthor_dri.so
   %{_libdir}/dri/pl111_dri.so
   %{_libdir}/dri/repaper_dri.so
   %{_libdir}/dri/rockchip_dri.so
@@ -538,8 +538,8 @@ popd
 %{_libdir}/dri/lima_dri.so
 %endif
 %if 0%{?with_panfrost}
+%{_libdir}/dri/panthor_dri.so
 %{_libdir}/dri/panfrost_dri.so
-%{_libdir}/dri/hdlcd_dri.so
 %endif
 %{_libdir}/dri/nouveau_dri.so
 %if 0%{?with_vmware}
