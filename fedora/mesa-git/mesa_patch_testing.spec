@@ -10,7 +10,7 @@
 
 %define commit 0cec71d7ce0a793b35aca7c142f511417c3fd57a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20250409.19
+%global commit_date 20251118.23
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %global hw_video_codecs_free vc1dec,av1dec,av1enc,vp9dec
@@ -19,13 +19,10 @@
 %ifnarch s390x
 %global with_hardware 1
 %global with_vulkan_hw 1
-%global with_vdpau 1
 %global with_va 1
 %if !0%{?rhel}
-%global with_nine 1
 %global with_nvk %{with vulkan_hw}
 %global with_opencl 1
-%global with_opencl_rust 1
 %endif
 %global base_vulkan ,amd
 %endif
@@ -33,9 +30,7 @@
 %ifarch %{ix86} x86_64
 %global with_crocus 1
 %global with_i915   1
-%global with_intel_clc 1
 %global with_iris   1
-%global with_xa     1
 %global intel_platform_vulkan ,intel,intel_hasvk
 %endif
 
@@ -43,7 +38,7 @@
 %global with_intel_vk_rt 1
 %endif
 
-%ifarch aarch64 x86_64 %{ix86}
+%ifarch aarch64
 %if !0%{?rhel}
 %global with_lima      1
 %global with_vc4       1
@@ -54,7 +49,6 @@
 %global with_panfrost  1
 %global with_tegra     1
 %global with_v3d       1
-%global with_xa        1
 %global extra_platform_vulkan ,broadcom,freedreno,panfrost,imagination-experimental
 %endif
 
@@ -99,7 +93,7 @@ Source1:        Mesa-MLAA-License-Clarification-Email.txt
 # Disable rgb10 configs by default:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1560481
 #Patch7:         0001-gallium-Disable-rgb10-configs-by-default.patch
-Patch1:         001-disable-proc_macro2-unstable-features.patch
+#Patch1:         001-disable-proc_macro2-unstable-features.patch
 
 BuildRequires:  meson >= 1.3.0
 BuildRequires:  cbindgen
@@ -119,7 +113,7 @@ BuildRequires:  pkgconfig(libunwind)
 BuildRequires:  pkgconfig(expat)
 BuildRequires:  pkgconfig(zlib) >= 1.2.3
 BuildRequires:  pkgconfig(libzstd)
-BuildRequires:  pkgconfig(libselinux)
+BuildRequires:  pkgconfig(libdisplay-info)
 BuildRequires:  pkgconfig(wayland-scanner)
 BuildRequires:  pkgconfig(wayland-protocols) >= 1.8
 BuildRequires:  pkgconfig(wayland-client) >= 1.11
@@ -149,9 +143,6 @@ BuildRequires:  flex
 %if 0%{?with_lmsensors}
 BuildRequires:  lm_sensors-devel
 %endif
-%if 0%{?with_vdpau}
-BuildRequires:  pkgconfig(vdpau) >= 1.1
-%endif
 %if 0%{?with_va}
 BuildRequires:  pkgconfig(libva) >= 0.38.0
 %endif
@@ -173,6 +164,7 @@ BuildRequires:  (crate(proc-macro2) >= 1.0.56 with crate(proc-macro2) < 2)
 BuildRequires:  (crate(quote) >= 1.0.25 with crate(quote) < 2)
 BuildRequires:  (crate(syn/clone-impls) >= 2.0.15 with crate(syn/clone-impls) < 3)
 BuildRequires:  (crate(unicode-ident) >= 1.0.6 with crate(unicode-ident) < 2)
+BuildRequires:  (crate(rustc-hash) >= 2.0.0 with crate(rustc-hash) < 3)
 %endif
 %if %{with valgrind}
 BuildRequires:  pkgconfig(valgrind)
@@ -180,9 +172,6 @@ BuildRequires:  pkgconfig(valgrind)
 BuildRequires:  python3-devel
 BuildRequires:  python3-yaml
 BuildRequires:  python3-mako
-%if 0%{?with_intel_clc}
-BuildRequires:  python3-ply
-%endif
 BuildRequires:  vulkan-headers
 BuildRequires:  glslang
 %if 0%{?with_vulkan_hw}
@@ -198,6 +187,9 @@ Summary:        Mesa driver filesystem
 Provides:       mesa-dri-filesystem = %{?epoch:%{epoch}:}%{version}-%{release}
 Obsoletes:      mesa-omx-drivers < %{?epoch:%{epoch}:}%{version}-%{release}
 Obsoletes:      mesa-libglapi < %{?epoch:%{epoch}:}%{version}-%{release}
+Obsoletes:      mesa-libxatracker < %{?epoch:%{epoch}:}%{version}-%{release}
+Obsoletes:      mesa-libxatracker-devel < %{?epoch:%{epoch}:}%{version}-%{release}
+
 
 %description filesystem
 %{summary}.
@@ -258,18 +250,11 @@ Recommends:     %{name}-va-drivers%{?_isa}
 %package        va-drivers
 Summary:        Mesa-based VA-API video acceleration drivers
 Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Obsoletes:      %{name}-vaapi-drivers < 22.2.0-5
+Obsoletes:      %{name}-vaapi-drivers < %{?epoch:%{epoch}:}%{version}-%{release}
+Obsoletes:      %{name}-vdpau-drivers < %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:       %{name}-vdpau-drivers = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description va-drivers
-%{summary}.
-%endif
-
-%if 0%{?with_vdpau}
-%package        vdpau-drivers
-Summary:        Mesa-based VDPAU drivers
-Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-
-%description vdpau-drivers
 %{summary}.
 %endif
 
@@ -291,25 +276,6 @@ Provides:       libgbm-devel%{?_isa}
 %description libgbm-devel
 %{summary}.
 
-%if 0%{?with_xa}
-%package libxatracker
-Summary:        Mesa XA state tracker
-Provides:       libxatracker
-Provides:       libxatracker%{?_isa}
-
-%description libxatracker
-%{summary}.
-
-%package libxatracker-devel
-Summary:        Mesa XA state tracker development package
-Requires:       %{name}-libxatracker%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Provides:       libxatracker-devel
-Provides:       libxatracker-devel%{?_isa}
-
-%description libxatracker-devel
-%{summary}.
-%endif
-
 %if 0%{?with_opencl}
 %package libOpenCL
 Summary:        Mesa OpenCL runtime library
@@ -329,20 +295,6 @@ Requires:       %{name}-libOpenCL%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{rele
 %{summary}.
 %endif
 
-%if 0%{?with_nine}
-%package libd3d
-Summary:        Mesa Direct3D9 state tracker
-
-%description libd3d
-%{summary}.
-
-%package libd3d-devel
-Summary:        Mesa Direct3D9 state tracker development package
-Requires:       %{name}-libd3d%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-
-%description libd3d-devel
-%{summary}.
-%endif
 
 %package vulkan-drivers
 Summary:        Mesa Vulkan drivers
@@ -365,8 +317,24 @@ export RUSTFLAGS="%build_rustflags"
 %if 0%{?with_nvk}
 export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 # So... Meson can't actually find them without tweaks
-%define inst_crate_nameversion() %(basename %{cargo_registry}/%{1}-*)
-%define rewrite_wrap_file() sed -e "/source.*/d" -e "s/%{1}-.*/%{inst_crate_nameversion %{1}}/" -i subprojects/%{1}.wrap
+
+%define inst_crate_nameversion() %( \
+  found_dir=$(find %{cargo_registry} -maxdepth 1 -type d -name '%{1}-*' 2>/dev/null | head -n1); \
+  if [ -n "$found_dir" ]; then basename "$found_dir"; fi \
+)
+
+%define rewrite_wrap_file() \
+  wrapfile=$(find subprojects -maxdepth 1 -name '%{1}*.wrap' | head -n1) && \
+  if [ -z "$wrapfile" ]; then \
+    echo "ERROR: .wrap file not found for crate %{1}" >&2; exit 1; \
+  fi && \
+  crate_dir="%{expand:%%inst_crate_nameversion %{1}}" && \
+  if [ -z "$crate_dir" ]; then \
+    echo "ERROR: Crate directory not found in %{cargo_registry} for %{1}" >&2; exit 1; \
+  fi && \
+  echo "→ Rewriting $wrapfile to use directory = $crate_dir" && \
+  sed -i -e '/^source_/d' -e "s|^directory = .*|directory = ${crate_dir}|" "$wrapfile"
+
 
 %rewrite_wrap_file paste
 %rewrite_wrap_file proc-macro2
@@ -387,34 +355,23 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 %else
   -Dgallium-drivers=llvmpipe,softpipe,virgl \
 %endif
-  -Dgallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
+  -Dgallium-mediafoundation=disabled \
   -Dgallium-va=%{?with_va:enabled}%{!?with_va:disabled} \
-  -Dgallium-xa=%{?with_xa:enabled}%{!?with_xa:disabled} \
-  -Dgallium-nine=%{?with_nine:true}%{!?with_nine:false} \
-  -Dgallium-opencl=%{?with_opencl:icd}%{!?with_opencl:disabled} \
- %if 0%{?with_opencl_rust}
-  -Dgallium-rusticl=true \
- %endif
+  -Dgallium-rusticl=%{?with_opencl:true}%{!?with_opencl:false} \
   -Dvulkan-drivers=%{?vulkan_drivers} \
   -Dvulkan-layers=device-select%{?with_vulkan_overlay:,overlay} \
-  -Dshared-glapi=enabled \
   -Dgles1=enabled \
   -Dgles2=enabled \
   -Dopengl=true \
-  -Dgbm=enabled \
   -Dglx=dri \
   -Degl=enabled \
   -Dglvnd=enabled \
-%if 0%{?with_intel_clc}
-  -Dintel-clc=enabled \
-%endif
   -Dintel-rt=%{?with_intel_vk_rt:enabled}%{!?with_intel_vk_rt:disabled} \
   -Dmicrosoft-clc=disabled \
   -Dllvm=enabled \
   -Dshared-llvm=enabled \
   -Dvalgrind=%{?with_valgrind:enabled}%{!?with_valgrind:disabled} \
   -Dbuild-tests=false \
-  -Dselinux=true \
 %if !0%{?with_libunwind}
   -Dlibunwind=disabled \
 %endif
@@ -432,9 +389,7 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 %install
 %meson_install
 
-# libvdpau opens the versioned name, don't bother including the unversioned
-rm -vf %{buildroot}%{_libdir}/vdpau/*.so
-# likewise glvnd
+# glvnd opens the versioned name, don't bother including the unversioned
 rm -vf %{buildroot}%{_libdir}/libGLX_mesa.so
 rm -vf %{buildroot}%{_libdir}/libEGL_mesa.so
 # XXX can we just not build this
@@ -456,9 +411,7 @@ popd
 %doc docs/Mesa-MLAA-License-Clarification-Email.txt
 %dir %{_libdir}/dri
 %if 0%{?with_hardware}
-%if 0%{?with_vdpau}
-%dir %{_libdir}/vdpau
-%endif
+
 %endif
 
 %files libGL
@@ -480,54 +433,23 @@ popd
 %{_libdir}/gbm/dri_gbm.so
 %{_libdir}/libgbm.so.1
 %{_libdir}/libgbm.so.1.*
+%{_includedir}/gbm_backend_abi.h
+
 %files libgbm-devel
 %{_libdir}/libgbm.so
 %{_includedir}/gbm.h
 %{_libdir}/pkgconfig/gbm.pc
 
-%if 0%{?with_xa}
-%files libxatracker
-%if 0%{?with_hardware}
-%{_libdir}/libxatracker.so.2
-%{_libdir}/libxatracker.so.2.*
-%endif
-
-%files libxatracker-devel
-%if 0%{?with_hardware}
-%{_libdir}/libxatracker.so
-%{_includedir}/xa_tracker.h
-%{_includedir}/xa_composite.h
-%{_includedir}/xa_context.h
-%{_libdir}/pkgconfig/xatracker.pc
-%endif
-%endif
 
 %if 0%{?with_opencl}
+
 %files libOpenCL
-%{_libdir}/libMesaOpenCL.so.*
-%if 0%{?with_opencl_rust}
 %{_libdir}/libRusticlOpenCL.so.*
-%endif
-%{_sysconfdir}/OpenCL/vendors/mesa.icd
-%if 0%{?with_opencl_rust}
 %{_sysconfdir}/OpenCL/vendors/rusticl.icd
-%endif
+
 %files libOpenCL-devel
-%{_libdir}/libMesaOpenCL.so
-%if 0%{?with_opencl_rust}
 %{_libdir}/libRusticlOpenCL.so
-%endif
-%endif
 
-%if 0%{?with_nine}
-%files libd3d
-%dir %{_libdir}/d3d/
-%{_libdir}/d3d/*.so.*
-
-%files libd3d-devel
-%{_libdir}/pkgconfig/d3d.pc
-%{_includedir}/d3dadapter/
-%{_libdir}/d3d/*.so
 %endif
 
 %files dri-drivers
@@ -555,7 +477,9 @@ popd
   %endif
 %endif
 
-%ifarch aarch64 x86_64 %{ix86}
+%ifarch aarch64 %{ix86} x86_64
+  %{_libdir}/dri/hdlcd_dri.so
+  %{_libdir}/dri/apple_dri.so
   %{_libdir}/dri/ingenic-drm_dri.so
   %{_libdir}/dri/imx-drm_dri.so
   %{_libdir}/dri/imx-lcdif_dri.so
@@ -568,6 +492,31 @@ popd
   %{_libdir}/dri/rcar-du_dri.so
   %{_libdir}/dri/sti_dri.so
   %{_libdir}/dri/stm_dri.so
+  # old kmsro drivers
+  %{_libdir}/dri/armada-drm_dri.so
+  %{_libdir}/dri/exynos_dri.so
+  %{_libdir}/dri/gm12u320_dri.so
+  %{_libdir}/dri/hx8357d_dri.so
+  %{_libdir}/dri/ili9163_dri.so
+  %{_libdir}/dri/ili9225_dri.so
+  %{_libdir}/dri/ili9341_dri.so
+  %{_libdir}/dri/ili9486_dri.so
+  %{_libdir}/dri/imx-dcss_dri.so
+  %{_libdir}/dri/mediatek_dri.so
+  %{_libdir}/dri/meson_dri.so
+  %{_libdir}/dri/mi0283qt_dri.so
+  %{_libdir}/dri/pl111_dri.so
+  %{_libdir}/dri/repaper_dri.so
+  %{_libdir}/dri/rockchip_dri.so
+  %{_libdir}/dri/rzg2l-du_dri.so
+  %{_libdir}/dri/ssd130x_dri.so
+  %{_libdir}/dri/st7586_dri.so
+  %{_libdir}/dri/st7735r_dri.so
+  %{_libdir}/dri/sun4i-drm_dri.so
+  %{_libdir}/dri/udl_dri.so
+  %{_libdir}/dri/vkms_dri.so
+  %{_libdir}/dri/zynqmp-dpsub_dri.so
+  # kmsro end
 %endif
 %if 0%{?with_vc4}
 %{_libdir}/dri/vc4_dri.so
@@ -589,8 +538,8 @@ popd
 %{_libdir}/dri/lima_dri.so
 %endif
 %if 0%{?with_panfrost}
+%{_libdir}/dri/panthor_dri.so
 %{_libdir}/dri/panfrost_dri.so
-%{_libdir}/dri/hdlcd_dri.so
 %endif
 %{_libdir}/dri/nouveau_dri.so
 %if 0%{?with_vmware}
@@ -598,39 +547,11 @@ popd
 %endif
 %endif
 %if 0%{?with_hardware}
-%dir %{_libdir}/gallium-pipe
-%{_libdir}/gallium-pipe/*.so
 %{_libdir}/dri/libdril_dri.so
 %{_libdir}/libgallium-*.so
 %endif
 
-# old kmsro drivers
-%{_libdir}/dri/armada-drm_dri.so
-%{_libdir}/dri/exynos_dri.so
-%{_libdir}/dri/gm12u320_dri.so
-%{_libdir}/dri/hx8357d_dri.so
-%{_libdir}/dri/ili9163_dri.so
-%{_libdir}/dri/ili9225_dri.so
-%{_libdir}/dri/ili9341_dri.so
-%{_libdir}/dri/ili9486_dri.so
-%{_libdir}/dri/imx-dcss_dri.so
-%{_libdir}/dri/mediatek_dri.so
-%{_libdir}/dri/meson_dri.so
-%{_libdir}/dri/mi0283qt_dri.so
-%{_libdir}/dri/panthor_dri.so
-%{_libdir}/dri/pl111_dri.so
-%{_libdir}/dri/repaper_dri.so
-%{_libdir}/dri/rockchip_dri.so
-%{_libdir}/dri/rzg2l-du_dri.so
-%{_libdir}/dri/ssd130x_dri.so
-%{_libdir}/dri/st7586_dri.so
-%{_libdir}/dri/st7735r_dri.so
-%{_libdir}/dri/sun4i-drm_dri.so
-%{_libdir}/dri/udl_dri.so
-%{_libdir}/dri/vkms_dri.so
-%{_libdir}/dri/zynqmp-dpsub_dri.so
 %{_libdir}/dri/zink_dri.so
-# kmsro end
 
 %if 0%{?with_hardware}
 %if 0%{?with_va}
@@ -644,18 +565,6 @@ popd
 %endif
 %{_libdir}/dri/virtio_gpu_drv_video.so
 %endif
-
-%if 0%{?with_vdpau}
-%files vdpau-drivers
-%{_libdir}/vdpau/libvdpau_nouveau.so.1*
-%if 0%{?with_r600}
-%{_libdir}/vdpau/libvdpau_r600.so.1*
-%endif
-%if 0%{?with_radeonsi}
-%{_libdir}/vdpau/libvdpau_radeonsi.so.1*
-%endif
-%endif
-%{_libdir}/vdpau/libvdpau_virtio_gpu.so.1*
 %endif
 
 %files vulkan-drivers
@@ -682,7 +591,7 @@ popd
   %{_datadir}/vulkan/icd.d/intel_icd.*.json
   %{_datadir}/vulkan/icd.d/intel_hasvk_icd.*.json
 %endif
-%ifarch aarch64 x86_64 %{ix86}
+%ifarch aarch64
   %{_libdir}/libvulkan_broadcom.so
   %{_datadir}/vulkan/icd.d/broadcom_icd.*.json
   %{_libdir}/libvulkan_freedreno.so
@@ -696,6 +605,38 @@ popd
 %endif
 
 %changelog
+* Wed Sep 17 2025 Mihai Vultur <xanto@egaming.ro>
+  Disable compiling of ARM specific drivers in x86_64 builds
+
+* Thu Sep 11 2025 Mihai Vultur <xanto@egaming.ro>
+  Remove 'gallium-vdpau' option after:
+  https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/36632
+
+* Fri Aug 08 2025 Mihai Vultur <xanto@egaming.ro>
+  Remove 'intel-clc' option after:
+  https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/36625
+
+* Thu Aug 07 2025 Mihai Vultur <xanto@egaming.ro>
+  Modify 'rewrite_wrap_file' define to also modify the directory = directive in meson wrap.
+  Because it seems that meson can't reliably use those by default.
+
+* Sun May 25 2025 Mihai Vultur <xanto@egaming.ro>
+  Don't use 'gallium-xa' anymore.
+  Explicitely set -Dgallium-mediafoundation=disabled
+  https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/35113
+
+* Wed May 21 2025 Mihai Vultur <xanto@egaming.ro>
+  Add 'rustc-hash' dependency required for building nvk.
+  https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/34865
+
+* Thu Apr 17 2025 Mihai Vultur <xanto@egaming.ro>
+  Remove 'gallium-opencl' now that clover was removed. 
+  https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/19385
+
+* Fri Apr 11 2025 Mihai Vultur <xanto@egaming.ro>
+  support building with system libgbm
+  https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/33890
+
 * Sat Mar 29 2025 Mihai Vultur <xanto@egaming.ro>
   swrast has been removed in favor of softpipe+llvmpipe:
   https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/34217
