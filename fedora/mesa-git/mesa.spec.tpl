@@ -341,6 +341,7 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 %rewrite_wrap_file quote
 %rewrite_wrap_file syn
 %rewrite_wrap_file unicode-ident
+%rewrite_wrap_file rustc-hash
 %endif 
 
 # We've gotten a report that enabling LTO for mesa breaks some games. See
