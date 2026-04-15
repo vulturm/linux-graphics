@@ -10,7 +10,7 @@
 
 %define commit 0cec71d7ce0a793b35aca7c142f511417c3fd57a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20260414.18
+%global commit_date 20260415.03
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %global hw_video_codecs_free vc1dec,av1dec,av1enc,vp9dec
@@ -341,6 +341,7 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 %rewrite_wrap_file quote
 %rewrite_wrap_file syn
 %rewrite_wrap_file unicode-ident
+%rewrite_wrap_file rustc-hash
 %endif 
 
 # We've gotten a report that enabling LTO for mesa breaks some games. See
