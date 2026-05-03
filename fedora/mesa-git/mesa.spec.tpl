@@ -100,6 +100,8 @@ BuildRequires:  cbindgen
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
+BuildRequires:  libstdc++-devel
+BuildRequires:  libstdc++-static
 %if 0%{?with_hardware}
 BuildRequires:  kernel-headers
 %endif
