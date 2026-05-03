@@ -10,7 +10,7 @@
 
 %define commit a0a88e329de1ea5216736d1042b657adaa547e3e
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20260503.20
+%global commit_date 20260503.21
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %global hw_video_codecs_free vc1dec,av1dec,av1enc,vp9dec
@@ -100,6 +100,8 @@ BuildRequires:  cbindgen
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
+BuildRequires:  libstdc++-devel
+BuildRequires:  libstdc++-static
 %if 0%{?with_hardware}
 BuildRequires:  kernel-headers
 %endif
