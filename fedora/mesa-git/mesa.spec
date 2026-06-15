@@ -8,9 +8,9 @@
 %define version_string 26.2.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 9cf08a325c8d003e1254943fd60151f75bcca4b9
+%define commit 68b21aa375c5fb1b6f19df9682710657b66944ab
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20260615.15
+%global commit_date 20260615.20
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %global hw_video_codecs_free vc1dec,av1dec,av1enc,vp9dec
