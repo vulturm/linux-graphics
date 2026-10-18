@@ -555,6 +555,7 @@ popd
 %endif
 
 %{_libdir}/dri/zink_dri.so
+%{_libdir}/dri/zink_drv_video.so
 
 %if 0%{?with_hardware}
 %if 0%{?with_va}
@@ -608,6 +609,9 @@ popd
 %endif
 
 %changelog
+* Sun Oct 18 2025 Mihai Vultur <xanto@egaming.ro>
+  Also package zink video support.
+
 * Wed Sep 17 2025 Mihai Vultur <xanto@egaming.ro>
   Disable compiling of ARM specific drivers in x86_64 builds
 
