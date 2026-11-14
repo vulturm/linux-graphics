@@ -10,7 +10,7 @@
 
 %define commit 0cec71d7ce0a793b35aca7c142f511417c3fd57a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20260502.23
+%global commit_date 20261114.02
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %global hw_video_codecs_free vc1dec,av1dec,av1enc,vp9dec
@@ -100,6 +100,8 @@ BuildRequires:  cbindgen
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
+BuildRequires:  libstdc++-devel
+BuildRequires:  libstdc++-static
 %if 0%{?with_hardware}
 BuildRequires:  kernel-headers
 %endif
@@ -553,6 +555,7 @@ popd
 %endif
 
 %{_libdir}/dri/zink_dri.so
+%{_libdir}/dri/zink_drv_video.so
 
 %if 0%{?with_hardware}
 %if 0%{?with_va}
@@ -606,6 +609,9 @@ popd
 %endif
 
 %changelog
+* Sun Oct 18 2025 Mihai Vultur <xanto@egaming.ro>
+  Also package zink video support.
+
 * Wed Sep 17 2025 Mihai Vultur <xanto@egaming.ro>
   Disable compiling of ARM specific drivers in x86_64 builds
 
