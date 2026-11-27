@@ -495,6 +495,7 @@ popd
   %{_libdir}/dri/rcar-du_dri.so
   %{_libdir}/dri/sti_dri.so
   %{_libdir}/dri/stm_dri.so
+  %{_libdir}/dri/verisilicon_dri.so
   # old kmsro drivers
   %{_libdir}/dri/armada-drm_dri.so
   %{_libdir}/dri/exynos_dri.so
@@ -609,7 +610,10 @@ popd
 %endif
 
 %changelog
-* Sun Oct 18 2025 Mihai Vultur <xanto@egaming.ro>
+* Sat Nov 28 2026 Mihai Vultur <xanto@egaming.ro>
+  Also package verisilicon_dri.so
+
+* Sun Oct 18 2026 Mihai Vultur <xanto@egaming.ro>
   Also package zink video support.
 
 * Wed Sep 17 2025 Mihai Vultur <xanto@egaming.ro>
