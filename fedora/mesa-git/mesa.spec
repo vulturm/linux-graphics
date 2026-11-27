@@ -8,9 +8,9 @@
 %define version_string 27.0.0
 %global version_major %(ver=%{version_string}; echo ${ver%.*.*})
 
-%define commit 57d8cc51b20a85270b93e0378eea912467ec35a0
+%define commit 1988f68d095bf04092003ea49db52e73825f4a13
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20261128.00
+%global commit_date 20261128.01
 %global gitrel .%{commit_date}.%{shortcommit}
 
 %global hw_video_codecs_free vc1dec,av1dec,av1enc,vp9dec
@@ -495,6 +495,7 @@ popd
   %{_libdir}/dri/rcar-du_dri.so
   %{_libdir}/dri/sti_dri.so
   %{_libdir}/dri/stm_dri.so
+  %{_libdir}/dri/verisilicon_dri.so
   # old kmsro drivers
   %{_libdir}/dri/armada-drm_dri.so
   %{_libdir}/dri/exynos_dri.so
@@ -609,7 +610,10 @@ popd
 %endif
 
 %changelog
-* Sun Oct 18 2025 Mihai Vultur <xanto@egaming.ro>
+* Sat Nov 28 2026 Mihai Vultur <xanto@egaming.ro>
+  Also package verisilicon_dri.so
+
+* Sun Oct 18 2026 Mihai Vultur <xanto@egaming.ro>
   Also package zink video support.
 
 * Wed Sep 17 2025 Mihai Vultur <xanto@egaming.ro>
